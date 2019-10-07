@@ -84,6 +84,13 @@ namespace Pringine {
             // check if window was crossed
             if(input_handler->was_crossed())
                 is_running = false;
+            
+            if(input_handler->get_key_down(SDLK_q))
+            {
+                
+                is_running = false;
+                log_detailed_to(LOGMODE_MONITOR, LOGTYPE_GENERAL, 0, NULL, "Key 'q' pressed", NULL);
+            }
         }
     }
     
