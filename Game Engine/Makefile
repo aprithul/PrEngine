@@ -1,38 +1,31 @@
-PreEngine:  FrameRateCounter.o FrameRateRegulatorComponent.o Engine.o Component.o Input.o Matrix4x4f.o TimeComponent.o Vector2f.o Vector3f.o RendererComponent_SDL.o main.o
-	g++ -std=c++11 FrameRateCounter.o FrameRateRegulatorComponent.o Engine.o Component.o Input.o Matrix4x4f.o TimeComponent.o Vector2f.o Vector3f.o RendererComponent_SDL.o main.o -o ./Build/PreEngine -I/Library/Frameworks/SDL2.framework/Headers -F/Library/Frameworks -framework SDL2
+INC_DIR := ./Sources
+SRC_DIR := ./Sources
+OBJ_DIR := ./Build
 
-main.o: main.cpp
-	g++ -std=c++11 -c main.cpp
+CC       := g++
+CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11
+CXXFLAGS := -Wall
+LDLIBS   := -lSDL2
 
-Engine.o: Engine.cpp Engine.hpp
-	g++ -std=c++11 -c Engine.cpp
+SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
+DEPS    := $(wildcard $(OBJ_DIR)/*.d)
 
-Component.o: Component.cpp Component.hpp
-	g++ -std=c++11 -c Component.cpp
+.PHONY: clean
 
-FrameRateCounter.o: FrameRateCounter.cpp FrameRateCounter.hpp
-	g++ -std=c++11 -c FrameRateCounter.cpp
+Pringine: $(OBJECTS)
+	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-FrameRateRegulatorComponent.o: FrameRateRegulatorComponent.cpp FrameRateRegulatorComponent.hpp
-	g++ -std=c++11 -c FrameRateRegulatorComponent.cpp
+$(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $(OUTPUT_OPTION) $<
 
-Input.o: Input.cpp Input.hpp
-	g++ -std=c++11 -c Input.cpp
+clean: ; $(RM) $(DEPS) $(OBJECTS)
 
-Matrix4x4f.o: Matrix4x4f.cpp Matrix4x4f.hpp
-	g++ -std=c++11 -c Matrix4x4f.cpp
+include $(DEPS)
 
-RendererComponent_SDL.o: RendererComponent_SDL.cpp RendererComponent_SDL.hpp
-	g++ -std=c++11 -c RendererComponent_SDL.cpp
-
-TimeComponent.o: TimeComponent.cpp TimeComponent.hpp
-	g++ -std=c++11 -c TimeComponent.cpp
-
-Vector2f.o: Vector2f.cpp Vector2f.hpp
-	g++ -std=c++11 -c Vector2f.cpp
-
-Vector3f.o: Vector3f.cpp Vector3f.hpp
-	g++ -std=c++11 -c Vector3f.cpp
-
-clean:
-	rm -f *.o
+$(MAKEFILE_LIST): ;
+%:: %,v
+%:: RCS/%,v
+%:: RCS/%
+%:: s.%
+%:: SCCS/s.%

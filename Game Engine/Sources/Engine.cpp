@@ -8,7 +8,6 @@
 
 #include "Engine.hpp"
 #include "Input.hpp"
-#include "RendererComponent.hpp"
 
 namespace Pringine {
     
