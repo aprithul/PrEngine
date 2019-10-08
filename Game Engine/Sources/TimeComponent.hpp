@@ -11,6 +11,7 @@
 
 #include <iostream>
 #include "Component.hpp"
+#include "SDL2/SDL.h"
 
 namespace Pringine {
     class Time: public Component

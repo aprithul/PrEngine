@@ -10,6 +10,7 @@
 #define Component_hpp
 
 #include <iostream>
+#include "SDL2/SDL.h"
 
 namespace Pringine {
     

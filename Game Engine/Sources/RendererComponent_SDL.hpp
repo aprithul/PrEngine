@@ -6,16 +6,26 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#ifndef DisplayAuto_h
-#define DisplayAuto_h
+#ifndef RENDERCOMPONENET_HPP
+#define RENDERCOMPONENET_HPP
 
 #include "Component.hpp"
 #include "TimeComponent.hpp"
+#include "LoggerComponenet.hpp"
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 namespace Pringine {
     
+    // globally required functions that are related to renderer but shouldn't require access to the renderer
+    extern SDL_Renderer* current_renderer;
+    extern SDL_Renderer* get_current_renderer();
+    extern void set_current_renderer(SDL_Renderer* _renderer);
+    extern SDL_Texture* load_texture(const std::string &file, SDL_Renderer *ren); 
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     class RendererComponent_SDL : public Component
     {
     public:

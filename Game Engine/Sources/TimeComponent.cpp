@@ -8,7 +8,6 @@
 
 
 #include "TimeComponent.hpp"
-#include "SDL2/SDL.h"
 
 namespace Pringine {
     

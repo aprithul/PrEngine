@@ -7,7 +7,6 @@
 //
 
 #include "Input.hpp"
-#include <iostream>
 
 namespace Pringine {
     

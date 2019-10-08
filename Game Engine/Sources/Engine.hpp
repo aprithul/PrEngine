@@ -10,8 +10,12 @@
 #define Engine_hpp
 
 #include "Component.hpp"
+#include "Utils.hpp"
+#include "Input.hpp"
 #include <map>
 #include <iostream>
+#include "LoggerComponenet.hpp"
+
 
 namespace Pringine {
     // pair typedef, used as component map key

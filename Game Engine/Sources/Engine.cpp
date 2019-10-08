@@ -7,13 +7,11 @@
 //
 
 #include "Engine.hpp"
-#include "Input.hpp"
 
 namespace Pringine {
     
     Engine::Engine()
     {
-        
     }
     
     Engine::~Engine()
@@ -89,7 +87,7 @@ namespace Pringine {
             {
                 
                 is_running = false;
-                log_detailed_to(LOGMODE_MONITOR, LOGTYPE_GENERAL, 0, NULL, "Key 'q' pressed", NULL);
+                log_to(LOGTYPE_GENERAL, "Key 'q' pressed");
             }
         }
     }

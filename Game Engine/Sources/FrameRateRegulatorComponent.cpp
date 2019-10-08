@@ -7,7 +7,6 @@
 //
 
 #include "FrameRateRegulatorComponent.hpp"
-#include "SDL2/SDL.h"
 
 namespace Pringine {
     FrameRateRegulator::FrameRateRegulator()

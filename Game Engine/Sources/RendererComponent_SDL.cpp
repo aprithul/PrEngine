@@ -8,6 +8,28 @@
 #include "RendererComponent_SDL.hpp"
 
 namespace Pringine {
+
+    // globally required functions that are related to renderer but shouldn't require access to the renderer
+    SDL_Renderer* current_renderer = NULL;
+
+    SDL_Renderer* get_current_renderer()
+    {
+        //return current_renderer;
+    }
+    void set_current_renderer(SDL_Renderer* _renderer)
+    {
+        //current_renderer = _renderer;
+    }
+    SDL_Texture* load_texture(const std::string &file, SDL_Renderer *ren)
+    {
+        SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
+        if (texture == nullptr)
+        {
+            log_to(LOGTYPE_ERROR, std::string("Couldn't load texture :" + file).c_str());
+        }
+	    return texture;
+    }
+    //////////////////////////////////////////////////////////////////////
     
     // publics
     RendererComponent_SDL::RendererComponent_SDL(int width, int height, std::string title, bool vsync)
@@ -40,6 +62,7 @@ namespace Pringine {
     
     void RendererComponent_SDL::start()
     {
+
     }
     
     void RendererComponent_SDL::update()

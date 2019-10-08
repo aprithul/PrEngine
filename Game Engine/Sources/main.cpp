@@ -4,6 +4,7 @@
 //  Created by Aniruddha Prithul on 7/22/17.
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
+
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "Engine.hpp"
@@ -13,13 +14,15 @@
 #include "FrameRateRegulatorComponent.hpp"
 #include "FrameRateCounter.hpp"
 
+
 bool is_running = true;
 
 int main(int argc, const char * argv[]) {
     
+    SDL_Init(SDL_INIT_EVERYTHING);
+
     // create a new game engine instance
     Pringine::Engine* game_engine = new Pringine::Engine();
-    
     // add the components
     // render, frame regulator and frame counter should be the last three components updated ( and so added to engine )
     game_engine->add_component( "Time",    0, new Pringine::Time());

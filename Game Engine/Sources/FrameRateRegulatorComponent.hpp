@@ -12,6 +12,8 @@
 #include <iostream>
 #include "Component.hpp"
 #include "TimeComponent.hpp"
+#include "SDL2/SDL.h"
+
 
 namespace Pringine {
     class FrameRateRegulator:public Component

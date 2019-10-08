@@ -12,8 +12,9 @@
 #include <stdio.h>
 #include <map>
 #include "Component.hpp"
-#include "Vector2f.hpp"
+#include "Vector2.cpp"
 #include "SDL2/SDL.h"
+#include <iostream>
 
 namespace Pringine {
     class Input:public Component
@@ -27,7 +28,7 @@ namespace Pringine {
         bool get_mouse_button(int button);
         bool get_mouse_button_down(int button);
         bool get_mouse_button_up(int button);
-        Vector2f get_mouse_position();
+        Vector2<float> get_mouse_position();
         bool was_crossed();
         void start() override;
         void end() override;

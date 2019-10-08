@@ -3,9 +3,9 @@ SRC_DIR := ./Sources
 OBJ_DIR := ./Build
 
 CC       := g++
-CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11
+CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11 -g
 CXXFLAGS := -Wall
-LDLIBS   := -lSDL2
+LDLIBS   := -lSDL2 -lSDL2_image
 
 SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
@@ -20,6 +20,9 @@ $(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $(OUTPUT_OPTION) $<
 
 clean: ; $(RM) $(DEPS) $(OBJECTS)
+
+run: Pringine
+	./Pringine
 
 include $(DEPS)
 
