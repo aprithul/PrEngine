@@ -11,8 +11,10 @@
 namespace Pringine
 {
     
-    Component::Component()
+    Component::Component(std::string name, int priority)
     {
+        this->priority = priority;
+        this->name = name;
         this->is_active = true;
     }
     

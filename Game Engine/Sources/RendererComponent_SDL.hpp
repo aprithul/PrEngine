@@ -30,7 +30,7 @@ namespace Pringine {
     {
     public:
 
-        RendererComponent_SDL(int width, int height, std::string title, bool vsync);
+        RendererComponent_SDL(int width, int height, std::string title, bool vsync, std::string name, int priority);
         RendererComponent_SDL();
         ~RendererComponent_SDL();
         

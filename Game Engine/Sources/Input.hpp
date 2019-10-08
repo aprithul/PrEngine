@@ -20,7 +20,7 @@ namespace Pringine {
     class Input:public Component
     {
     public:
-        Input();
+        Input(std::string name, int priority);
         ~Input();
         bool get_key(int keycode);
         bool get_key_up(int keycode);

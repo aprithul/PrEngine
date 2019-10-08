@@ -32,7 +32,7 @@ namespace Pringine {
     //////////////////////////////////////////////////////////////////////
     
     // publics
-    RendererComponent_SDL::RendererComponent_SDL(int width, int height, std::string title, bool vsync)
+    RendererComponent_SDL::RendererComponent_SDL(int width, int height, std::string title, bool vsync,std::string name, int priority):Component(name,priority)
     {
         // initialize SDL video
         SDL_Init(SDL_INIT_VIDEO);

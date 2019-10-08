@@ -17,7 +17,7 @@ namespace Pringine {
     class Time: public Component
     {
     public:
-        Time();
+        Time(std::string name, int priority);
         ~Time();
         void update() override;
         void start() override;

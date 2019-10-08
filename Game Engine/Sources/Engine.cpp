@@ -17,33 +17,40 @@ namespace Pringine {
     Engine::~Engine()
     {
         
-        // delete each object pointed by iterator, cause clearing before that will cause only the pointers to get deleted
-        // but the objects themselves will remain in memory, causing memory leak
-        for(std::map< string_int_pair,Component*>::iterator it = engine_components.begin(); it!=engine_components.end(); ++it)
+        for(int _i=0; _i<engine_components.size(); _i++)
         {
-            delete (it->second);
+            delete engine_components[_i];
         }
         // can safley clear now
         engine_components.clear();
-        std::cout<<"engine destructor"<<std::endl;
+        log_to(LOGTYPE_GENERAL, "Engine destroyed");
     }
     
-    // add a new component to the engine
-    Component* Engine::add_component(std::string component_name, int order, Pringine::Component* component)
+    static bool priority_comparer(Component* a, Component* b)
     {
-        string_int_pair key(component_name,order);
-        engine_components[key] = component;
-        std::cout<<"Component "<<component_name<<" added to engine"<<std::endl;
+        return (a->priority<b->priority);        
+    }
+
+    // add a new component to the engine
+    Component* Engine::add_component(Component* component)
+    {
+        //string_int_pair key(component_name,order);
+        //engine_components[key] = component;
+        engine_components.push_back(component);
+        //std::sort(engine_components.begin(), engine_components.end(), priority_comparer);
+        //std::cout<<"Component "<<component_name<<" added to engine"<<std::endl;
         return component;
     }
     
     // get the specified component
     Component* Engine::get_component(std::string component_name)
     {
-        for(std::map< string_int_pair,Component*>::iterator it = engine_components.begin(); it!=engine_components.end(); ++it)
+        for(int _i=0; _i<engine_components.size(); _i++)
         {
-            if((it->first).first == component_name)
-                return it->second;
+            if(engine_components[_i]->name == component_name)
+            {
+                return engine_components[_i];
+            }
         }
         
         return NULL;
@@ -53,30 +60,31 @@ namespace Pringine {
     void Engine::start()
     {
         this->is_running = true;
-        
-        for(std::map< string_int_pair,Component*>::iterator it = engine_components.begin(); it!=engine_components.end(); ++it)
+        for(int _i=0; _i<engine_components.size(); _i++)
         {
-            (*(it->second)).start();
+                engine_components[_i]->start();
         }
-        
-        std::cout<<"Engine started"<<std::endl;
+
+        // get the reference to the input component
+        input_handler = (Pringine::Input*)this->get_component("Input");
+
+
+        log_to(LOGTYPE_GENERAL, "Engine started");
         
     }
     
     // called every frame
     void Engine::update()
     {
-        // get the reference to the input component
-        Pringine::Input* input_handler = (Pringine::Input*)this->get_component("Input");
-        
+                
         // engine loop
         // updates at specified frame rate
         while(this->is_running)
         {
             // update all components
-            for(std::map< string_int_pair,Component*>::iterator it = engine_components.begin(); it!=engine_components.end(); ++it)
+            for(int _i=0; _i<engine_components.size(); _i++)
             {
-                (*(it->second)).update();
+                engine_components[_i]->update();
             }
             
             // check if window was crossed
@@ -85,24 +93,18 @@ namespace Pringine {
             
             if(input_handler->get_key_down(SDLK_q))
             {
-                
                 is_running = false;
                 log_to(LOGTYPE_GENERAL, "Key 'q' pressed");
             }
         }
     }
     
-    
     // called in the end
     void Engine::end()
     {
-        for(std::map< string_int_pair,Component*>::iterator it = engine_components.begin(); it!=engine_components.end(); ++it)
+        for(int _i=0; _i<engine_components.size(); _i++)
         {
-            (*(it->second)).end();
+            engine_components[_i]->end();
         }
     }
-    
-
-
-    
 }

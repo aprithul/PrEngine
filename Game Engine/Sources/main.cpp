@@ -25,11 +25,11 @@ int main(int argc, const char * argv[]) {
     Pringine::Engine* game_engine = new Pringine::Engine();
     // add the components
     // render, frame regulator and frame counter should be the last three components updated ( and so added to engine )
-    game_engine->add_component( "Time",    0, new Pringine::Time());
-    game_engine->add_component( "Input",    1, new Pringine::Input());
-    Pringine::RendererComponent_SDL* renderer_SDL = (Pringine::RendererComponent_SDL*)game_engine->add_component( "Renderer", 99999, new Pringine::RendererComponent_SDL(800,600,"Pringine",false));
-    Pringine::FrameRateRegulator* frame_rate_regulator = (Pringine::FrameRateRegulator*)game_engine->add_component( "FrameRateRegulator", 100000, new Pringine::FrameRateRegulator());
-    game_engine->add_component("Frame Counter", 100001, new Pringine::FrameRateCounter());
+    game_engine->add_component( new Pringine::Time("Time", 0));
+    game_engine->add_component(new Pringine::Input( "Input", 1));
+    Pringine::RendererComponent_SDL* renderer_SDL = (Pringine::RendererComponent_SDL*)game_engine->add_component(new Pringine::RendererComponent_SDL(800,600,"Pringine",false, "Renderer", 99999));
+    Pringine::FrameRateRegulator* frame_rate_regulator = (Pringine::FrameRateRegulator*)game_engine->add_component( new Pringine::FrameRateRegulator("FrameRateRegulator", 100000));
+    game_engine->add_component(new Pringine::FrameRateCounter("Frame Counter", 100001));
     
     // can't exceed 60fps if vsync is on
     frame_rate_regulator->set_frame_rate(100);

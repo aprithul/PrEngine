@@ -19,7 +19,7 @@ namespace Pringine {
     class FrameRateRegulator:public Component
     {
     public:
-        FrameRateRegulator();
+        FrameRateRegulator(std::string name, int priority);
         ~FrameRateRegulator();
         void start() override;
         void update() override;

@@ -15,7 +15,7 @@ namespace Pringine {
     double Time::current_frame_start_time;
     double Time::last_frame_start_time;
     
-    Time::Time():Pringine::Component()
+    Time::Time(std::string name, int priority):Component(name,priority)
     {
     }
     

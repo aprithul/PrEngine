@@ -16,7 +16,7 @@ namespace Pringine {
     class FrameRateCounter:public Component
     {
     public:
-        FrameRateCounter();
+        FrameRateCounter(std::string name, int priority);
         ~FrameRateCounter();
     private:
         void start() override;

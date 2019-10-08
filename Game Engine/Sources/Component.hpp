@@ -10,6 +10,7 @@
 #define Component_hpp
 
 #include <iostream>
+#include <string>
 #include "SDL2/SDL.h"
 
 namespace Pringine {
@@ -18,12 +19,14 @@ namespace Pringine {
     class Component
     {
     public:
-        bool is_active;
-        Component();
+        Component(std::string, int name);
         virtual ~Component();
         virtual void start() = 0;
         virtual void update() = 0;
         virtual void end() = 0;
+        bool is_active;
+        std::string name;
+        int priority;
         
     };
 }
