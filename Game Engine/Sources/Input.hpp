@@ -11,13 +11,13 @@
 
 #include <stdio.h>
 #include <map>
-#include "Component.hpp"
-#include "Vector2.cpp"
+#include "Module.hpp"
+#include "Vector2.hpp"
 #include "SDL2/SDL.h"
 #include <iostream>
 
 namespace Pringine {
-    class Input:public Component
+    class Input:public Module
     {
     public:
         Input(std::string name, int priority);

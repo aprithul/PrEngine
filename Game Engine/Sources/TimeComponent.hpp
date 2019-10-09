@@ -10,11 +10,11 @@
 #define TimeComponent_hpp
 
 #include <iostream>
-#include "Component.hpp"
+#include "Module.hpp"
 #include "SDL2/SDL.h"
 
 namespace Pringine {
-    class Time: public Component
+    class Time: public Module
     {
     public:
         Time(std::string name, int priority);

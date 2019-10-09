@@ -9,7 +9,7 @@
 #ifndef RENDERCOMPONENET_HPP
 #define RENDERCOMPONENET_HPP
 
-#include "Component.hpp"
+#include "Module.hpp"
 #include "TimeComponent.hpp"
 #include "LoggerComponenet.hpp"
 #include <iostream>
@@ -26,7 +26,7 @@ namespace Pringine {
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-    class RendererComponent_SDL : public Component
+    class RendererComponent_SDL : public Module
     {
     public:
 

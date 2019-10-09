@@ -36,5 +36,4 @@ namespace Pringine
         return this->graphics_frames[index];
     }
 
-
 }

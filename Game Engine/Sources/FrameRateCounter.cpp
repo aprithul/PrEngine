@@ -10,7 +10,7 @@
 
 namespace Pringine {
     
-    FrameRateCounter::FrameRateCounter(std::string name, int priority):Component(name,priority)
+    FrameRateCounter::FrameRateCounter(std::string name, int priority):Module(name,priority)
     {
         one_second = 0;
     }

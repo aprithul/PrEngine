@@ -9,7 +9,7 @@
 #include "FrameRateRegulatorComponent.hpp"
 
 namespace Pringine {
-    FrameRateRegulator::FrameRateRegulator(std::string name, int priority):Component(name,priority)
+    FrameRateRegulator::FrameRateRegulator(std::string name, int priority):Module(name,priority)
     {
     }
     

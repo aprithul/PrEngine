@@ -6,8 +6,8 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#ifndef Component_hpp
-#define Component_hpp
+#ifndef MODULE_HPP
+#define MODULE_HPP
 
 #include <iostream>
 #include <string>
@@ -16,11 +16,11 @@
 namespace Pringine {
     
     // every component class extends this
-    class Component
+    class Module
     {
     public:
-        Component(std::string, int name);
-        virtual ~Component();
+        Module(std::string, int name);
+        virtual ~Module();
         virtual void start() = 0;
         virtual void update() = 0;
         virtual void end() = 0;

@@ -10,10 +10,10 @@
 #define FrameRateCounter_hpp
 
 #include <iostream>
-#include "Component.hpp"
+#include "Module.hpp"
 #include "TimeComponent.hpp"
 namespace Pringine {
-    class FrameRateCounter:public Component
+    class FrameRateCounter:public Module
     {
     public:
         FrameRateCounter(std::string name, int priority);

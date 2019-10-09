@@ -10,13 +10,13 @@
 #define FrameRateRegulatorComponent_hpp
 
 #include <iostream>
-#include "Component.hpp"
+#include "Module.hpp"
 #include "TimeComponent.hpp"
 #include "SDL2/SDL.h"
 
 
 namespace Pringine {
-    class FrameRateRegulator:public Component
+    class FrameRateRegulator:public Module
     {
     public:
         FrameRateRegulator(std::string name, int priority);

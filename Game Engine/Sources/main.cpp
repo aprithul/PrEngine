@@ -13,6 +13,7 @@
 #include "TimeComponent.hpp"
 #include "FrameRateRegulatorComponent.hpp"
 #include "FrameRateCounter.hpp"
+#include "EntityManagementSystem.hpp"
 
 
 bool is_running = true;
@@ -27,6 +28,7 @@ int main(int argc, const char * argv[]) {
     // render, frame regulator and frame counter should be the last three components updated ( and so added to engine )
     game_engine->add_component( new Pringine::Time("Time", 0));
     game_engine->add_component(new Pringine::Input( "Input", 1));
+    Pringine::EntityManagementSystem* entity_management_system = ( Pringine::EntityManagementSystem*)game_engine->add_component(new Pringine::EntityManagementSystem("Entity Management System", 2));
     Pringine::RendererComponent_SDL* renderer_SDL = (Pringine::RendererComponent_SDL*)game_engine->add_component(new Pringine::RendererComponent_SDL(800,600,"Pringine",false, "Renderer", 99999));
     Pringine::FrameRateRegulator* frame_rate_regulator = (Pringine::FrameRateRegulator*)game_engine->add_component( new Pringine::FrameRateRegulator("FrameRateRegulator", 100000));
     game_engine->add_component(new Pringine::FrameRateCounter("Frame Counter", 100001));

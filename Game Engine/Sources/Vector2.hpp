@@ -18,27 +18,54 @@ namespace Pringine {
     class Vector2
     {
     public:
-    
-        Vector2();
-        Vector2(T x, T y);
-        ~Vector2();
-
-        T get_x() const;
-        T get_y() const;
-        void set_x(T x);
-        void set_y(T y);
-
-        Vector2 operator+(const Vector2& v);
-        Vector2 operator+=(const Vector2& v);
-        Vector2 operator-(const Vector2& v);
-        T operator*(const Vector2& v);
-        Vector2 operator/(const T v);
-        Vector2 normalize();
-        float length();
-        
-    private:
         T x,y;
         
+        Vector2()
+        {
+
+        }
+
+        Vector2(T x, T y)
+        {
+            this->x = x;
+            this->y = y;
+        }
+        ~Vector2()
+        {
+
+        }
+
+        Vector2 operator+(const Vector2& v) const
+        {
+            return Vector2<T>( this->x + v.x, this->y + v.y);
+
+        }
+        Vector2 operator+=(const Vector2& v){
+            this->x += v.x;
+            this->y += v.y;
+            return Vector2<T>( this->x, this->y);
+        }
+        Vector2 operator-(const Vector2& v) const{
+            return Vector2<T>( this->x - v.x, this->y - v.y);
+        }
+        T operator*(const Vector2& v) const{
+            return (this->x * v.x + this->y * v.y);
+        }
+        Vector2 operator/(const T v) const{
+        return Vector2<T>( this->x / v, this->y / v);
+
+        }
+        Vector2 normalize(){
+        double len = length();
+        x /= len;
+        y /= len;
+        return (*this);
+        }
+        float length() const{
+        return sqrt( x*x + y*y);
+
+        }
     };
+        
 }
 #endif /* Vector2_hpp */

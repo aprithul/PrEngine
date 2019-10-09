@@ -32,7 +32,7 @@ namespace Pringine {
     //////////////////////////////////////////////////////////////////////
     
     // publics
-    RendererComponent_SDL::RendererComponent_SDL(int width, int height, std::string title, bool vsync,std::string name, int priority):Component(name,priority)
+    RendererComponent_SDL::RendererComponent_SDL(int width, int height, std::string title, bool vsync,std::string name, int priority):Module(name,priority)
     {
         // initialize SDL video
         SDL_Init(SDL_INIT_VIDEO);
@@ -43,7 +43,7 @@ namespace Pringine {
         
         // create window and sdl_renderer
         set_vsync(vsync);
-        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_SHOWN);
+        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN);
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
         set_clear_color(255,0,0,255);
     }
@@ -77,7 +77,7 @@ namespace Pringine {
 
     void RendererComponent_SDL::end()
     {
-        std::cout<<"RendererComponent Ended"<<std::endl;
+        log_to(LOGTYPE_GENERAL, "RendererComponent Ended");
     }
 
         

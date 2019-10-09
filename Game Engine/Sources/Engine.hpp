@@ -9,7 +9,7 @@
 #ifndef Engine_hpp
 #define Engine_hpp
 
-#include "Component.hpp"
+#include "Module.hpp"
 #include "Utils.hpp"
 #include "Input.hpp"
 #include <map>
@@ -39,8 +39,8 @@ namespace Pringine {
     public:
         Engine();
         ~Engine();
-        Component* add_component(Component* component);
-        Component* get_component(std::string);
+        Module* add_component(Module* component);
+        Module* get_component(std::string);
         void start();
         void update();
         void end();
@@ -50,8 +50,8 @@ namespace Pringine {
         // map to store all components
         // sorted in execution order
         //std::map< string_int_pair, Component*, CompareComponent> engine_components;
-        static bool priority_comparer(Component* a, Component* b);
-        std::vector<Component*> engine_components;
+        static bool priority_comparer(Module* a, Module* b);
+        std::vector<Module*> engine_components;
         Input* input_handler;
         int frame_rate;
         double frame_delta;

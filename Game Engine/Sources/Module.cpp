@@ -6,19 +6,19 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#include "Component.hpp"
+#include "Module.hpp"
 
 namespace Pringine
 {
     
-    Component::Component(std::string name, int priority)
+    Module::Module(std::string name, int priority)
     {
         this->priority = priority;
         this->name = name;
         this->is_active = true;
     }
     
-    Component::~Component()
+    Module::~Module()
     {
         
     }

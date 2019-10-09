@@ -1,11 +1,12 @@
 #ifndef GRAPHICS_HPP
 #define GRAPHICS_HPP
+
 #include <SDL2/SDL.h>
 #include "Utils.hpp"
-#include "RendererComponent_SDL.hpp"
+#include "Module.hpp"
 #include <string>
 #include "LoggerComponenet.hpp"
-
+#include "RendererComponent_SDL.hpp"
 
 namespace Pringine
 {

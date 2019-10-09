@@ -26,13 +26,13 @@ namespace Pringine {
         log_to(LOGTYPE_GENERAL, "Engine destroyed");
     }
     
-    static bool priority_comparer(Component* a, Component* b)
+    static bool priority_comparer(Module* a, Module* b)
     {
         return (a->priority<b->priority);        
     }
 
     // add a new component to the engine
-    Component* Engine::add_component(Component* component)
+    Module* Engine::add_component(Module* component)
     {
         //string_int_pair key(component_name,order);
         //engine_components[key] = component;
@@ -43,7 +43,7 @@ namespace Pringine {
     }
     
     // get the specified component
-    Component* Engine::get_component(std::string component_name)
+    Module* Engine::get_component(std::string component_name)
     {
         for(int _i=0; _i<engine_components.size(); _i++)
         {

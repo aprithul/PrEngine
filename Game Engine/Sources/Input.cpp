@@ -10,7 +10,7 @@
 
 namespace Pringine {
     
-    Input::Input(std::string name, int priority):Component(name,priority)
+    Input::Input(std::string name, int priority):Module(name,priority)
     {
     }
     
