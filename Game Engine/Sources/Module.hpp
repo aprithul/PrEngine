@@ -9,7 +9,6 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
-#include <iostream>
 #include <string>
 #include "SDL2/SDL.h"
 

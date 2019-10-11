@@ -3,6 +3,7 @@
 
 #include "Module.hpp"
 #include "Entity.hpp"
+#include "Logger.hpp"
 #include <vector>
 #include <queue>
 #define MAX_ENTITY_ID 999999
@@ -25,6 +26,7 @@ namespace Pringine
         private:
             Entity* entities[MAX_ENTITY_ID];
             std::queue<int> released_ids;
+            static int current_max_entity_id;
             static int entity_count;
     };
 }

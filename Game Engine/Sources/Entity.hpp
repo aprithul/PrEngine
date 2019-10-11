@@ -1,9 +1,8 @@
 #ifndef ENTITY_HPP
 #define ENTITY_HPP
 
+#include <string>
 #include "Transform.hpp"
-#include "Graphics.hpp"
-
 namespace Pringine
 {
     class Entity
@@ -16,7 +15,7 @@ namespace Pringine
             int id;
             std::string name;
             bool is_sleeping;
-
+            
             virtual void awake();
             virtual void start();
             virtual void update();

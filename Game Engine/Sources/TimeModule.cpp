@@ -7,7 +7,7 @@
 //
 
 
-#include "TimeComponent.hpp"
+#include "TimeModule.hpp"
 
 namespace Pringine {
     

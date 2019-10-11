@@ -6,7 +6,7 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#include "FrameRateCounter.hpp"
+#include "FrameRateCounterModule.hpp"
 
 namespace Pringine {
     
@@ -22,7 +22,7 @@ namespace Pringine {
     
     void FrameRateCounter::start()
     {
-        
+        this->frame_count = 0;
     }
     
     void FrameRateCounter::update()
@@ -32,7 +32,8 @@ namespace Pringine {
         
         if(one_second>=1.0)
         {
-            std::cout<<"frame rate: "<< frame_count<<std::endl;
+            LOG(LOGTYPE_GENERAL, std::string("frame rate: ").append(std::to_string(frame_count)));
+            //std::cout<<"frame rate: "<< frame_count<<std::endl;
             frame_count = 0;
             one_second -= 1.0;
         }

@@ -6,17 +6,16 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#ifndef Engine_hpp
-#define Engine_hpp
+#ifndef ENGINE_HPP
+#define ENGINE_HPP
 
 #include "Module.hpp"
 #include "Utils.hpp"
-#include "Input.hpp"
+#include "InputModule.hpp"
+#include "Logger.hpp"
 #include <map>
 #include <vector>
-#include <iostream>
 #include <algorithm>
-#include "LoggerComponenet.hpp"
 
 
 namespace Pringine {
@@ -39,8 +38,8 @@ namespace Pringine {
     public:
         Engine();
         ~Engine();
-        Module* add_component(Module* component);
-        Module* get_component(std::string);
+        Module* add_module(Module* _module);
+        Module* get_module(std::string);
         void start();
         void update();
         void end();
@@ -51,7 +50,7 @@ namespace Pringine {
         // sorted in execution order
         //std::map< string_int_pair, Component*, CompareComponent> engine_components;
         static bool priority_comparer(Module* a, Module* b);
-        std::vector<Module*> engine_components;
+        std::vector<Module*> engine_modules;
         Input* input_handler;
         int frame_rate;
         double frame_delta;

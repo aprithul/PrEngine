@@ -9,7 +9,6 @@
 #ifndef TimeComponent_hpp
 #define TimeComponent_hpp
 
-#include <iostream>
 #include "Module.hpp"
 #include "SDL2/SDL.h"
 

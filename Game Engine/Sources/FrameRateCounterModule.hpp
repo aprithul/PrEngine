@@ -9,9 +9,12 @@
 #ifndef FrameRateCounter_hpp
 #define FrameRateCounter_hpp
 
-#include <iostream>
+#include <string>
 #include "Module.hpp"
-#include "TimeComponent.hpp"
+#include "TimeModule.hpp"
+#include "Logger.hpp"
+
+
 namespace Pringine {
     class FrameRateCounter:public Module
     {

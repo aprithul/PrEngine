@@ -9,9 +9,8 @@
 #ifndef FrameRateRegulatorComponent_hpp
 #define FrameRateRegulatorComponent_hpp
 
-#include <iostream>
 #include "Module.hpp"
-#include "TimeComponent.hpp"
+#include "TimeModule.hpp"
 #include "SDL2/SDL.h"
 
 
@@ -25,8 +24,9 @@ namespace Pringine {
         void update() override;
         void end() override;
         void set_frame_rate(int frame_rate);
+        void set_frame_rate_to_uncapped();
     private:
-        int frame_rate;
+        int target_frame_rate;
         double frame_delta;
         double idle_time;
         double target_time;

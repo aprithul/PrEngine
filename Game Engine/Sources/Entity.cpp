@@ -5,11 +5,12 @@ namespace Pringine
     
     Entity::Entity()
     {
-
+        id = -1;
     }
 
     Entity::Entity(std::string name)
     {
+        id = -1;        
         this->name = name;
     }
     

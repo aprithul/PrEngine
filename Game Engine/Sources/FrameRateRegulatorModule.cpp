@@ -6,7 +6,7 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#include "FrameRateRegulatorComponent.hpp"
+#include "FrameRateRegulatorModule.hpp"
 
 namespace Pringine {
     FrameRateRegulator::FrameRateRegulator(std::string name, int priority):Module(name,priority)
@@ -51,7 +51,13 @@ namespace Pringine {
     
     void FrameRateRegulator::set_frame_rate(int frame_rate)
     {
-        this->frame_rate = frame_rate;
+        this->target_frame_rate = frame_rate;
         this->frame_delta = 1.0/frame_rate;
     }
+
+    void FrameRateRegulator::set_frame_rate_to_uncapped()
+    {
+        this->frame_delta = 0.0f;
+    }
+
 }

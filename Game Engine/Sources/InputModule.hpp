@@ -14,7 +14,6 @@
 #include "Module.hpp"
 #include "Vector2.hpp"
 #include "SDL2/SDL.h"
-#include <iostream>
 
 namespace Pringine {
     class Input:public Module

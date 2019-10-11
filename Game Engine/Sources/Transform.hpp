@@ -12,6 +12,7 @@ namespace Pringine{
             Vector2<float> scale;
             
             Transform();
+            Transform(Vector2<float> position, float angle, Vector2<float> scale);
             ~Transform();
             Vector2<float> translate(const Vector2<float>& translation);
             void rotate(float amount);

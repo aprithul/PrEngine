@@ -17,13 +17,13 @@ namespace Pringine {
     Engine::~Engine()
     {
         
-        for(int _i=0; _i<engine_components.size(); _i++)
+        for(int _i=0; _i<engine_modules.size(); _i++)
         {
-            delete engine_components[_i];
+            delete engine_modules[_i];
         }
         // can safley clear now
-        engine_components.clear();
-        log_to(LOGTYPE_GENERAL, "Engine destroyed");
+        engine_modules.clear();
+        LOG(LOGTYPE_GENERAL, "Engine destroyed");
     }
     
     static bool priority_comparer(Module* a, Module* b)
@@ -32,24 +32,20 @@ namespace Pringine {
     }
 
     // add a new component to the engine
-    Module* Engine::add_component(Module* component)
+    Module* Engine::add_module(Module* component)
     {
-        //string_int_pair key(component_name,order);
-        //engine_components[key] = component;
-        engine_components.push_back(component);
-        //std::sort(engine_components.begin(), engine_components.end(), priority_comparer);
-        //std::cout<<"Component "<<component_name<<" added to engine"<<std::endl;
+        engine_modules.push_back(component);
         return component;
     }
     
     // get the specified component
-    Module* Engine::get_component(std::string component_name)
+    Module* Engine::get_module(std::string component_name)
     {
-        for(int _i=0; _i<engine_components.size(); _i++)
+        for(int _i=0; _i<engine_modules.size(); _i++)
         {
-            if(engine_components[_i]->name == component_name)
+            if(engine_modules[_i]->name == component_name)
             {
-                return engine_components[_i];
+                return engine_modules[_i];
             }
         }
         
@@ -60,16 +56,16 @@ namespace Pringine {
     void Engine::start()
     {
         this->is_running = true;
-        for(int _i=0; _i<engine_components.size(); _i++)
+        for(int _i=0; _i<engine_modules.size(); _i++)
         {
-                engine_components[_i]->start();
+                engine_modules[_i]->start();
         }
 
-        // get the reference to the input component
-        input_handler = (Pringine::Input*)this->get_component("Input");
+        // get the reference to the input module
+        input_handler = (Pringine::Input*)this->get_module("Input");
 
 
-        log_to(LOGTYPE_GENERAL, "Engine started");
+        LOG(LOGTYPE_GENERAL, "Engine started");
         
     }
     
@@ -82,9 +78,9 @@ namespace Pringine {
         while(this->is_running)
         {
             // update all components
-            for(int _i=0; _i<engine_components.size(); _i++)
+            for(int _i=0; _i<engine_modules.size(); _i++)
             {
-                engine_components[_i]->update();
+                engine_modules[_i]->update();
             }
             
             // check if window was crossed
@@ -94,7 +90,7 @@ namespace Pringine {
             if(input_handler->get_key_down(SDLK_q))
             {
                 is_running = false;
-                log_to(LOGTYPE_GENERAL, "Key 'q' pressed");
+                LOG(LOGTYPE_GENERAL, "Key 'q' pressed");
             }
         }
     }
@@ -102,9 +98,9 @@ namespace Pringine {
     // called in the end
     void Engine::end()
     {
-        for(int _i=0; _i<engine_components.size(); _i++)
+        for(int _i=0; _i<engine_modules.size(); _i++)
         {
-            engine_components[_i]->end();
+            engine_modules[_i]->end();
         }
     }
 }

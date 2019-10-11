@@ -6,13 +6,15 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#ifndef LOGGER_COMPONENT_HPP
-#define LOGGER_COMPONENT_HPP
+#ifndef LOGGER
+#define LOGGER
 
 #include <unistd.h>
 #include <stdio.h>
-#include "Utils.hpp"
+#include <iostream>
+#include <fstream>
 #include <string>
+#include "Utils.hpp"
 
 namespace Pringine{
 
@@ -25,15 +27,22 @@ namespace Pringine{
     }LogType;
 
 
+    typedef enum
+    {
+        LOGLEVEL_MAX,
+        LOGLEVEL_MODERATE,
+        LOGLEVEL_MIN
+    }LogLevel;
+
+
     // Logging functions
-    extern FILE* log_fp;
     extern const char* log_file_path;
     extern bool log_enabled;
-    void log_to(LogType type, const char* log_text);
-    void close_log_fp();
-    void set_log_file_path(const char* log_file_path);
+    extern LogLevel log_level;
+    extern void LOG(LogType type = LOGTYPE_GENERAL, std::string log_text="", bool log_to_file = false);
+    extern void close_log_file();
+    extern void set_log_file_path(const char* log_file_path);
     
-        
 }
 
 

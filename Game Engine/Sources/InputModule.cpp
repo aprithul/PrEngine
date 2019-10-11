@@ -6,7 +6,7 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 //
 
-#include "Input.hpp"
+#include "InputModule.hpp"
 
 namespace Pringine {
     
