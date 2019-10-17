@@ -31,11 +31,11 @@ namespace Pringine {
             return a.second < b.second;
         }
     };*/
-    
     // engine class to manage engine components
     class Engine
     {
     public:
+        Input* input_handler;
         Engine();
         ~Engine();
         Module* add_module(Module* _module);
@@ -51,12 +51,14 @@ namespace Pringine {
         //std::map< string_int_pair, Component*, CompareComponent> engine_components;
         static bool priority_comparer(Module* a, Module* b);
         std::vector<Module*> engine_modules;
-        Input* input_handler;
         int frame_rate;
         double frame_delta;
         bool is_running;
 
     };
+
+    extern Engine* engine;
+
 }
 
 #endif /* Engine_hpp */

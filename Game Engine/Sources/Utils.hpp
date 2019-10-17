@@ -13,5 +13,16 @@ namespace Pringine
     extern char* read_file(char* file_name);
     extern FILE* write_to_file(const char* text, const char* file_name, FILE *fp);
     extern std::string get_resource_path(const std::string &subDir); 
+    
+    template<typename T>
+    T clamp(T value, T low, T high)
+    {
+        if(value > high)
+            return high;
+        if(value<low)
+            return low;
+        else
+            return value;
+    }
 }
 #endif

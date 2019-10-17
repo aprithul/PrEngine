@@ -10,8 +10,11 @@
 
 namespace Pringine {
     
+    Engine* engine;
+
     Engine::Engine()
     {
+        engine = this;
     }
     
     Engine::~Engine()

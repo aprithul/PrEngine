@@ -6,6 +6,7 @@
 //
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #include "Engine.hpp"
 #include "RendererModule.hpp"
 #include "InputModule.hpp"
@@ -14,7 +15,9 @@
 #include "FrameRateCounterModule.hpp"
 #include "EntityManagementSystemModule.hpp"
 #include "Sprite.hpp"
+#include "Camera.hpp"
 #include "Utils.hpp"
+#include "Vector2.hpp"
 
         
         bool is_running = true;
@@ -32,47 +35,31 @@
         Pringine::EntityManagementSystem* entity_management_system = 
                         ( Pringine::EntityManagementSystem*)game_engine->
                                 add_module(new Pringine::EntityManagementSystem("Entity Management System", 2));
-        Pringine::Renderer2D* renderer2d = 
-                        (Pringine::Renderer2D*)game_engine->
-                                add_module(new Pringine::Renderer2D(1280,800,"Pringine",true, "Renderer", 99999));
+        
         Pringine::FrameRateRegulator* frame_rate_regulator = 
                         (Pringine::FrameRateRegulator*)game_engine->
                                 add_module( new Pringine::FrameRateRegulator("FrameRateRegulator", 100000));
         game_engine->add_module(new Pringine::FrameRateCounter("Frame Counter", 100001));
         
         // can't exceed 60fps if vsync is on
-        frame_rate_regulator->set_frame_rate(60);
+        frame_rate_regulator->set_frame_rate(100);
         //frame_rate_regulator->set_frame_rate_to_uncapped();
 
-        Pringine::Sprite** entities = new Pringine::Sprite*[100];
+
+        Pringine::Camera* camera = new Pringine::Camera(1,1,0.01f);
+        camera->transform.position = Pringine::Vector2<float>(0,0);
+        entity_management_system->assign_id_and_store_entity(*camera);
+        Pringine::Renderer2D* renderer2d = 
+                        (Pringine::Renderer2D*)game_engine->
+                                add_module(new Pringine::Renderer2D(1024,768,"Pringine",false,camera, 25, "Renderer", 99999));
+
+        //Pringine::Sprite** entities = new Pringine::Sprite*[500];
         std::string graphics_file_location = Pringine::get_resource_path("highres.jpg");
-        /*for(int i=0; i<15; i++){
-                entities[i] = new Pringine::Sprite(graphics_file_location, *renderer2d);
-                entity_management_system->assign_id_and_store_entity(*entities[i]);
-        }*/
-        /*
-        entity_management_system->delete_entity(entities[0]->id);
-        entity_management_system->delete_entity(entities[15]->id);
-        entity_management_system->delete_entity(entities[45]->id);
-        entity_management_system->delete_entity(entities[1]->id);
-        //entity_management_system->delete_entity(entities[45]->id);
-        */
-        entities[0] = new Pringine::Sprite(Pringine::get_resource_path("highres.jpg"), *renderer2d);
-        entity_management_system->assign_id_and_store_entity(*entities[0]);
-        entities[1] = new Pringine::Sprite(Pringine::get_resource_path("cube.png"), *renderer2d);
-        entity_management_system->assign_id_and_store_entity(*entities[1]);
-        //entities[1] = new Pringine::Sprite(graphics_file_location, *renderer2d);
-       // entity_management_system->assign_id_and_store_entity(*entities[1]);
-
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-        //entity_management_system->assign_id_and_store_entity(*entities[0]);
-
-
+        //for(int i=0; i<300; i++){
+        Pringine::TextureSlicingParameters slicing_param_1(0,0,2560,1600,0,0);
+        Pringine::Sprite* sprite = new Pringine::Sprite(Pringine::get_resource_path("highres.jpg"), slicing_param_1, *renderer2d, 1);
+        sprite->transform.position = Pringine::Vector2<float>(0,0);
+        entity_management_system->assign_id_and_store_entity(*sprite);
 
         game_engine->start();
         game_engine->update();

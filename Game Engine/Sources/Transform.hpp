@@ -1,6 +1,8 @@
 #ifndef TRANSFORM_HPP
 #define TRANSFORM_HPP
 #include "Vector2.hpp"
+#include "Logger.hpp"
+#include <string>
 
 namespace Pringine{
     

@@ -5,12 +5,11 @@
 
 namespace Pringine
 {
-    class BehaviourComponent : public Module
+    class Behaviour
     {
         public:
-            std::string name;
-            
-        private:
+            Behaviour();
+            virtual ~Behaviour();
     };
 }
 

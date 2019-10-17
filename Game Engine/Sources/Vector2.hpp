@@ -35,15 +35,15 @@ namespace Pringine {
 
         }
 
-        Vector2 operator+(const Vector2& v) const
+        Vector2<T> operator+(const Vector2& v) const
         {
             return Vector2<T>( this->x + v.x, this->y + v.y);
 
         }
-        Vector2 operator+=(const Vector2& v){
+        Vector2<T> operator+=(const Vector2& v){
             this->x += v.x;
             this->y += v.y;
-            return Vector2<T>( this->x, this->y);
+            return *this;//Vector2<T>( this->x, this->y);
         }
         Vector2 operator-(const Vector2& v) const{
             return Vector2<T>( this->x - v.x, this->y - v.y);
@@ -51,6 +51,20 @@ namespace Pringine {
         T operator*(const Vector2& v) const{
             return (this->x * v.x + this->y * v.y);
         }
+
+        Vector2<T> operator^(const Vector2& v) const{
+            return Vector2<T>(this->x * v.x, this->y * v.y);
+        }
+
+
+        Vector2 operator*(const double d) const{
+            return Vector2<T>( this->x * d, this->y * d);
+        }
+
+        Vector2 operator*(const float f) const{
+            return Vector2<T>( this->x * f, this->y * f);
+        }
+
         Vector2 operator/(const T v) const{
         return Vector2<T>( this->x / v, this->y / v);
 

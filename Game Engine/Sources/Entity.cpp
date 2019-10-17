@@ -3,12 +3,12 @@
 namespace Pringine
 {
     
-    Entity::Entity()
+    Entity::Entity(EntityType type):type(type)
     {
         id = -1;
     }
 
-    Entity::Entity(std::string name)
+    Entity::Entity(std::string name, EntityType type):type(type)
     {
         id = -1;        
         this->name = name;

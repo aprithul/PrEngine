@@ -17,16 +17,56 @@
 #include <queue>
 #include "Module.hpp"
 #include "TimeModule.hpp"
+#include "Camera.hpp"
 #include "Logger.hpp"
 #include "Transform.hpp"
-
+#include <map>
 
 namespace Pringine {
     class Graphics;
     
     // globally required functions that are related to renderer but shouldn't require access to the renderer
     extern SDL_Texture* load_texture(const std::string &file, SDL_Renderer *ren); 
+    extern std::map<std::string, SDL_Texture*> loaded_texture_library;
     //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    struct GraphicsFrame
+    {
+        SDL_Texture* texture;
+        SDL_Rect region;
+    };
+
+    struct TextureSlicingParameters
+    {
+        int x;
+        int y;
+        int w;
+        int h;
+        int x_pad;
+        int y_pad;
+
+        TextureSlicingParameters(int x, int y, int w, int h, int x_pad, int y_pad)
+        {
+            this->x = x;
+            this->y = y;
+            this->w = w;
+            this->h = h;
+            this->x_pad = x_pad;
+            this->y_pad = y_pad;
+        }
+        TextureSlicingParameters(int x, int y, int dim, int pad)
+        {
+            this->x = x;
+            this->y = y;
+            this->w = dim;
+            this->h = dim;
+            this->x_pad = pad;
+            this->y_pad = pad;
+        }
+
+        
+
+    };
 
 
     class Renderer2D : public Module
@@ -36,8 +76,13 @@ namespace Pringine {
         // reference to the sdl window
         SDL_Window* sdl_window = NULL;
         SDL_Renderer* sdl_renderer = NULL;
-
-        Renderer2D(int width, int height, std::string title, bool vsync, std::string name, int priority);
+        SDL_Texture* render_texture = NULL;
+        // display attributes
+        int window_height;
+        int window_width;
+        int world_unit_to_pixels;
+        
+        Renderer2D(int width, int height, std::string title, bool vsync, Camera* camera, int world_unit_to_pixels, std::string name, int priority);
         Renderer2D();
         ~Renderer2D();
         
@@ -45,18 +90,17 @@ namespace Pringine {
         void set_clear_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
         int add_graphics_to_draw(Graphics* graphics);
         void remove_graphics(int id);
-
+        void render_to_render_texture();
+        
         void start() override;
         void update() override;
         void end() override;
         
     private:
         
-        // display attributes
-        int height;
-        int width;
-        std::string title;
         
+        std::string title;
+        Camera* camera;
         Graphics* render_list[MAX_RENDERED_GRAPHICS_PER_FRAME];
         std::queue<int> released_positions;
         int render_array_head;
@@ -73,21 +117,19 @@ namespace Pringine {
     {
     private:
         
-        SDL_Texture** graphics_frames;  //we want to be able to store multiple animation frames
+        GraphicsFrame* graphics_frames;  //we want to be able to store multiple animation frames
         int current_frame_index;
         int number_of_frames;
         
     public:
-        SDL_Rect dimension;
+        SDL_Rect dst_dimension;
         float angle;
         Graphics();
         ~Graphics();
-        SDL_Texture* get_current_frame();
-        SDL_Texture* get_frame_at(int index);
-        void load_graphics(std::string graphics_file, const Renderer2D& renderer2d, int num_of_frames = 1);
-
+        GraphicsFrame* get_current_frame();
+        GraphicsFrame* get_frame_at(int index);
+        void load_graphics(std::string graphics_file, TextureSlicingParameters slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1);
     };
 }
-
 
 #endif /* Display_h */

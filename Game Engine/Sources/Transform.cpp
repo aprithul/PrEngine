@@ -23,7 +23,8 @@ namespace  Pringine
 
     Vector2<float> Transform::translate(const Vector2<float>& translation)
     {
-        this->position += translation;
+        position = position + translation;
+        return this->position;
     }
 
     void Transform::rotate(float angle)
