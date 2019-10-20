@@ -48,10 +48,12 @@ namespace Pringine
     template<typename T>
     T abs(T v)
     {
-        if(v >= 0)
+        if(v > 0)
             return v;
-        else
+        else if (v < 0)
             return -v;
+        else
+            return 0;
     }
 }
 #endif

@@ -13,6 +13,7 @@ namespace Pringine
     {
         public:
             Player(GameController* game_controller);
+            Player(Keyboard* game_controller);
             ~Player();
 
             void awake() override;
@@ -23,6 +24,7 @@ namespace Pringine
             Transform transform;
             int id;
             GameController* game_controller;
+            Keyboard* keyboard;
             Camera* main_camera;
 
     };

@@ -54,8 +54,8 @@ namespace Pringine {
                 game_controllers[i].button_released_flags[j] = false;
                 game_controllers[i].button_pressed_flags[j] = false;
             }
-            keyboardgc.button_released_flags[j] = false;
-            keyboardgc.button_pressed_flags[j] = false;
+            //keyboardgc.button_released_flags[j] = false;
+            //keyboardgc.button_pressed_flags[j] = false;
         }
 
         for(int i=0; i<MAX_MOUSE_BUTTON_COUNT; i++)
@@ -63,6 +63,12 @@ namespace Pringine {
             mouse.button_pressed_flags[i] = false;
             mouse.button_released_flags[i] = false;
         }
+    
+        for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_pressed_flags.begin(); it!=keyboard.key_pressed_flags.end(); ++it)
+            keyboard.key_pressed_flags[it->first] = false;
+        
+        for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_released_flags.begin(); it!=keyboard.key_released_flags.end(); ++it)
+            keyboard.key_released_flags[it->first] = false;
 
         while (SDL_PollEvent(&event)) {
             switch (event.type)
@@ -78,9 +84,9 @@ namespace Pringine {
                         if(abs(val) <= game_controllers[i].dead_zone)
                             val = 0.0f;
                         
-                        game_controllers[i].axis_state[game_controllers[i].axis_binding[event.caxis.axis]] = val * (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTY || event.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY ? -1.f:1.f);//*-1.f;
-                        if( abs(val) > game_controllers[i].dead_zone)
-                            std::cout<<"Controller: "<<game_controllers[i].name<<" axis name: "<<game_controllers[i].axis_binding[event.caxis.axis]<<"  value: "<< game_controllers[i].axis_state[game_controllers[i].axis_binding[event.caxis.axis]]<<std::endl;
+                        game_controllers[i].axis_state[event.caxis.axis] = val * (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTY || event.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY ? -1.f:1.f);//*-1.f;
+                        //if( abs(val) > game_controllers[i].dead_zone)
+                        //    std::cout<<"Controller: "<<game_controllers[i].name<<" axis name: "<<event.caxis.axis<<"  value: "<< game_controllers[i].axis_state[event.caxis.axis]<<std::endl;
 
                     }
                 }
@@ -90,9 +96,9 @@ namespace Pringine {
                 {
                     if(event.cbutton.which == game_controllers[i].instance_id)
                     {
-                        game_controllers[i].button_pressed_flags[game_controllers[i].button_binding[event.cbutton.button]] = event.cbutton.state;
-                        game_controllers[i].button_state[game_controllers[i].button_binding[event.cbutton.button]] = event.cbutton.state;                        
-                        std::cout<<"Controller: "<<game_controllers[i].name<<" Pressed: "<<(SDL_GameControllerButton)game_controllers[i].button_binding[event.cbutton.button]<<std::endl;
+                        game_controllers[i].button_pressed_flags[event.cbutton.button] = true;
+                        game_controllers[i].button_state[event.cbutton.button] = true;                        
+                        std::cout<<"Controller: "<<game_controllers[i].name<<" Pressed: "<<(SDL_GameControllerButton)event.cbutton.button<<std::endl;
                     }
                 }
                 break;
@@ -101,14 +107,14 @@ namespace Pringine {
                 {
                     if(event.cbutton.which == game_controllers[i].instance_id)
                     {
-                        game_controllers[i].button_released_flags[game_controllers[i].button_binding[event.cbutton.button]] = event.cbutton.state;
-                        game_controllers[i].button_state[game_controllers[i].button_binding[event.cbutton.button]] = event.cbutton.state;                        
-                        std::cout<<"Controller: "<<game_controllers[i].name<<" Released: "<<(SDL_GameControllerButton)game_controllers[i].button_binding[event.cbutton.button]<<std::endl;
+                        game_controllers[i].button_released_flags[event.cbutton.button] = true;
+                        game_controllers[i].button_state[event.cbutton.button] = false;                        
+                        std::cout<<"Controller: "<<game_controllers[i].name<<" Released: "<<(SDL_GameControllerButton)event.cbutton.button<<std::endl;
                     }
                 }
                 break;
             case SDL_CONTROLLERDEVICEREMOVED:
-                std::cout<<"Controller detached "<< event.cdevice.which<<std::endl;
+                std::cout<<"Controller detached  "<< event.cdevice.which<<std::endl;
                 update_game_controllers();
                 break;
             case SDL_CONTROLLERDEVICEADDED:
@@ -117,11 +123,13 @@ namespace Pringine {
                 break;
             // end game controller events
             ///////////////////////////////
-            // start keyboard to gamecontroller start
+            // start keyboard / keboard to gamecontroller
+            
             case SDL_KEYDOWN:
                 if(event.key.repeat == 0)
                 {
-                    if(keyboardgc.axis_binding.count(event.key.keysym.sym)>0)
+                    // KeyboardGameController
+                    /*if(keyboardgc.axis_binding.count(event.key.keysym.sym)>0)
                     {
                         std::pair<SDL_GameControllerAxis, float> _pair = keyboardgc.axis_binding[event.key.keysym.sym];
                         keyboardgc.axis_state[_pair.first] += _pair.second;
@@ -133,17 +141,22 @@ namespace Pringine {
                         keyboardgc.button_state[button] = true;
                         keyboardgc.button_pressed_flags[button] = true;
                         //std::cout<<button<<",  "<< true<<std::endl;
-                    }
+                    }*/
+
+                    // keyboard
+                    keyboard.key_state[ event.key.keysym.sym ] = true;
+                    keyboard.key_pressed_flags[event.key.keysym.sym] = true;
                 }
                 else
                 {
                     //TEMPROARY
-                    if(event.key.keysym.sym == SDLK_q)
-                        was_crossed = true;
+                   // if(event.key.keysym.sym == SDLK_q)
+                   //     was_crossed = true;
                 }
                 break;
             case SDL_KEYUP:
-                if(keyboardgc.axis_binding.count(event.key.keysym.sym)>0)
+                // game controller
+                /*if(keyboardgc.axis_binding.count(event.key.keysym.sym)>0)
                 {
                     std::pair<SDL_GameControllerAxis, float> _pair = keyboardgc.axis_binding[event.key.keysym.sym];
                     keyboardgc.axis_state[_pair.first] -= _pair.second;
@@ -156,7 +169,11 @@ namespace Pringine {
                     keyboardgc.button_pressed_flags[button] = false;
                     //std::cout<<button<<",  "<< false<<std::endl;
 
-                }
+                }*/
+
+                keyboard.key_state[ event.key.keysym.sym ] = false;
+                keyboard.key_released_flags[ event.key.keysym.sym] = true;
+
                 break;
             
             // keyboard gamecontroller end
@@ -207,8 +224,9 @@ namespace Pringine {
             }
         }
 
-        std::cout<<"No gamecontroller attached, returing keyboard as gamecontroller"<<std::endl;
-        return &keyboardgc;
+        std::cout<<"No gamecontroller attached"<<std::endl;
+        //return &keyboardgc;
+        return nullptr;
     }
 
 
@@ -238,6 +256,9 @@ namespace Pringine {
         for(int i=SDL_CONTROLLER_BUTTON_A; i<SDL_CONTROLLER_BUTTON_MAX; i++)
             button_binding[i] = (SDL_GameControllerButton)i;
         
+
+        button_binding[SDL_CONTROLLER_BUTTON_X] = SDL_CONTROLLER_BUTTON_Y;
+        button_binding[SDL_CONTROLLER_BUTTON_Y] = SDL_CONTROLLER_BUTTON_X;
     }
 
     GameController::GameController(SDL_GameController* game_controller)
@@ -245,7 +266,17 @@ namespace Pringine {
         this->game_controller = game_controller;
         this->joy_stick = SDL_GameControllerGetJoystick(game_controller);
         this->name = SDL_GameControllerName(game_controller);
-        dead_zone = 0.015f;
+        
+        for(int i=SDL_CONTROLLER_AXIS_LEFTX; i<SDL_CONTROLLER_AXIS_MAX; i++)
+            axis_state[i] = 0.f;
+        
+        for(int i=SDL_CONTROLLER_BUTTON_A; i<SDL_CONTROLLER_BUTTON_MAX; i++)
+        {
+            button_state[i] = false;
+            button_pressed_flags[i] = false;
+            button_released_flags[i] = false;
+        }
+        dead_zone = 0.03f;
 
         // temporary
         // initial bindings
@@ -265,22 +296,55 @@ namespace Pringine {
 
     float GameController::get_axis(SDL_GameControllerAxis axis)
     {
-        return axis_state[axis];
+        SDL_GameControllerAxis _axis = axis_binding[axis];
+        return axis_state[_axis];
     }
 
-    bool GameController::get_button(SDL_GameControllerButton action)
+    bool GameController::get_button(SDL_GameControllerButton button)
     {
-        return button_state[action];
+        SDL_GameControllerButton _button = button_binding[button];
+        return button_state[_button];
     }
 
-    bool GameController::get_button_pressed(SDL_GameControllerButton button)
+    bool GameController::get_button_down(SDL_GameControllerButton button)
     {
-        return button_pressed_flags[button];
+        SDL_GameControllerButton _button = button_binding[button];
+        return button_pressed_flags[_button];
     }
     
-    bool GameController::get_button_released(SDL_GameControllerButton button)
+    bool GameController::get_button_up(SDL_GameControllerButton button)
     {
-        return button_released_flags[button];
+        SDL_GameControllerButton _button = button_binding[button];
+        return button_released_flags[_button];
+    }
+
+    SDL_GameControllerButton GameController::find_down_button()
+    {
+        for(int i=0; i<SDL_CONTROLLER_BUTTON_MAX; i++)
+        {
+            if(button_pressed_flags[i] == true)
+            {
+                return (SDL_GameControllerButton)i;
+            }
+        }
+        return SDL_CONTROLLER_BUTTON_INVALID;
+    }
+
+    std::pair<SDL_GameControllerAxis, float> GameController::find_max_axis()
+    {
+        float max = 0.0f;
+        SDL_GameControllerAxis max_axis = SDL_CONTROLLER_AXIS_INVALID;
+        for(int i=0; i<SDL_CONTROLLER_AXIS_MAX; i++)
+        {
+            if(abs(axis_state[i]) > abs(max))
+            {
+                max = axis_state[i];
+                max_axis = (SDL_GameControllerAxis)i;
+            }
+
+        }
+        return std::pair<SDL_GameControllerAxis, float>{max_axis, max};
+
     }
 
     ///////////////
@@ -312,6 +376,58 @@ namespace Pringine {
     KeyboardGameController::~KeyboardGameController()
     {
 
+    }
+/////////////////////////////////////////////////////////
+
+    Keyboard::Keyboard()
+    {
+        // test binding
+        key_binding[SDLK_ESCAPE] = SDLK_ESCAPE;
+        key_binding[SDLK_c] = SDLK_c;
+        key_binding[SDLK_t] = SDLK_r;
+    }
+
+    Keyboard::~Keyboard()
+    {
+
+    }
+    
+    bool Keyboard::get_key(SDL_Keycode k)
+    {
+        SDL_Keycode kk = key_binding[k];
+        if(key_state.count(kk)>0)
+            return key_state[kk];
+        return false;
+    }
+
+    bool Keyboard::get_key_down(SDL_Keycode k)
+    {
+        SDL_Keycode kk = key_binding[k];
+        
+        if(key_pressed_flags.count(kk)>0)
+            return key_pressed_flags[kk];
+        return false;
+    }
+
+    bool Keyboard::get_key_up(SDL_Keycode k)
+    {
+        SDL_Keycode kk = key_binding[k];
+        if(key_released_flags.count(kk)>0)
+            return key_released_flags[kk];
+        return false;
+
+    }
+
+    SDL_Keycode Keyboard::find_down_key()
+    {
+        for (std::map<SDL_Keycode,bool>::iterator it=key_pressed_flags.begin(); it!=key_pressed_flags.end(); ++it)
+        {
+            if(it->second == true)
+            {
+                return it->first;
+            }
+        }
+        return -1;
     }
 
 

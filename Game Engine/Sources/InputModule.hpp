@@ -40,19 +40,22 @@ namespace Pringine {
 
             float get_axis(SDL_GameControllerAxis axis);
             bool get_button(SDL_GameControllerButton action);
-            bool get_button_pressed(SDL_GameControllerButton action);
-            bool get_button_released(SDL_GameControllerButton action);
-
+            bool get_button_down(SDL_GameControllerButton action);
+            bool get_button_up(SDL_GameControllerButton action);
+            SDL_GameControllerButton find_down_button();
+            std::pair<SDL_GameControllerAxis, float> find_max_axis();
+            
             SDL_GameControllerAxis axis_binding[SDL_CONTROLLER_AXIS_MAX];
             std::string axis_names[SDL_CONTROLLER_AXIS_MAX];
-            float axis_state[SDL_CONTROLLER_AXIS_MAX];
+            float axis_state[SDL_CONTROLLER_AXIS_MAX]; 
 
             SDL_GameControllerButton button_binding[SDL_CONTROLLER_BUTTON_MAX];
+            std::string button_names[SDL_CONTROLLER_BUTTON_MAX];
             bool button_state[SDL_CONTROLLER_BUTTON_MAX];
             bool button_pressed_flags[SDL_CONTROLLER_BUTTON_MAX];
             bool button_released_flags[SDL_CONTROLLER_BUTTON_MAX];
 
-
+            
 
     };
 
@@ -92,6 +95,24 @@ namespace Pringine {
 
     };
 
+    class Keyboard
+    {
+        public:
+            Keyboard();
+            ~Keyboard();
+            std::map<SDL_Keycode, SDL_Keycode> key_binding;
+            std::map<SDL_Keycode, std::string> key_names;
+            
+            std::map<SDL_Keycode, bool> key_state;
+            std::map<SDL_Keycode, bool> key_pressed_flags;
+            std::map<SDL_Keycode, bool> key_released_flags;
+
+            bool get_key(SDL_Keycode k);
+            bool get_key_down(SDL_Keycode k);
+            bool get_key_up(SDL_Keycode k);
+            SDL_Keycode find_down_key();
+    };
+
 
     class InputManager : public Module
     {
@@ -99,20 +120,23 @@ namespace Pringine {
             InputManager(std::string name, int priority);
             ~InputManager();
             bool was_crossed;
-
+            
             void start() override;
             void update() override;
             void end() override;
 
             GameController* get_gamecontroller();
-        
+            Keyboard keyboard;
+
         private:
 
             void update_game_controllers();
             GameController game_controllers[MAX_GAMECONTROLLER_COUNT];
             Mouse mouse;
-            KeyboardGameController keyboardgc;
+            //KeyboardGameController keyboardgc;
             SDL_Event event;
+
+            
             
 
     };

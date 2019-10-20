@@ -77,11 +77,13 @@
                 entity_management_system->assign_id_and_store_entity(*sprite_cube);
         }
         Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller();
+        Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
         if(gc == nullptr)
                 std::cout<<"Didn't return a valid gamecontroller"<<std::endl;
         else
         {
                 Pringine::Player* player = new Pringine::Player(gc);
+                player->keyboard = kb;
                 player->main_camera = camera;
                 entity_management_system->assign_id_and_store_entity(*player);
         }
