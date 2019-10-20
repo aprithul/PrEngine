@@ -18,7 +18,7 @@ namespace Pringine
         {
             if(entities[i] != nullptr)
             {
-                LOG(LOGTYPE_GENERAL, std::string("Deleting entity, id: ").append(std::to_string(entities[i]->id)));
+                //LOG(LOGTYPE_GENERAL, std::string("Deleting entity, id: ").append(std::to_string(entities[i]->id)));
                 delete entities[i];
             }
         }

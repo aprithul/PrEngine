@@ -12,15 +12,17 @@
 
 #define MAX_RENDERED_GRAPHICS_PER_FRAME 999999
 
+
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <queue>
+#include <utility>
+#include <map>
+#include "Engine.hpp"
 #include "Module.hpp"
 #include "TimeModule.hpp"
-#include "Camera.hpp"
 #include "Logger.hpp"
 #include "Transform.hpp"
-#include <map>
 
 namespace Pringine {
     class Graphics;
@@ -81,17 +83,22 @@ namespace Pringine {
         int window_height;
         int window_width;
         int world_unit_to_pixels;
-        
-        Renderer2D(int width, int height, std::string title, bool vsync, Camera* camera, int world_unit_to_pixels, std::string name, int priority);
+        float zoom_amount;
+        Vector2<float> view_position;
+
+        Renderer2D(int width, int height, std::string title, bool vsync, int world_unit_to_pixels, std::string name, int priority);
         Renderer2D();
         ~Renderer2D();
         
         void set_frame_rate(int frame_rate);
-        void set_clear_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+        void set_draw_color(SDL_Color color);
         int add_graphics_to_draw(Graphics* graphics);
         void remove_graphics(int id);
         void render_to_render_texture();
-        
+
+        void draw_rectangle(Rect rect, SDL_Color color, bool screen_space = false);
+        void draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space = false);
+    
         void start() override;
         void update() override;
         void end() override;
@@ -100,13 +107,17 @@ namespace Pringine {
         
         
         std::string title;
-        Camera* camera;
+        SDL_Color clear_color;
         Graphics* render_list[MAX_RENDERED_GRAPHICS_PER_FRAME];
         std::queue<int> released_positions;
+        std::queue<std::pair<SDL_Color,SDL_Rect>> debug_shapes_rect;
+        std::queue<std::pair<SDL_Color, std::pair<Vector2<float>,Vector2<float>>>> debug_shapes_line;
         int render_array_head;
+        bool do_draw_debug_shapes;
 
         // draws 'everything' on screen inside renderer update
         void draw();
+        void draw_debug();
         void set_vsync(bool value);
         
     };
@@ -118,12 +129,13 @@ namespace Pringine {
     private:
         
         GraphicsFrame* graphics_frames;  //we want to be able to store multiple animation frames
-        int current_frame_index;
-        int number_of_frames;
         
     public:
+        int layer;
         SDL_Rect dst_dimension;
         float angle;
+        int current_frame_index;
+        int number_of_frames;
         Graphics();
         ~Graphics();
         GraphicsFrame* get_current_frame();

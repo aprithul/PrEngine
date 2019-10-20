@@ -22,6 +22,7 @@ namespace Pringine {
                 return nullptr;
             }
 
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"linear");
             SDL_Texture *texture = IMG_LoadTexture(ren, file_name.c_str());
             if (texture == nullptr){
                 LOG(LOGTYPE_ERROR, std::string("Couldn't load texture : ").append(file_name));
@@ -38,7 +39,32 @@ namespace Pringine {
     //////////////////////////////////////////////////////////////////////
     
     // publics
-    Renderer2D::Renderer2D(int width, int height, std::string title, bool vsync, Camera* camera, int world_unit_to_pixels, std::string name, int priority):Module(name,priority)
+
+    void insertionSort(Graphics** arr, int n)  
+    {  
+        int i, j;  
+        //LOG(LOGTYPE_GENERAL, std::to_string(n));
+        Graphics* key;
+        for (i = 2; i <= n; i++) 
+        {  
+            key = arr[i];  
+            j = i - 1;  
+    
+            /* Move elements of arr[0..i-1], that are  
+            greater than key, to one position ahead  
+            of their current position */
+            while (j >= 1 && arr[j]->layer > key->layer) 
+            {  
+                arr[j + 1] = arr[j];  
+                j = j - 1;  
+            }  
+            arr[j + 1] = key;  
+        }  
+
+    } 
+
+
+    Renderer2D::Renderer2D(int width, int height, std::string title, bool vsync, int world_unit_to_pixels, std::string name, int priority):Module(name,priority)
     {
         // initialize SDL video
         SDL_Init(SDL_INIT_VIDEO);
@@ -46,19 +72,23 @@ namespace Pringine {
         this->window_width = width;
         this->window_height = height;
         this->title = title;
-        this->camera = camera;
+        this->zoom_amount = 1.0f;
+        this->view_position.x = 0.0f;
+        this->view_position.y = 0.0f;
         this->world_unit_to_pixels = world_unit_to_pixels;
+        this->clear_color={255,255,255,255};
+        this->do_draw_debug_shapes = true;
         // create window and sdl_renderer
         set_vsync(vsync);
+        SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
         sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height,  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
         sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-        set_clear_color(255,0,0,255);
         render_texture = SDL_CreateTexture( sdl_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->window_width, this->window_height );
     }
 
-    void Renderer2D::set_clear_color(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+    void Renderer2D::set_draw_color(SDL_Color color)
     {
-        SDL_SetRenderDrawColor(sdl_renderer, r,g,b,a);
+        SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color.b, color.a);
     }
     
     Renderer2D::~Renderer2D()
@@ -87,20 +117,26 @@ namespace Pringine {
     
     void Renderer2D::update()
     {
+        //if( Pringine::engine->input_handler->get_key_down(SDLK_d))
+        //    do_draw_debug_shapes = !do_draw_debug_shapes;
+
         if(is_active)
         {
             //set render target to texture 
-            SDL_SetRenderTarget(sdl_renderer, render_texture);
+            //SDL_SetRenderTarget(sdl_renderer, render_texture);
+            set_draw_color(clear_color);
             SDL_RenderClear(sdl_renderer);
             draw();
+            if(do_draw_debug_shapes)
+                draw_debug();
             SDL_RenderPresent(sdl_renderer);
 
             //reset back to render to screen
-            SDL_SetRenderTarget(sdl_renderer, NULL);
+            //SDL_SetRenderTarget(sdl_renderer, NULL);
             //copy over the render texture to screen
             // before that resize the texture to apply any screen effect ( zoom / rotation)
-            int src_w = this->window_width * 1/camera->zoom_amount;
-            int src_h = this->window_height * 1/camera->zoom_amount;
+            int src_w = this->window_width;// * 1/zoom_amount;
+            int src_h = this->window_height;// * 1/zoom_amount;
             SDL_Rect src_rct;
             src_rct.x = (this->window_width - src_w)/2;
             src_rct.y = (this->window_height - src_h)/2;
@@ -154,6 +190,8 @@ namespace Pringine {
             }
 
             render_list[next_pos] = graphics;
+            
+            insertionSort(render_list, render_array_head);
             return next_pos;
             
         }
@@ -186,10 +224,40 @@ namespace Pringine {
         }
     }
 
+    void Renderer2D::draw_rectangle(Rect rect, SDL_Color color, bool screen_space)
+    {
+        static SDL_Rect sdl_rect;
+        if(!screen_space)
+        {
+            sdl_rect.x = ((rect.x - view_position.x) - rect.w/2.0f)*world_unit_to_pixels*zoom_amount + window_width/2.0f;
+            sdl_rect.y = (-(rect.y - view_position.y) - rect.h/2.0f)*world_unit_to_pixels*zoom_amount + window_height/2.0f;
+            sdl_rect.w = rect.w * world_unit_to_pixels*zoom_amount;
+            sdl_rect.h = rect.h * world_unit_to_pixels*zoom_amount;
+        }
+
+        debug_shapes_rect.emplace( std::make_pair(color, sdl_rect));
+        //SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color. b, color.a);
+        //SDL_RenderDrawRect( sdl_renderer , &sdl_rect);
+    }
+
+    void Renderer2D::draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space)
+    {
+        if(!screen_space)
+        {
+            p1.x *= world_unit_to_pixels*zoom_amount;
+            p1.y *= world_unit_to_pixels*zoom_amount;
+            p2.x *= world_unit_to_pixels*zoom_amount;
+            p2.y *= world_unit_to_pixels*zoom_amount;
+        }
+
+        //debug_shapes_line.emplace(color, p1,p2 );
+
+    }
 
     // private    
     void Renderer2D::draw()
     {
+
         for(int _i=0; _i<=render_array_head; _i++)
         {
             Graphics* _graphics = render_list[_i];
@@ -198,15 +266,36 @@ namespace Pringine {
                 // dst_dimension has world unit values, convert to screen space
                 // also make drawing relative to camera position
                 // also make center of screen 0,0
-                _graphics->dst_dimension.w *= world_unit_to_pixels;
-                _graphics->dst_dimension.h *= world_unit_to_pixels;
+                _graphics->dst_dimension.w *= (world_unit_to_pixels * zoom_amount);
+                _graphics->dst_dimension.h *= (world_unit_to_pixels * zoom_amount);
                 
-                _graphics->dst_dimension.x = (((_graphics->dst_dimension.x - camera->transform.position.x)*world_unit_to_pixels) - (_graphics->dst_dimension.w/2) + window_width/2);
-                _graphics->dst_dimension.y = ((-(_graphics->dst_dimension.y - camera->transform.position.y)*world_unit_to_pixels) - (_graphics->dst_dimension.h/2) + window_height/2);
+                _graphics->dst_dimension.x = (((_graphics->dst_dimension.x - view_position.x)*world_unit_to_pixels*zoom_amount) - (_graphics->dst_dimension.w/2) + window_width/2);
+                _graphics->dst_dimension.y = ((-(_graphics->dst_dimension.y - view_position.y)*world_unit_to_pixels*zoom_amount) - (_graphics->dst_dimension.h/2) + window_height/2);
 
                 SDL_RenderCopyEx(this->sdl_renderer, _graphics->get_current_frame()->texture , &(_graphics->get_current_frame()->region), 
                                         &_graphics->dst_dimension, _graphics->angle, NULL, SDL_FLIP_NONE) ;
             }
+        }
+    }
+
+    void Renderer2D::draw_debug()
+    {
+        while(!debug_shapes_rect.empty())
+        {
+            SDL_Color &c = debug_shapes_rect.front().first;
+            SDL_Rect &rect = debug_shapes_rect.front().second; 
+            set_draw_color(c);
+            SDL_RenderDrawRect( sdl_renderer , &rect);
+            debug_shapes_rect.pop();
+        }
+
+        while(!debug_shapes_line.empty())
+        {
+            SDL_Color &c = debug_shapes_line.front().first;
+            std::pair<Vector2<float>, Vector2<float>> &line = debug_shapes_line.front().second; 
+            set_draw_color(c);
+            SDL_RenderDrawLineF(sdl_renderer, line.first.x, line.first.y, line.second.x, line.second.y);
+            debug_shapes_line.pop();
         }
     }
 
@@ -229,7 +318,7 @@ namespace Pringine {
                 if(graphics_frames[_i].texture != nullptr)
                     SDL_DestroyTexture(graphics_frames[_i].texture);
             }*/
-            LOG(LOGTYPE_GENERAL,"Deleted: ");
+            //LOG(LOGTYPE_GENERAL,"Deleted: ");
             delete[] graphics_frames;
         }
     }
@@ -272,14 +361,6 @@ namespace Pringine {
                             frame->region.h = slicing_params.h - (_j+slicing_params.h-h);
                         else
                             frame->region.h = slicing_params.h;
-
-                        frame->region.h = slicing_params.h;
-
-                        //dst_dimension.w = slicing_params.w;
-                        //dst_dimension.h = slicing_params.h;
-
-                        
-                        
 
                         frame_no++;
                     }

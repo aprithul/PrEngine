@@ -9,38 +9,116 @@
 #ifndef Input_hpp
 #define Input_hpp
 
-#include <stdio.h>
+
+#include <stdlib.h>
+#include <iostream>
+#include <utility>
+#include <string>
 #include <map>
 #include "Module.hpp"
 #include "Vector2.hpp"
 #include "SDL2/SDL.h"
+#include "Utils.hpp"
+
+#define MAX_GAMECONTROLLER_COUNT 16
+#define MAX_MOUSE_BUTTON_COUNT 10
 
 namespace Pringine {
-    class Input:public Module
+
+    class GameController
     {
-    public:
-        Input(std::string name, int priority);
-        ~Input();
-        bool get_key(int keycode);
-        bool get_key_up(int keycode);
-        bool get_key_down(int keycode);
-        bool get_mouse_button(int button);
-        bool get_mouse_button_down(int button);
-        bool get_mouse_button_up(int button);
-        Vector2<float> get_mouse_position();
-        bool was_crossed();
-        void start() override;
-        void end() override;
-        void update() override;
-        
-    private:
-        SDL_Event input_event;
-        bool cross_clicked;
-        std::map<int, bool> key_down;
-        std::map<int, bool> key_up;
-        std::map<int, bool> key_pressed;
-        
+        public:
+            SDL_GameController* game_controller;            
+            SDL_Joystick* joy_stick;
+            std::string name;
+            int instance_id;
+            float dead_zone;
+            
+            GameController();
+            GameController(SDL_GameController* game_controller);
+            ~GameController();
+
+            float get_axis(SDL_GameControllerAxis axis);
+            bool get_button(SDL_GameControllerButton action);
+            bool get_button_pressed(SDL_GameControllerButton action);
+            bool get_button_released(SDL_GameControllerButton action);
+
+            SDL_GameControllerAxis axis_binding[SDL_CONTROLLER_AXIS_MAX];
+            std::string axis_names[SDL_CONTROLLER_AXIS_MAX];
+            float axis_state[SDL_CONTROLLER_AXIS_MAX];
+
+            SDL_GameControllerButton button_binding[SDL_CONTROLLER_BUTTON_MAX];
+            bool button_state[SDL_CONTROLLER_BUTTON_MAX];
+            bool button_pressed_flags[SDL_CONTROLLER_BUTTON_MAX];
+            bool button_released_flags[SDL_CONTROLLER_BUTTON_MAX];
+
+
+
     };
+
+    class KeyboardGameController : public GameController
+    {
+        public:
+            std::string name;
+            
+            KeyboardGameController();
+            ~KeyboardGameController();
+
+            std::map<SDL_Keycode, std::pair<SDL_GameControllerAxis,float>> axis_binding;
+            //std::string axis_names[SDL_CONTROLLER_AXIS_MAX];
+            //float axis_state[SDL_CONTROLLER_AXIS_MAX];
+
+            std::map<SDL_Keycode, SDL_GameControllerButton> button_binding;
+            //bool button_state[SDL_CONTROLLER_BUTTON_MAX];
+            //bool button_pressed_flags[SDL_CONTROLLER_BUTTON_MAX];
+            //bool button_released_flags[SDL_CONTROLLER_BUTTON_MAX];
+    };
+
+    class Mouse
+    {
+        public:
+
+            Mouse();
+            ~Mouse();
+            bool get_mouse_button(int index);
+            bool get_mouse_button_down(int index);
+            bool get_mouse_button_up(int index);
+            int window_id;
+            Vector2<int> position;
+            bool button_state[MAX_MOUSE_BUTTON_COUNT];
+            int click_count[MAX_MOUSE_BUTTON_COUNT];
+            bool button_released_flags[MAX_MOUSE_BUTTON_COUNT];
+            bool button_pressed_flags[MAX_MOUSE_BUTTON_COUNT];
+
+    };
+
+
+    class InputManager : public Module
+    {
+        public:
+            InputManager(std::string name, int priority);
+            ~InputManager();
+            bool was_crossed;
+
+            void start() override;
+            void update() override;
+            void end() override;
+
+            GameController* get_gamecontroller();
+        
+        private:
+
+            void update_game_controllers();
+            GameController game_controllers[MAX_GAMECONTROLLER_COUNT];
+            Mouse mouse;
+            KeyboardGameController keyboardgc;
+            SDL_Event event;
+            
+
+    };
+
+
+
 }
 
 

@@ -65,7 +65,7 @@ namespace Pringine {
         }
 
         // get the reference to the input module
-        input_handler = (Pringine::Input*)this->get_module("Input");
+        input_manager = (Pringine::InputManager*)this->get_module("Input");
 
 
         LOG(LOGTYPE_GENERAL, "Engine started");
@@ -87,14 +87,14 @@ namespace Pringine {
             }
             
             // check if window was crossed
-            if(input_handler->was_crossed())
+            if(input_manager->was_crossed)
                 is_running = false;
             
-            if(input_handler->get_key_down(SDLK_q))
-            {
-                is_running = false;
-                LOG(LOGTYPE_GENERAL, "Key 'q' pressed");
-            }
+            //if(input_handler->get_key_down(SDLK_q))
+            //{
+            //    is_running = false;
+            //    LOG(LOGTYPE_GENERAL, "Key 'q' pressed");
+            //}
         }
     }
     

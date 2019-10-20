@@ -14,6 +14,18 @@ namespace Pringine
     extern FILE* write_to_file(const char* text, const char* file_name, FILE *fp);
     extern std::string get_resource_path(const std::string &subDir); 
     
+    struct Rect
+    {
+        float x;
+        float y;
+        float w;
+        float h;
+        
+        Rect(float x,float y,float w,float h);
+        Rect();
+    };
+    
+
     template<typename T>
     T clamp(T value, T low, T high)
     {
@@ -23,6 +35,23 @@ namespace Pringine
             return low;
         else
             return value;
+    }
+
+    template<typename T>
+    int sign(T v)
+    {
+        if(v >= 0)
+            return 1;
+        else return -1;
+    }
+
+    template<typename T>
+    T abs(T v)
+    {
+        if(v >= 0)
+            return v;
+        else
+            return -v;
     }
 }
 #endif

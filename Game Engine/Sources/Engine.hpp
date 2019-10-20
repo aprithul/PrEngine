@@ -35,7 +35,7 @@ namespace Pringine {
     class Engine
     {
     public:
-        Input* input_handler;
+        InputManager* input_manager;
         Engine();
         ~Engine();
         Module* add_module(Module* _module);
