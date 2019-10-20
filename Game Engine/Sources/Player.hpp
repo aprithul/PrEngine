@@ -25,6 +25,7 @@ namespace Pringine
             int id;
             GameController* game_controller;
             Keyboard* keyboard;
+            Mouse* mouse;
             Camera* main_camera;
 
     };

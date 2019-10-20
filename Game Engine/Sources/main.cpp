@@ -78,12 +78,15 @@
         }
         Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller();
         Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
+        Pringine::Mouse* mouse =  &((Pringine::InputManager*)game_engine->get_module("Input"))->mouse;
+
         if(gc == nullptr)
                 std::cout<<"Didn't return a valid gamecontroller"<<std::endl;
         else
         {
                 Pringine::Player* player = new Pringine::Player(gc);
                 player->keyboard = kb;
+                player->mouse = mouse;
                 player->main_camera = camera;
                 entity_management_system->assign_id_and_store_entity(*player);
         }

@@ -62,6 +62,8 @@ namespace Pringine {
         {
             mouse.button_pressed_flags[i] = false;
             mouse.button_released_flags[i] = false;
+            mouse.kb_up[ mouse.mb_to_kb_binding[i]] = false;
+            mouse.kb_down[ mouse.mb_to_kb_binding[i]] = false;
         }
     
         for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_pressed_flags.begin(); it!=keyboard.key_pressed_flags.end(); ++it)
@@ -146,6 +148,14 @@ namespace Pringine {
                     // keyboard
                     keyboard.key_state[ event.key.keysym.sym ] = true;
                     keyboard.key_pressed_flags[event.key.keysym.sym] = true;
+
+                    // mouse button mapping to keyboard
+                    if(mouse.kb.count(event.key.keysym.sym)>0)
+                    {
+                        mouse.kb[event.key.keysym.sym] = true;
+                        mouse.kb_down[event.key.keysym.sym] = true;
+                    }
+
                 }
                 else
                 {
@@ -174,9 +184,17 @@ namespace Pringine {
                 keyboard.key_state[ event.key.keysym.sym ] = false;
                 keyboard.key_released_flags[ event.key.keysym.sym] = true;
 
+                // mouse button mapping to keyboard
+                if(mouse.kb.count(event.key.keysym.sym)>0)
+                {
+                    mouse.kb[event.key.keysym.sym] = false;
+                    mouse.kb_up[event.key.keysym.sym] = true;
+                }
+
                 break;
             
             // keyboard gamecontroller end
+
             case SDL_MOUSEMOTION:
                 mouse.position.x = event.motion.x;
                 mouse.position.y = event.motion.y;
@@ -184,14 +202,14 @@ namespace Pringine {
                 //std::cout<<"Mouse Position: "<< mouse.position.x<<","<<mouse.position.y<<std::endl;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                mouse.button_pressed_flags[event.button.button] = event.button.state;
+                mouse.button_pressed_flags[event.button.button] = true;
                 mouse.click_count[event.button.button] = event.button.clicks;
-                mouse.button_state[event.button.button] = event.button.state;
+                mouse.button_state[event.button.button] = true;
                 //std::cout<<"mouse click: "<<mouse.click_count[event.button.button]<<std::endl;
                 break;
             case SDL_MOUSEBUTTONUP:
-                mouse.button_released_flags[event.button.button] = event.button.state;
-                mouse.button_state[event.button.button] = event.button.state;
+                mouse.button_released_flags[event.button.button] = true;
+                mouse.button_state[event.button.button] = false;
                 break;
             case SDL_QUIT:
                 was_crossed = true;
@@ -403,7 +421,6 @@ namespace Pringine {
     bool Keyboard::get_key_down(SDL_Keycode k)
     {
         SDL_Keycode kk = key_binding[k];
-        
         if(key_pressed_flags.count(kk)>0)
             return key_pressed_flags[kk];
         return false;
@@ -440,12 +457,21 @@ namespace Pringine {
         position.x = 0;
         position.y = 0;
         window_id = -1;
+
         for(int i=0; i<MAX_MOUSE_BUTTON_COUNT; i++)
         {
             button_state[i] = false;
             button_pressed_flags[i] = false;
             button_released_flags[i] = false;
         }
+
+        //initial binding
+        for(int i=0; i<MAX_MOUSE_BUTTON_COUNT; i++)
+        {
+            mb_to_mb_binding[i] = i;
+            mb_to_kb_binding[i] = SDLK_UNKNOWN;
+        }
+
     }
 
 
@@ -457,7 +483,14 @@ namespace Pringine {
     bool Mouse::get_mouse_button(int index)
     {
         if(index < MAX_MOUSE_BUTTON_COUNT)  
-            return button_state[index];
+        {
+            int mb_index = mb_to_mb_binding[index];
+            SDL_Keycode kb_index = mb_to_kb_binding[mb_index];
+            if(kb_index == SDLK_UNKNOWN)
+                return button_state[mb_index];
+            else
+                return kb[kb_index];
+        }
         else
         {
             std::cout<<"Invalid mouse index"<<std::endl;
@@ -468,7 +501,14 @@ namespace Pringine {
     bool Mouse::get_mouse_button_down(int index)
     {
         if(index < MAX_MOUSE_BUTTON_COUNT)  
-            return button_pressed_flags[index];
+        {
+            int mb_index = mb_to_mb_binding[index];
+            SDL_Keycode kb_index = mb_to_kb_binding[mb_index];
+            if(kb_index == SDLK_UNKNOWN)
+                return button_pressed_flags[mb_index];
+            else
+                return kb_down[kb_index];
+        }
         else
         {
             std::cout<<"Invalid mouse index"<<std::endl;
@@ -479,7 +519,14 @@ namespace Pringine {
     bool Mouse::get_mouse_button_up(int index)
     {
         if(index < MAX_MOUSE_BUTTON_COUNT)  
-            return button_released_flags[index];
+        {
+            int mb_index = mb_to_mb_binding[index];
+            SDL_Keycode kb_index = mb_to_kb_binding[mb_index];
+            if(kb_index == SDLK_UNKNOWN)
+                return button_released_flags[mb_index];
+            else
+                return kb_up[kb_index];
+        }
         else
         {
             std::cout<<"Invalid mouse index"<<std::endl;
@@ -487,10 +534,20 @@ namespace Pringine {
         }        
     }
 
-    
+    void Mouse::map_mb_to_mb(int from, int to)
+    {
+        mb_to_mb_binding[from] = to;
+    }    
 
 
-
+    void Mouse::map_mb_to_kb(int from, SDL_Keycode to)
+    {
+        mb_to_mb_binding[from] = from;
+        mb_to_kb_binding[from] = to;
+        kb[to] = false;
+        kb_up[to] = false;
+        kb_down[to] = false;
+    }
 
 
 

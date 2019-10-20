@@ -24,7 +24,7 @@ namespace Pringine{
 
     void Player::start()
     {
-
+    
     }
 
     void Player::update()
@@ -82,6 +82,12 @@ namespace Pringine{
        }
         */
 
+        if(mouse->get_mouse_button_down(0))
+            std::cout<<"mouse 0 down"<<std::endl;
+        if(mouse->get_mouse_button_up(0))
+            std::cout<<"mouse 0 up"<<std::endl;
+        if(mouse->get_mouse_button(0))
+            std::cout<<"mouse 0 held"<<std::endl;
 
     }
 

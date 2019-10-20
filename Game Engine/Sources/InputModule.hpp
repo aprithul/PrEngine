@@ -83,15 +83,25 @@ namespace Pringine {
 
             Mouse();
             ~Mouse();
+
             bool get_mouse_button(int index);
             bool get_mouse_button_down(int index);
             bool get_mouse_button_up(int index);
             int window_id;
+
             Vector2<int> position;
+            int mb_to_mb_binding[MAX_MOUSE_BUTTON_COUNT];
+            SDL_Keycode mb_to_kb_binding[MAX_MOUSE_BUTTON_COUNT];
+
             bool button_state[MAX_MOUSE_BUTTON_COUNT];
             int click_count[MAX_MOUSE_BUTTON_COUNT];
             bool button_released_flags[MAX_MOUSE_BUTTON_COUNT];
             bool button_pressed_flags[MAX_MOUSE_BUTTON_COUNT];
+            std::map<SDL_Keycode, bool> kb_down;
+            std::map<SDL_Keycode, bool> kb_up;
+            std::map<SDL_Keycode, bool> kb;
+            void map_mb_to_mb(int from, int to);
+            void map_mb_to_kb(int from, SDL_Keycode to);
 
     };
 
@@ -127,12 +137,12 @@ namespace Pringine {
 
             GameController* get_gamecontroller();
             Keyboard keyboard;
+            Mouse mouse;
 
         private:
 
             void update_game_controllers();
             GameController game_controllers[MAX_GAMECONTROLLER_COUNT];
-            Mouse mouse;
             //KeyboardGameController keyboardgc;
             SDL_Event event;
 
