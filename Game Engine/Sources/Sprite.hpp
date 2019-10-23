@@ -9,7 +9,7 @@ namespace Pringine
     class Sprite : public Entity
     {
         public:
-            Sprite(const std::string& graphics_file_name, TextureSlicingParameters slicing_param, Renderer2D& renderer2d, int num_of_animation_frames = 1, int pixel_to_world_scale = 100, int layer = 999);
+            Sprite(const std::string& graphics_file_name, const TextureSlicingParameters* slicing_param, Renderer2D& renderer2d, int num_of_animation_frames = 1, int pixel_to_world_scale = 100, int layer = 999);
             ~Sprite() override;
             Transform transform;
             Graphics graphics;

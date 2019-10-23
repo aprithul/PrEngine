@@ -13,6 +13,10 @@ namespace Pringine {
     InputManager::InputManager(std::string name, int priority):Module(name, priority)
     {
         was_crossed = false;
+        SDL_Init(SDL_INIT_GAMECONTROLLER);
+        SDL_Init(SDL_INIT_JOYSTICK);
+        SDL_Init(SDL_INIT_EVENTS);
+        SDL_Init(SDL_INIT_HAPTIC);
     }
 
     InputManager::~InputManager()
@@ -36,17 +40,16 @@ namespace Pringine {
                     game_controllers[i].name = SDL_GameControllerName(game_controllers[i].game_controller);
                     game_controllers[i].joy_stick = SDL_GameControllerGetJoystick(game_controllers[i].game_controller);
                     game_controllers[i].instance_id = SDL_JoystickInstanceID(game_controllers[i].joy_stick) ;
-                    std::cout<<"Game Controller: "<<game_controllers[i].name<<", "<<game_controllers[i].instance_id<<std::endl;
+                    LOG(LOGTYPE_GENERAL, "Game Controller: ",game_controllers[i].name, std::to_string(game_controllers[i].instance_id));
                 }
                 else
-                    std::cout<<"couldn't get game controller"<<std::endl;
+                    LOG(LOGTYPE_GENERAL,"couldn't get game controller");
             }
         }
     }
 
     void InputManager::update()
     {
-
         for(int j=SDL_CONTROLLER_BUTTON_A; j<SDL_CONTROLLER_BUTTON_MAX; j++)
         {
             for(int i=0; i<MAX_GAMECONTROLLER_COUNT; i++)
@@ -71,6 +74,8 @@ namespace Pringine {
         
         for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_released_flags.begin(); it!=keyboard.key_released_flags.end(); ++it)
             keyboard.key_released_flags[it->first] = false;
+
+//        LOG(LOGTYPE_GENERAL, std::to_string(Time::get_time()));
 
         while (SDL_PollEvent(&event)) {
             switch (event.type)
@@ -100,7 +105,7 @@ namespace Pringine {
                     {
                         game_controllers[i].button_pressed_flags[event.cbutton.button] = true;
                         game_controllers[i].button_state[event.cbutton.button] = true;                        
-                        std::cout<<"Controller: "<<game_controllers[i].name<<" Pressed: "<<(SDL_GameControllerButton)event.cbutton.button<<std::endl;
+                        LOG(LOGTYPE_GENERAL,"Controller: ",game_controllers[i].name," Pressed: ", std::to_string((SDL_GameControllerButton)event.cbutton.button));
                     }
                 }
                 break;
@@ -111,16 +116,16 @@ namespace Pringine {
                     {
                         game_controllers[i].button_released_flags[event.cbutton.button] = true;
                         game_controllers[i].button_state[event.cbutton.button] = false;                        
-                        std::cout<<"Controller: "<<game_controllers[i].name<<" Released: "<<(SDL_GameControllerButton)event.cbutton.button<<std::endl;
+                        LOG(LOGTYPE_GENERAL,"Controller: ",game_controllers[i].name," Released: ", std::to_string((SDL_GameControllerButton)event.cbutton.button));                        
                     }
                 }
                 break;
             case SDL_CONTROLLERDEVICEREMOVED:
-                std::cout<<"Controller detached  "<< event.cdevice.which<<std::endl;
+                LOG(LOGTYPE_WARNING,"Controller detached  ", std::to_string(event.cdevice.which));
                 update_game_controllers();
                 break;
             case SDL_CONTROLLERDEVICEADDED:
-                std::cout<<"Controller added "<< event.cdevice.which<<std::endl;
+                LOG(LOGTYPE_GENERAL,"Controller added  ", std::to_string(event.cdevice.which));
                 update_game_controllers();
                 break;
             // end game controller events
@@ -237,12 +242,12 @@ namespace Pringine {
         {
             if(game_controllers[i].instance_id >= 0)
             {
-                std::cout<<"Returned game controller: "<<game_controllers[i].name<<" , instnace id: "<<game_controllers[i].instance_id<<std::endl;
+                LOG(LOGTYPE_GENERAL,"Returned game controller: ",game_controllers[i].name," , instnace id: ", std::to_string(game_controllers[i].instance_id));
                 return &game_controllers[i];
             }
         }
 
-        std::cout<<"No gamecontroller attached"<<std::endl;
+        LOG(LOGTYPE_GENERAL,"No gamecontroller attached");
         //return &keyboardgc;
         return nullptr;
     }
@@ -493,7 +498,7 @@ namespace Pringine {
         }
         else
         {
-            std::cout<<"Invalid mouse index"<<std::endl;
+            LOG(LOGTYPE_ERROR, "Invalid mouse index");
             return false;
         }        
     }
@@ -511,7 +516,7 @@ namespace Pringine {
         }
         else
         {
-            std::cout<<"Invalid mouse index"<<std::endl;
+            LOG(LOGTYPE_ERROR,"Invalid mouse index");
             return false;
         }        
     }
@@ -529,7 +534,7 @@ namespace Pringine {
         }
         else
         {
-            std::cout<<"Invalid mouse index"<<std::endl;
+            LOG(LOGTYPE_ERROR,"Invalid mouse index");
             return false;
         }        
     }

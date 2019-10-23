@@ -24,7 +24,7 @@ namespace Pringine {
         void update() override;
         void end() override;
         void set_frame_rate(int frame_rate);
-        void set_frame_rate_to_uncapped();
+        void set_uncapped();
     private:
         int target_frame_rate;
         double frame_delta;

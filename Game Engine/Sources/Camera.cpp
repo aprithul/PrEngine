@@ -2,13 +2,12 @@
 
 namespace Pringine
 {
-    Camera::Camera(int width, int height, float zoom_speed, Renderer2D* renderer2d):Entity(ENTITY_TYPE_CAMERA)
+    Camera::Camera(int width, int height, Renderer2D* renderer2d):Entity(ENTITY_TYPE_CAMERA)
     {
         this->width = width;
         this->height = height;
         this->aspect_ratio = width/height;
         this->zoom_amount = 1.0f;
-        this->zoom_speed = zoom_speed;
         this->renderer2d = renderer2d;
     }
 
@@ -56,7 +55,6 @@ namespace Pringine
         //LOG(LOGTYPE_GENERAL, std::to_string(transform.position.x).append(", ").append(std::to_string(transform.position.y)));
  */
        
-        zoom_amount = Pringine::clamp(zoom_amount,1.0f, 5.0f);
 
         renderer2d->view_position = transform.position;
         renderer2d->zoom_amount = zoom_amount;
@@ -72,5 +70,17 @@ namespace Pringine
         color.a = 255;
         renderer2d->draw_rectangle(camera_bounds, color);
 
+    }
+
+    void Camera::zoom_in(float zoom_speed)
+    {
+        zoom_amount += zoom_speed  * Time::Frame_time;
+        zoom_amount = Pringine::clamp(zoom_amount,1.0f, 5.0f);
+    }
+
+    void Camera::zoom_out(float zoom_speed)
+    {
+        zoom_amount -= zoom_speed  * Time::Frame_time;
+        zoom_amount = Pringine::clamp(zoom_amount,1.0f, 5.0f);
     }
 }

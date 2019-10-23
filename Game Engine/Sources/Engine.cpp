@@ -27,6 +27,7 @@ namespace Pringine {
         // can safley clear now
         engine_modules.clear();
         LOG(LOGTYPE_GENERAL, "Engine destroyed");
+        SDL_Quit();
     }
     
     static bool priority_comparer(Module* a, Module* b)

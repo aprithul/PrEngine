@@ -15,6 +15,7 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <queue>
 #include <utility>
 #include <map>
@@ -70,6 +71,18 @@ namespace Pringine {
 
     };
 
+    enum TextJustification
+    {
+        TOP_LEFT,
+        TOP_CENTER,
+        TOP_RIGHT,
+        MIDDLE_LEFT,
+        MIDDLE_CENTER,
+        MIDDLE_RIGHT,
+        BOTTOM_LEFT,
+        BOTTOM_CENTER,
+        BOTTOM_RIGHT
+    };
 
     class Renderer2D : public Module
     {
@@ -94,17 +107,21 @@ namespace Pringine {
         void set_draw_color(SDL_Color color);
         int add_graphics_to_draw(Graphics* graphics);
         void remove_graphics(int id);
-        void render_to_render_texture();
 
         void draw_rectangle(Rect rect, SDL_Color color, bool screen_space = false);
         void draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space = false);
-    
+        TTF_Font* open_font(const std::string font_file_name,int font_size);
+        //SDL_Texture* draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
+        SDL_Texture* get_text_texture(const std::string& text, TTF_Font* font, SDL_Color color);
+        void draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification);        
+        void draw_text(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
+        void close_font(TTF_Font* font);
+
         void start() override;
         void update() override;
         void end() override;
         
     private:
-        
         
         std::string title;
         SDL_Color clear_color;
@@ -112,12 +129,15 @@ namespace Pringine {
         std::queue<int> released_positions;
         std::queue<std::pair<SDL_Color,SDL_Rect>> debug_shapes_rect;
         std::queue<std::pair<SDL_Color, std::pair<Vector2<float>,Vector2<float>>>> debug_shapes_line;
+        std::queue<std::pair<SDL_Texture*, SDL_Rect>> ttf_textures;
+        void justify_text(TextJustification tj, SDL_Rect& rect);
         int render_array_head;
         bool do_draw_debug_shapes;
 
         // draws 'everything' on screen inside renderer update
         void draw();
         void draw_debug();
+        void draw_ttf_textures();
         void set_vsync(bool value);
         
     };
@@ -140,7 +160,7 @@ namespace Pringine {
         ~Graphics();
         GraphicsFrame* get_current_frame();
         GraphicsFrame* get_frame_at(int index);
-        void load_graphics(std::string graphics_file, TextureSlicingParameters slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1);
+        void load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1);
     };
 }
 

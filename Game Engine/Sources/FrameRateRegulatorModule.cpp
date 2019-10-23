@@ -55,7 +55,7 @@ namespace Pringine {
         this->frame_delta = 1.0/frame_rate;
     }
 
-    void FrameRateRegulator::set_frame_rate_to_uncapped()
+    void FrameRateRegulator::set_uncapped()
     {
         this->frame_delta = 0.0f;
     }

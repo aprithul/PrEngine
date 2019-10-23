@@ -23,7 +23,7 @@ namespace Pringine{
 
   
 
-    void LOG(LogType type, std::string log_text, bool log_to_file)
+    void LOG(LogType type, const std::string& log_text, const std::string& log_text_2,const std::string& log_text_3,const std::string& log_text_4,const std::string& log_text_5,const std::string& log_text_6,const std::string& log_text_7,const std::string& log_text_8,const std::string& log_text_9,const std::string& log_text_10)
     {
 
         if(!log_enabled)
@@ -44,20 +44,20 @@ namespace Pringine{
         switch (type)
         {
         case LOGTYPE_GENERAL:
-            std::cout<<log_extra_info<<log_text<<std::endl;
+            std::cout<<log_extra_info<<log_text<<log_text_2<<log_text_3<<log_text_4<<log_text_5<<log_text_6<<log_text_7<<log_text_8<<log_text_9<<log_text_10<<std::endl;
             break;
         case LOGTYPE_WARNING:
-            std::cout<< "\033[1;33m" << "Warning:"<<"\033[0m"<<log_extra_info<<log_text<<std::endl;
+            std::cout<< "\033[1;33m" << "Warning:"<<"\033[0m"<<log_extra_info<<log_text<<log_text_2<<log_text_3<<log_text_4<<log_text_5<<log_text_6<<log_text_7<<log_text_8<<log_text_9<<log_text_10<<std::endl;
             break;
         case LOGTYPE_ERROR:
-            std::cout<< "\033[1;31m" << "Error:"<<"\033[0m"<<log_extra_info<<log_text<<std::endl;
+            std::cout<< "\033[1;31m" << "Error:"<<"\033[0m"<<log_extra_info<<log_text<<log_text_2<<log_text_3<<log_text_4<<log_text_5<<log_text_6<<log_text_7<<log_text_8<<log_text_9<<log_text_10<<std::endl;
             break;
         }
 
-        if(log_to_file)
+        if(log_file)
         {    
             if(log_file.is_open())
-                log_file<<LogTypeStrings[type]<<": "<<log_text;
+                log_file<<LogTypeStrings[type]<<": "<<log_text<<log_text_2<<log_text_3<<log_text_4<<log_text_5<<log_text_6<<log_text_7<<log_text_8<<log_text_9<<log_text_10;
         }
     }
 

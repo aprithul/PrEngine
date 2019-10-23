@@ -13,16 +13,17 @@ namespace Pringine
     class Camera: public Entity
     {
         public:
-            Camera(int width, int height, float zoom_speed, Renderer2D* renderer2d);
+            Camera(int width, int height, Renderer2D* renderer2d);
             ~Camera();
             Transform transform;
             int width;
             int height;
-            float zoom_speed;
             float zoom_amount;
             float aspect_ratio;
             Renderer2D* renderer2d;
 
+            void zoom_in(float zoom_speed);
+            void zoom_out(float zoom_speed);
             void start() override;
             void update() override;
 

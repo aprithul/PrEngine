@@ -12,6 +12,8 @@
 #include <string>
 #include "SDL2/SDL.h"
 
+#define IS_SERVER false
+
 namespace Pringine {
     
     // every component class extends this

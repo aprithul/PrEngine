@@ -5,7 +5,7 @@ OBJ_DIR := ./Build
 CC       := g++
 CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11 -g
 CXXFLAGS := -Wall
-LDLIBS   := -lSDL2 -lSDL2_image
+LDLIBS   := -lSDL2 -lSDL2_image -lSDL2_ttf
 
 SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)

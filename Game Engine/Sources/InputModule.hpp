@@ -9,16 +9,14 @@
 #ifndef Input_hpp
 #define Input_hpp
 
-
-#include <stdlib.h>
 #include <iostream>
-#include <utility>
 #include <string>
 #include <map>
+#include <SDL2/SDL.h>
 #include "Module.hpp"
 #include "Vector2.hpp"
-#include "SDL2/SDL.h"
 #include "Utils.hpp"
+#include "TimeModule.hpp"
 
 #define MAX_GAMECONTROLLER_COUNT 16
 #define MAX_MOUSE_BUTTON_COUNT 10

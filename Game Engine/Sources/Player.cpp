@@ -44,11 +44,18 @@ namespace Pringine{
 
         if(keyboard->get_key_up(SDLK_t))
             std::cout<<"t released"<<std::endl;
-            
+        */
+
         Vector2<float> translation( game_controller->get_axis(SDL_CONTROLLER_AXIS_LEFTX), game_controller->get_axis(SDL_CONTROLLER_AXIS_LEFTY));
         translation = translation * (float)(Time::Frame_time*5.f);
         main_camera->transform.translate(translation);
 
+        main_camera->zoom_in( 1 * game_controller->get_axis(SDL_CONTROLLER_AXIS_TRIGGERLEFT));
+        main_camera->zoom_out( 1 * game_controller->get_axis(SDL_CONTROLLER_AXIS_TRIGGERRIGHT));
+
+        if(game_controller->get_button_down(SDL_CONTROLLER_BUTTON_A))
+            LOG(LOGTYPE_GENERAL, "A down");
+/*
         if(game_controller->get_button_down(SDL_CONTROLLER_BUTTON_A))
             std::cout<<"A down"<<std::endl;
         if(game_controller->get_button_up(SDL_CONTROLLER_BUTTON_A))
@@ -80,7 +87,6 @@ namespace Pringine{
        {
            std::cout<<b<<" is down"<<std::endl;
        }
-        */
 
         if(mouse->get_mouse_button_down(0))
             std::cout<<"mouse 0 down"<<std::endl;
@@ -88,6 +94,7 @@ namespace Pringine{
             std::cout<<"mouse 0 up"<<std::endl;
         if(mouse->get_mouse_button(0))
             std::cout<<"mouse 0 held"<<std::endl;
+        */
 
     }
 
