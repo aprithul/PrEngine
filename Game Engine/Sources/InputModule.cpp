@@ -30,7 +30,7 @@ namespace Pringine {
 
     void InputManager::update_game_controllers()
     {
-
+        LOG(LOGTYPE_GENERAL, "Num of Joysticks: ", std::to_string(SDL_NumJoysticks()));
         for(int i=0; i<SDL_NumJoysticks(); i++)
         {
             if (SDL_IsGameController(i)) {
@@ -40,7 +40,6 @@ namespace Pringine {
                     game_controllers[i].name = SDL_GameControllerName(game_controllers[i].game_controller);
                     game_controllers[i].joy_stick = SDL_GameControllerGetJoystick(game_controllers[i].game_controller);
                     game_controllers[i].instance_id = SDL_JoystickInstanceID(game_controllers[i].joy_stick) ;
-                    LOG(LOGTYPE_GENERAL, "Game Controller: ",game_controllers[i].name, std::to_string(game_controllers[i].instance_id));
                 }
                 else
                     LOG(LOGTYPE_GENERAL,"couldn't get game controller");
@@ -57,8 +56,6 @@ namespace Pringine {
                 game_controllers[i].button_released_flags[j] = false;
                 game_controllers[i].button_pressed_flags[j] = false;
             }
-            //keyboardgc.button_released_flags[j] = false;
-            //keyboardgc.button_pressed_flags[j] = false;
         }
 
         for(int i=0; i<MAX_MOUSE_BUTTON_COUNT; i++)
@@ -94,7 +91,7 @@ namespace Pringine {
                         game_controllers[i].axis_state[event.caxis.axis] = val * (event.caxis.axis==SDL_CONTROLLER_AXIS_LEFTY || event.caxis.axis == SDL_CONTROLLER_AXIS_RIGHTY ? -1.f:1.f);//*-1.f;
                         //if( abs(val) > game_controllers[i].dead_zone)
                         //    std::cout<<"Controller: "<<game_controllers[i].name<<" axis name: "<<event.caxis.axis<<"  value: "<< game_controllers[i].axis_state[event.caxis.axis]<<std::endl;
-
+                        //LOG(LOGTYPE_GENERAL, "Analog Motion ",std::to_string(val));
                     }
                 }
                 break;
@@ -235,21 +232,20 @@ namespace Pringine {
         }
     }
 
-    GameController* InputManager::get_gamecontroller()
+    GameController* InputManager::get_gamecontroller(int index)
     {
         update_game_controllers();
-        for(int i=0; i<MAX_GAMECONTROLLER_COUNT; i++)
+        if(index<MAX_GAMECONTROLLER_COUNT)
         {
-            if(game_controllers[i].instance_id >= 0)
-            {
-                LOG(LOGTYPE_GENERAL,"Returned game controller: ",game_controllers[i].name," , instnace id: ", std::to_string(game_controllers[i].instance_id));
-                return &game_controllers[i];
-            }
+            LOG(LOGTYPE_GENERAL,"Returned game controller: ",game_controllers[index].name," , instnace id: ", std::to_string(game_controllers[index].instance_id));
+            LOG(LOGTYPE_WARNING, "Controller may not exist yet, verify instance id");
+            return &game_controllers[index];
         }
-
-        LOG(LOGTYPE_GENERAL,"No gamecontroller attached");
-        //return &keyboardgc;
-        return nullptr;
+        else
+        {
+            LOG(LOGTYPE_GENERAL,"Gamecontroller index is out of range");
+            return nullptr;
+        }
     }
 
 

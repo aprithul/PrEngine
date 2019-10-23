@@ -79,8 +79,12 @@ namespace Pringine {
                 
         // engine loop
         // updates at specified frame rate
+
+        #ifndef EMSCRIPTEN
         while(this->is_running)
+        #endif
         {
+            //LOG(LOGTYPE_GENERAL, "Updating: ");
             // update all components
             for(int _i=0; _i<engine_modules.size(); _i++)
             {

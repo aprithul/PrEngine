@@ -87,7 +87,10 @@ namespace Pringine {
             this->do_draw_debug_shapes = true;
             // create window and sdl_renderer
             set_vsync(vsync);
+            #ifndef EMSCRIPTEN
             SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
+            #endif
+
             sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height,  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
             sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
             render_texture = SDL_CreateTexture( sdl_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->window_width, this->window_height );
@@ -280,7 +283,7 @@ namespace Pringine {
             //SDL_RenderDrawRect( sdl_renderer , &sdl_rect);
         #endif
     }
-
+    
     void Renderer2D::draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space)
     {
         #if !IS_SERVER
@@ -401,7 +404,7 @@ namespace Pringine {
         #endif
     }
 
-    /*SDL_Texture* Renderer2D::draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color, Vector2<int> screen_position, TextJustification text_justification)
+    SDL_Texture* Renderer2D::draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color, Vector2<int> screen_position, TextJustification text_justification)
     {
         SDL_Texture *texture =  get_text_texture(text,font,color);
 
@@ -413,7 +416,7 @@ namespace Pringine {
 
         ttf_textures.push( std::pair<SDL_Texture*, SDL_Rect>{texture, text_rect});
         return texture;
-    }*/
+    }
 
     void Renderer2D::justify_text(TextJustification tj, SDL_Rect& text_rect)
     {
@@ -487,7 +490,11 @@ namespace Pringine {
                 SDL_Color &c = debug_shapes_line.front().first;
                 std::pair<Vector2<float>, Vector2<float>> &line = debug_shapes_line.front().second; 
                 set_draw_color(c);
+                #ifndef EMSCRIPTEN
                 SDL_RenderDrawLineF(sdl_renderer, line.first.x, line.first.y, line.second.x, line.second.y);
+                #else
+                SDL_RenderDrawLine(sdl_renderer, (int)line.first.x, (int)line.first.y, (int)line.second.x, (int)line.second.y);
+                #endif
                 debug_shapes_line.pop();
             }
         #endif

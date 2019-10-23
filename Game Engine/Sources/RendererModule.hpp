@@ -111,7 +111,7 @@ namespace Pringine {
         void draw_rectangle(Rect rect, SDL_Color color, bool screen_space = false);
         void draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space = false);
         TTF_Font* open_font(const std::string font_file_name,int font_size);
-        //SDL_Texture* draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
+        SDL_Texture* draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
         SDL_Texture* get_text_texture(const std::string& text, TTF_Font* font, SDL_Color color);
         void draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification);        
         void draw_text(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
@@ -127,9 +127,9 @@ namespace Pringine {
         SDL_Color clear_color;
         Graphics* render_list[MAX_RENDERED_GRAPHICS_PER_FRAME];
         std::queue<int> released_positions;
-        std::queue<std::pair<SDL_Color,SDL_Rect>> debug_shapes_rect;
-        std::queue<std::pair<SDL_Color, std::pair<Vector2<float>,Vector2<float>>>> debug_shapes_line;
-        std::queue<std::pair<SDL_Texture*, SDL_Rect>> ttf_textures;
+        std::queue<std::pair<SDL_Color,SDL_Rect> > debug_shapes_rect;
+        std::queue<std::pair<SDL_Color, std::pair<Vector2<float>,Vector2<float> > > > debug_shapes_line;
+        std::queue<std::pair<SDL_Texture*, SDL_Rect> > ttf_textures;
         void justify_text(TextJustification tj, SDL_Rect& rect);
         int render_array_head;
         bool do_draw_debug_shapes;

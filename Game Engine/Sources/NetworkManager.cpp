@@ -62,7 +62,7 @@ namespace Pringine
         if ( bind( handle, (const sockaddr*) &address, sizeof(sockaddr_in) ) < 0 )
         {
             
-            LOG( LOGTYPE_ERROR, "failed to bind socket : ", std::to_string(errno), std::string(strerror(errno)));
+            LOG( LOGTYPE_ERROR, "failed to bind socket : ", std::to_string(errno), std::string(" | "),std::string(strerror(errno)));
             return false;
         }
 
@@ -91,9 +91,9 @@ namespace Pringine
         return true;
     }
 
-    bool Socket::Send(const Address& destination, const void * data, int size)
+    bool Socket::Send(const Address& destination, const Packet* packet, int size)
     {
-        int sent_bytes = sendto( handle, data, size, 0, 
+        int sent_bytes = sendto( handle, packet, size, 0, 
                                 (sockaddr*)&(destination.address), sizeof(sockaddr_in) );
 
         if ( sent_bytes != size )
@@ -108,7 +108,7 @@ namespace Pringine
         
     }
 
-    int Socket::Receive(Address & sender, void * data, int size)
+    int Socket::Receive(Address & sender, Packet * packet, int size)
     {
         #if PLATFORM == PLATFORM_WINDOWS
         typedef int socklen_t;
@@ -118,7 +118,7 @@ namespace Pringine
         socklen_t fromLength = sizeof( from );
 
         int bytes = recvfrom( handle, 
-                            data, 
+                            packet, 
                             size,
                             0, 
                             (sockaddr*)&from, 
@@ -159,7 +159,6 @@ namespace Pringine
 
     NetworkManager::NetworkManager(const std::string& name, int priority) :Module(name,priority)
     {
-        LOG(LOGTYPE_GENERAL, "Openging Socket handle: ", std::to_string(socket.handle));
     }
 
     NetworkManager::~NetworkManager()
@@ -175,8 +174,19 @@ namespace Pringine
             return;
         }
         // send a packet
-        const char data[] = "hello world!";
-        socket.Send( Address(127,0,0,1,port), data, sizeof( data ) );
+        Packet packet;
+        packet.protocl_id = 1100;
+        packet.sequence_number = 1;
+        packet.ack = 0;
+        packet.bit_filed = 0x00;
+        packet.data[0] = 'H';
+        packet.data[1] = 'E';
+        packet.data[2] = 'L';
+        packet.data[3] = 'L';
+        packet.data[4] = 'O';
+        packet.data[5] = '\0';
+        std::cout<<"sending: "<<sizeof( packet )<<" bytes"<<std::endl;
+        socket.Send( Address(127,0,0,1,port), &packet, sizeof( packet ) );
     }
 
 
@@ -184,17 +194,15 @@ namespace Pringine
     {
         
         Address sender;
-        unsigned char buffer[256];
+        Packet packet;
         int bytes_read = socket.Receive( sender, 
-                            buffer, 
-                            sizeof( buffer ) );
+                            &packet, 
+                            sizeof( packet ) );
         //if ( !bytes_read )
-        if( bytes_read)
+        if( bytes_read > 96)
         {
-            LOG(LOGTYPE_GENERAL, "Data received!");
-            for(int i=0; i<bytes_read; i++)
-                std::cout<<buffer[i];
-            
+            LOG(LOGTYPE_GENERAL, "Data received! ",std::to_string(bytes_read));
+            std::cout<<packet.data<<std::endl;
             std::cout<<std::endl;
         }
             

@@ -3,7 +3,8 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/Users/prithul/emsdk/upstream/emscripten/system/include/"
             ],
             "defines": [],
             "macFrameworkPath": [

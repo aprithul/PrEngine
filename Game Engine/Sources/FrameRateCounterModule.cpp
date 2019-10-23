@@ -50,7 +50,11 @@ namespace Pringine {
                 // print frame rate to screen
                 std::string fr = "Frame rate : ";
                 fr.append(std::to_string(last_frame_count));
-                SDL_Color black{0,0,0,255};
+                SDL_Color black;
+                black.r = 0;
+                black.g = 0;
+                black.b = 0;
+                black.a =255;
 
                 if(text_texture != nullptr)
                     SDL_DestroyTexture(text_texture);

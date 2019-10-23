@@ -65,7 +65,7 @@ namespace Pringine {
             KeyboardGameController();
             ~KeyboardGameController();
 
-            std::map<SDL_Keycode, std::pair<SDL_GameControllerAxis,float>> axis_binding;
+            std::map<SDL_Keycode, std::pair<SDL_GameControllerAxis,float> > axis_binding;
             //std::string axis_names[SDL_CONTROLLER_AXIS_MAX];
             //float axis_state[SDL_CONTROLLER_AXIS_MAX];
 
@@ -133,7 +133,7 @@ namespace Pringine {
             void update() override;
             void end() override;
 
-            GameController* get_gamecontroller();
+            GameController* get_gamecontroller(int index);
             Keyboard keyboard;
             Mouse mouse;
 

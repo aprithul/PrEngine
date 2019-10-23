@@ -32,8 +32,21 @@
 #include "Module.hpp"
 #include "Logger.hpp"
 
+#define HEADER_SIZE 12
+#define PAYLOAD_SIZE 512
+
 namespace Pringine
 {
+
+    struct Packet   //524 bytes
+    {
+        uint32_t protocl_id;
+        uint16_t sequence_number;
+        uint16_t ack;
+        uint32_t bit_filed;
+        char data[PAYLOAD_SIZE];
+    };
+
 
     class Address
     {
@@ -73,11 +86,11 @@ namespace Pringine
             bool IsOpen() const;
 
             bool Send( const Address & destination, 
-                    const void * data, 
+                    const Packet* packet, 
                     int size );
 
             int Receive( Address & sender, 
-                        void * data, 
+                        Packet* packet, 
                         int size );
             int handle;
 
@@ -99,7 +112,7 @@ namespace Pringine
             void end() override;
 
         private:
-            const int port = 30000;
+            const int port = 30001;
             Socket socket;
     };
 }
