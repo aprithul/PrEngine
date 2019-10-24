@@ -31,5 +31,15 @@
 *.out
 *.app
 
+#html, js are builds. so ignore
+*.html
+*.js
+
+
+#html, js are builds. so ignore
+*.html
+*.js
+*.wasm
+
 #ds_store
 .DS_Store
