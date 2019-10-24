@@ -8,7 +8,7 @@ namespace Pringine
         //#if !IS_SERVER
             name = graphics_file_name;
             //LOG(LOGTYPE_GENERAL,"Created sprite");
-            graphics.load_graphics(graphics_file_name, slicing_param, _renderer2d, num_of_animation_frames) ;
+            graphics.load_graphics(graphics_file_name, slicing_param, _renderer2d, num_of_animation_frames, false) ;
             graphics.layer = layer;
             do_animate = false;
             this->renderer2d_id = _renderer2d.add_graphics_to_draw(&graphics);
@@ -55,6 +55,8 @@ namespace Pringine
     void Sprite::update()
     {
         #if !IS_SERVER
+
+
             if(do_animate)
             {
                 animation_accumulator += Time::Frame_time;
@@ -73,7 +75,7 @@ namespace Pringine
             graphics.dst_dimension.w = bounding_box.w;
             graphics.dst_dimension.h = bounding_box.h;
 
-            Rect bounds(transform.position.x, transform.position.y, bounding_box.w, bounding_box.h);
+            SDL_FRect bounds{transform.position.x, transform.position.y, bounding_box.w, bounding_box.h};
             SDL_Color color;
             color.r = 255;
             color.g = 122;

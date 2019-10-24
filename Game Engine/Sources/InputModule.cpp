@@ -455,8 +455,8 @@ namespace Pringine {
 
     Mouse::Mouse()
     {
-        position.x = 0;
-        position.y = 0;
+        position.x = -100;
+        position.y = -100;
         window_id = -1;
 
         for(int i=0; i<MAX_MOUSE_BUTTON_COUNT; i++)

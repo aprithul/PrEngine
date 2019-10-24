@@ -7,7 +7,7 @@
 #include "Module.hpp"
 #include <stdlib.h>
 #include <iostream>
-#include <emscripten.h>
+//#include <emscripten.h>
 #ifndef EMSCRIPTEN
 #include "NetworkManager.hpp"
 #endif
@@ -24,6 +24,7 @@
 #include "Sprite.hpp"
 #include "Player.hpp"
 #include "Camera.hpp"
+#include "GUI.hpp"
 
 void main_loop(void* game_engine);
 
@@ -59,11 +60,19 @@ int main(int argc, const char * argv[])
                                 add_module(new Pringine::NetworkManager("Network manager", 5));
         #endif
         
-        Pringine::Renderer2D* renderer2d = 
+        Pringine::Renderer2D* renderer2d =
                         (Pringine::Renderer2D*)game_engine->
-                                add_module(new Pringine::Renderer2D(640,480,"Pringine",true, 25, "Renderer", 99999));
+                                add_module(new Pringine::Renderer2D(640,360,"Pringine",true, 25, "Renderer", 99999));
         
         frame_rate_counter->renderer2D = renderer2d;
+        
+        Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
+        Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
+        Pringine::Mouse* mouse =  &((Pringine::InputManager*)game_engine->get_module("Input"))->mouse;
+        //mouse->map_mb_to_mb(1,0);
+        //mouse->map_mb_to_mb(3,1);
+
+        Pringine::initialize_gui(mouse, renderer2d);
 
         Pringine::Camera* camera = new Pringine::Camera(16,9,renderer2d);
         camera->transform.position = Pringine::Vector2<float>(0,0);
@@ -77,18 +86,19 @@ int main(int argc, const char * argv[])
         //sprite->transform.position = Pringine::Vector2<float>(0,0);
         //entity_management_system->assign_id_and_store_entity(*sprite);
 
-        Pringine::TextureSlicingParameters slicing_param_2(0,0,1024,1024,0,0);
-
+        //Pringine::TextureSlicingParameters slicing_param_2(0,0,1024,1024,0,0);
+        //Pringine::TextureSlicingParameters slicing_params(64,64,32,32,0,0);
         //for(int i=0; i<10; i++)
         {
-                Pringine::Sprite* sprite_cube = new Pringine::Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer2d, 4, 50, 10);
-                sprite_cube->transform.position = Pringine::Vector2<float>(0,0);
+        //        Pringine::Sprite* sprite_ui = new Pringine::Sprite(Pringine::get_resource_path("bats.png"), &slicing_params, *renderer2d, 17, 10, 10);
+                //Pringine::Sprite* sprite_cube = new Pringine::Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer2d, 4, 50, 10);
+        //        sprite_ui->transform.position = Pringine::Vector2<float>(0,0);
+                //sprite_cube->transform.position = Pringine::Vector2<float>(0,0);
                 //sprite_cube->set_animation(true, 4);
-                entity_management_system->assign_id_and_store_entity(*sprite_cube);
+        //        sprite_ui->set_animation(true, 1);
+                //entity_management_system->assign_id_and_store_entity(*sprite_cube);
+        //        entity_management_system->assign_id_and_store_entity(*sprite_ui);
         }
-        Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
-        Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
-        Pringine::Mouse* mouse =  &((Pringine::InputManager*)game_engine->get_module("Input"))->mouse;
 
         if(gc == nullptr)
                 Pringine::LOG( Pringine::LOGTYPE_ERROR,"Didn't return a valid gamecontroller");
@@ -102,6 +112,8 @@ int main(int argc, const char * argv[])
         //std::cout<<sprite->graphics.layer<<","<<sprite_cube->graphics.layer<<","<<sprite_cube_2->graphics.layer<<std::endl;
         game_engine->start();
         
+        //Pringine::show_file_structure( Pringine::get_resource_path(""),"");
+
         #ifndef EMSCRIPTEN
                 game_engine->update();
                 game_engine->end();

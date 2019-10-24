@@ -108,7 +108,8 @@ namespace Pringine {
         int add_graphics_to_draw(Graphics* graphics);
         void remove_graphics(int id);
 
-        void draw_rectangle(Rect rect, SDL_Color color, bool screen_space = false);
+        void draw_rectangle(SDL_FRect rect, SDL_Color color, bool screen_space = false, bool centered = false);
+        void draw_rectangle(SDL_Rect rect, SDL_Color color, bool screen_space = false, bool centered = false);
         void draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space = false);
         TTF_Font* open_font(const std::string font_file_name,int font_size);
         SDL_Texture* draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification);
@@ -160,7 +161,9 @@ namespace Pringine {
         ~Graphics();
         GraphicsFrame* get_current_frame();
         GraphicsFrame* get_frame_at(int index);
-        void load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1);
+        void draw(Renderer2D* renderer, bool world_space = true, bool centered = true, Vector2<float> view_position  = Vector2<float>{0,0}, float scale = 1.0f);
+        bool load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
+        bool load_graphics(SDL_Texture* texture, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
     };
 }
 

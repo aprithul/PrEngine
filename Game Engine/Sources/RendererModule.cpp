@@ -34,9 +34,11 @@ namespace Pringine {
                 }
                 
                 loaded_texture_library[file_name] = texture;
+                LOG(LOGTYPE_GENERAL, "Loaded : ", file_name);
                 return texture;
             }
             else
+                LOG(LOGTYPE_GENERAL, "Pre Loaded : ", file_name);
                 return loaded_texture_library[file_name];
         #endif
     }
@@ -91,10 +93,13 @@ namespace Pringine {
             SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
             #endif
 
-            sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height,  SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
+            sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height,  SDL_WINDOW_SHOWN);
             sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
             render_texture = SDL_CreateTexture( sdl_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->window_width, this->window_height );
             SDL_SetTextureBlendMode(render_texture, SDL_BLENDMODE_BLEND);
+
+            //load_texture("default.jpg", sdl_renderer);
+
         #endif
     }
 
@@ -150,6 +155,7 @@ namespace Pringine {
                 SDL_RenderClear(sdl_renderer);
 
                 draw();
+
                 if(do_draw_debug_shapes)
                     draw_debug();
                 //draw_ttf_textures();
@@ -266,24 +272,51 @@ namespace Pringine {
         #endif
     }
 
-    void Renderer2D::draw_rectangle(Rect rect, SDL_Color color, bool screen_space)
+    void Renderer2D::draw_rectangle(SDL_FRect rect, SDL_Color color, bool screen_space, bool centered)
     {
         #if !IS_SERVER
-        static SDL_Rect sdl_rect;
             if(!screen_space)
             {
-                sdl_rect.x = ((rect.x - view_position.x) - rect.w/2.0f)*world_unit_to_pixels*zoom_amount + window_width/2.0f;
-                sdl_rect.y = (-(rect.y - view_position.y) - rect.h/2.0f)*world_unit_to_pixels*zoom_amount + window_height/2.0f;
-                sdl_rect.w = rect.w * world_unit_to_pixels*zoom_amount;
-                sdl_rect.h = rect.h * world_unit_to_pixels*zoom_amount;
+                rect.x = ((rect.x - view_position.x) - rect.w/2.0f)*world_unit_to_pixels*zoom_amount + window_width/2.0f;
+                rect.y = (-(rect.y - view_position.y) - rect.h/2.0f)*world_unit_to_pixels*zoom_amount + window_height/2.0f;
+                rect.w = rect.w * world_unit_to_pixels*zoom_amount;
+                rect.h = rect.h * world_unit_to_pixels*zoom_amount;
             }
-
-            debug_shapes_rect.emplace( std::make_pair(color, sdl_rect));
-            //SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color. b, color.a);
-            //SDL_RenderDrawRect( sdl_renderer , &sdl_rect);
+            else if(centered)
+            {
+                rect.x -= rect.w/2.0f;
+                rect.y -= rect.h/2.0f;
+            }
+            //debug_shapes_rect.emplace( std::make_pair(color, sdl_rect));
+            SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color. b, color.a);
+            SDL_RenderDrawRectF( sdl_renderer , &rect);
         #endif
     }
-    
+
+    void Renderer2D::draw_rectangle(SDL_Rect rect, SDL_Color color, bool screen_space, bool centered)
+    {
+        #if !IS_SERVER
+            if(!screen_space)
+            {
+                rect.x = ((rect.x - view_position.x) - rect.w/2.0f)*world_unit_to_pixels*zoom_amount + window_width/2.0f;
+                rect.y = (-(rect.y - view_position.y) - rect.h/2.0f)*world_unit_to_pixels*zoom_amount + window_height/2.0f;
+                rect.w = rect.w * world_unit_to_pixels*zoom_amount;
+                rect.h = rect.h * world_unit_to_pixels*zoom_amount;
+            }
+            else if(centered)
+            {
+                rect.x -= rect.w/2.0f;
+                rect.y -= rect.h/2.0f;
+            }
+
+            //debug_shapes_rect.emplace( std::make_pair(color, sdl_rect));
+            SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color. b, color.a);
+            SDL_RenderDrawRect( sdl_renderer , &rect);
+        #endif
+    }
+
+
+
     void Renderer2D::draw_line(Vector2<float> p1, Vector2<float>p2, SDL_Color color, bool screen_space)
     {
         #if !IS_SERVER
@@ -308,17 +341,7 @@ namespace Pringine {
                 Graphics* _graphics = render_list[_i];
                 if(_graphics != nullptr)
                 {
-                    // dst_dimension has world unit values, convert to screen space
-                    // also make drawing relative to camera position
-                    // also make center of screen 0,0
-                    _graphics->dst_dimension.w *= (world_unit_to_pixels * zoom_amount);
-                    _graphics->dst_dimension.h *= (world_unit_to_pixels * zoom_amount);
-                    
-                    _graphics->dst_dimension.x = (((_graphics->dst_dimension.x - view_position.x)*world_unit_to_pixels*zoom_amount) - (_graphics->dst_dimension.w/2) + window_width/2);
-                    _graphics->dst_dimension.y = ((-(_graphics->dst_dimension.y - view_position.y)*world_unit_to_pixels*zoom_amount) - (_graphics->dst_dimension.h/2) + window_height/2);
-
-                    SDL_RenderCopyEx(this->sdl_renderer, _graphics->get_current_frame()->texture , &(_graphics->get_current_frame()->region), 
-                                            &_graphics->dst_dimension, _graphics->angle, NULL, SDL_FLIP_NONE) ;
+                    _graphics->draw(this, true, true, view_position,world_unit_to_pixels * zoom_amount);
                 }
             }
         #endif
@@ -538,19 +561,20 @@ namespace Pringine {
         }
     }
     
-    void Graphics::load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames)
+    bool Graphics::load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames, bool is_subregion)
     {
         #if !IS_SERVER
             // load all animation frames
             if(slicing_params == nullptr)
             {   
                 LOG(LOGTYPE_ERROR, "Slicing parameter is null, can't load graphics");
-                return;
+                return false;
             }
 
             this->number_of_frames = num_of_frames;
             graphics_frames = new GraphicsFrame[num_of_frames];
             SDL_Texture* texture = Pringine::load_texture(graphics_file, renderer2d.sdl_renderer);
+            
             if(texture != nullptr)
             {
                 int w = 0;
@@ -561,11 +585,76 @@ namespace Pringine {
                 int columns = w/(slicing_params->w+slicing_params->x_pad);
                 int rows = h/(slicing_params->h+slicing_params->y_pad);
                 int frame_no = 0;
+                int _i= slicing_params->x + slicing_params->x_pad;
 
-
-                for(int _i= slicing_params->x + slicing_params->x_pad; _i<w; _i += (slicing_params->w+slicing_params->x_pad))
+                for(int _j = slicing_params->y + slicing_params->y_pad; _j<h; _j += (slicing_params->h+slicing_params->y_pad))
                 {
-                    for(int _j = slicing_params->y + slicing_params->y_pad; _j<h; _j += (slicing_params->h+slicing_params->y_pad))
+                    for(; _i<w; _i += (slicing_params->w+slicing_params->x_pad))
+                    {
+                        if(frame_no<this->number_of_frames)
+                        {
+                            GraphicsFrame* frame = &graphics_frames[frame_no];
+                            frame->texture = texture;
+                            frame->region.x = _i;
+                            frame->region.y = _j;
+                            
+                            if(_i+slicing_params->w > w)
+                                frame->region.w = slicing_params->w - (_i+slicing_params->w-w);
+                            else
+                                frame->region.w = slicing_params->w;
+
+                            if(_j+slicing_params->h > h)
+                                frame->region.h = slicing_params->h - (_j+slicing_params->h-h);
+                            else
+                                frame->region.h = slicing_params->h;
+                            
+                            frame_no++;
+                        }
+                    }
+                    if(is_subregion)
+                        _i= slicing_params->x + slicing_params->x_pad;
+                    else
+                        _i = slicing_params->x_pad;
+                }
+
+                if(frame_no < number_of_frames)
+                {    
+                    LOG(LOGTYPE_ERROR, "Not enough frames in source texture, skipped ", std::to_string(number_of_frames-frame_no)," frames");
+                    number_of_frames = frame_no;
+                }
+                current_frame_index = 0;
+                return true;
+            }
+            LOG(LOGTYPE_ERROR, "Texture is null, couldn't load graphics");
+            return false;
+        #endif
+    }
+
+    bool Graphics::load_graphics(SDL_Texture* texture, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames, bool is_subregion)
+    {
+        #if !IS_SERVER
+            // load all animation frames
+            if(slicing_params == nullptr)
+            {   
+                LOG(LOGTYPE_ERROR, "Slicing parameter is null, can't load graphics");
+                return false;
+            }
+
+            this->number_of_frames = num_of_frames;
+            graphics_frames = new GraphicsFrame[num_of_frames];
+            if(texture != nullptr)
+            {
+                int w = 0;
+                int h = 0;
+                SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+                //LOG(LOGTYPE_GENERAL, std::to_string(w).append("  ").append(std::to_string(h)));
+
+                int frame_no = 0;
+
+                int _i= slicing_params->x + slicing_params->x_pad;
+                for(int _j = slicing_params->y + slicing_params->y_pad; _j<h; _j += (slicing_params->h+slicing_params->y_pad))
+                {
+                    for(; _i<w; _i += (slicing_params->w+slicing_params->x_pad))
                     {
                         if(frame_no<this->number_of_frames)
                         {
@@ -587,11 +676,26 @@ namespace Pringine {
                             frame_no++;
                         }
                     }
+                    if(is_subregion)
+                        _i= slicing_params->x + slicing_params->x_pad;
+                    else
+                        _i = slicing_params->x_pad;
                 }
+
+                if(frame_no < number_of_frames)
+                {    
+                    LOG(LOGTYPE_ERROR, "Not enough frames in source texture, skipped ", std::to_string(number_of_frames-frame_no)," frames");
+                    number_of_frames = frame_no;
+                }
+
                 current_frame_index = 0;
+                return true;
             }
+            LOG(LOGTYPE_ERROR, "Texture is null, couldn't load graphics");
+            return false;
         #endif
     }
+
 
     GraphicsFrame* Graphics::get_current_frame()
     {
@@ -609,4 +713,19 @@ namespace Pringine {
             return &this->graphics_frames[index];
         return nullptr;
     }  
+
+    void Graphics::draw(Renderer2D* renderer, bool world_space, bool centered, Vector2<float> view_position, float scale)
+    {
+            // dst_dimension has world unit values, convert to screen space
+            // also make drawing relative to camera position
+            // also make center of screen 0,0
+            dst_dimension.w *= scale;
+            dst_dimension.h *= scale;
+            
+            dst_dimension.x = (((dst_dimension.x - view_position.x)*scale) - (centered * dst_dimension.w/2) +  world_space*renderer->window_width/2);
+            dst_dimension.y = (( (world_space?-1:1) *(dst_dimension.y - view_position.y)*scale) - (centered * dst_dimension.h/2) + world_space*renderer->window_height/2);
+
+            SDL_RenderCopyEx(renderer->sdl_renderer, get_current_frame()->texture , &(get_current_frame()->region), 
+                                    &dst_dimension, angle, NULL, SDL_FLIP_NONE) ;
+    }
 }

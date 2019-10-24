@@ -62,7 +62,7 @@ namespace Pringine
         //LOG(LOGTYPE_GENERAL, std::string("zoom amount: ").append(std::to_string(zoom_amount)));
 
 
-        Rect camera_bounds(transform.position.x, transform.position.y, width, height);
+        SDL_FRect camera_bounds{transform.position.x, transform.position.y, (float)width, (float)height};
         SDL_Color color;
         color.r = 255;
         color.g = 122;

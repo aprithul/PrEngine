@@ -15,6 +15,7 @@
 #include "TimeModule.hpp"
 #include "Logger.hpp"
 #include "RendererModule.hpp"
+#include "GUI.hpp"
 
 namespace Pringine {
     class FrameRateCounter:public Module

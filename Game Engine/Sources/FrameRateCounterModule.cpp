@@ -69,6 +69,14 @@ namespace Pringine {
         #if !IS_SERVER
             if(text_texture != nullptr) 
                 renderer2D->draw_text(text_texture ,Vector2<int>{0,0}, TOP_LEFT);
+                //Pringine::draw_panel( u, 0, SDL_Rect{-100,0,100,100});
+                //Pringine::draw_panel( u, 0, SDL_Rect{0,0,100,100});
+                TextJustification tj;
+                //SDL_FRect anchor{0,0,0.15f,0.0889f};
+                SDL_FRect anchor{0,0,0,0};
+                if(Pringine::do_button((uintptr_t)(renderer2D), SDL_Rect{0,0,96,32}, anchor, "Hello", tj))
+                    LOG(LOGTYPE_GENERAL, "Button 1 clicked");
+
         #endif
     }
     
