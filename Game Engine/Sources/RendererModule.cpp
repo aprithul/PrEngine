@@ -376,7 +376,7 @@ namespace Pringine {
         #endif
     }
 
-    SDL_Texture* Renderer2D::get_text_texture(const std::string& text, TTF_Font* font, SDL_Color color)
+    SDL_Texture* Renderer2D::get_text_texture(const std::string& text, TTF_Font* font, SDL_Color& color)
     {
         #if !IS_SERVER
             SDL_Surface *surf = TTF_RenderText_Blended(font, text.c_str(), color);
@@ -415,7 +415,7 @@ namespace Pringine {
         #endif
     }
 
-    void Renderer2D::draw_text(const std::string& text, TTF_Font* font, SDL_Color color,Vector2<int> screen_position, TextJustification text_justification)
+    void Renderer2D::draw_text(const std::string& text, TTF_Font* font, SDL_Color& color,Vector2<int> screen_position, TextJustification text_justification)
     {
         #if !IS_SERVER
             SDL_Texture *texture =  get_text_texture(text,font,color);
@@ -427,7 +427,7 @@ namespace Pringine {
         #endif
     }
 
-    SDL_Texture* Renderer2D::draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color color, Vector2<int> screen_position, TextJustification text_justification)
+    SDL_Texture* Renderer2D::draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color& color, Vector2<int> screen_position, TextJustification text_justification)
     {
         SDL_Texture *texture =  get_text_texture(text,font,color);
 
