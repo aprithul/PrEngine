@@ -114,7 +114,8 @@ namespace Pringine {
         TTF_Font* open_font(const std::string font_file_name,int font_size);
         SDL_Texture* draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color& color,Vector2<int> screen_position, TextJustification text_justification);
         SDL_Texture* get_text_texture(const std::string& text, TTF_Font* font, SDL_Color& color);
-        void draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification);        
+        void draw_text(SDL_Texture* texture, SDL_Rect* dst_region, TextJustification text_justification, int height = -1);
+        void draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification, int height = -1);
         void draw_text(const std::string& text, TTF_Font* font, SDL_Color& color,Vector2<int> screen_position, TextJustification text_justification);
         void close_font(TTF_Font* font);
 
@@ -164,6 +165,7 @@ namespace Pringine {
         void draw(Renderer2D* renderer, bool world_space = true, bool centered = true, Vector2<float> view_position  = Vector2<float>{0,0}, float scale = 1.0f);
         bool load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
         bool load_graphics(SDL_Texture* texture, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
+        void add_frame_to_graphics(const GraphicsFrame& frame);
     };
 }
 

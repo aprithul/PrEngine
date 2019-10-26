@@ -1,4 +1,3 @@
-//
 //  Input.cpp
 //  Game Engine
 //
@@ -10,6 +9,9 @@
 
 namespace Pringine {
     
+    std::string textinput = "";
+    bool textinput_modified = false;
+
     InputManager::InputManager(std::string name, int priority):Module(name, priority)
     {
         was_crossed = false;
@@ -17,10 +19,17 @@ namespace Pringine {
         SDL_Init(SDL_INIT_JOYSTICK);
         SDL_Init(SDL_INIT_EVENTS);
         SDL_Init(SDL_INIT_HAPTIC);
-    }
 
+        SDL_StartTextInput();
+        if(SDL_IsTextInputActive())
+            LOG(LOGTYPE_GENERAL, "Text input is active");
+        else
+            LOG(LOGTYPE_GENERAL, "Text input is not active");
+    }
+    
     InputManager::~InputManager()
     {
+        SDL_StopTextInput();
     }
 
     void InputManager::start()
@@ -49,6 +58,8 @@ namespace Pringine {
 
     void InputManager::update()
     {
+        textinput_modified = false;
+
         for(int j=SDL_CONTROLLER_BUTTON_A; j<SDL_CONTROLLER_BUTTON_MAX; j++)
         {
             for(int i=0; i<MAX_GAMECONTROLLER_COUNT; i++)
@@ -159,11 +170,14 @@ namespace Pringine {
                     }
 
                 }
-                else
-                {
-                    //TEMPROARY
-                   // if(event.key.keysym.sym == SDLK_q)
-                   //     was_crossed = true;
+                //else
+                if(event.key.keysym.sym == SDLK_BACKSPACE)
+                {   
+                    if(textinput.length() != 0)
+                        textinput.pop_back();
+                    std::cout<<textinput.length()<<std::endl;
+                    
+                    textinput_modified = true;
                 }
                 break;
             case SDL_KEYUP:
@@ -213,6 +227,26 @@ namespace Pringine {
                 mouse.button_released_flags[event.button.button] = true;
                 mouse.button_state[event.button.button] = false;
                 break;
+            case SDL_TEXTINPUT:
+                    /* Add new text onto the end of our text */
+                    //text.append(event.text.text);
+                    textinput.append(event.text.text);
+                    textinput_modified = true;
+                    //LOG(LOGTYPE_GENERAL, "text: ",event.text.text);
+                    //LOG(LOGTYPE_GENERAL, "composition: ",event.edit.text);
+                    break;
+                case SDL_TEXTEDITING:
+                    /*
+                    Update the composition text.
+                    Update the cursor position.
+                    Update the selection length (if any).
+                    */
+                    //composition = event.edit.text;
+                    //cursor = event.edit.start;
+                    //selection_len = event.edit.length;
+                    LOG(LOGTYPE_GENERAL, "Composition: ", event.edit.text);
+                    LOG(LOGTYPE_GENERAL, "Cursor: ", std::to_string(event.edit.start));
+                    break;
             case SDL_QUIT:
                 was_crossed = true;
                 break;

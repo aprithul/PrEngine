@@ -23,6 +23,9 @@
 
 namespace Pringine {
 
+    extern std::string textinput;
+    extern bool textinput_modified;
+
     class GameController
     {
         public:

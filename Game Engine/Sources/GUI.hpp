@@ -25,7 +25,9 @@ namespace Pringine
         GUI_ID_PANEL,
         GUI_ID_BUTTON,
         GUI_ID_SLIDER_BASE,
-        GUI_ID_SLIDER_KNOB
+        GUI_ID_SLIDER_KNOB,
+        GUI_ID_TEXTBOX,
+        GUI_ID_TOGGLE
     };
 
     struct UI
@@ -37,7 +39,9 @@ namespace Pringine
     extern void show_file_structure(std::string root, std::string prefix);
     extern void draw_panel(uintptr_t id, SDL_Rect draw_region);
     extern bool do_button(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor, const std::string& text, const TextJustification& justification);
+    extern bool do_toggle(uintptr_t id, bool val, SDL_Rect& draw_region, SDL_FRect& anchor);
     extern float get_slider(uintptr_t id, float value, SDL_Rect& slide_region, SDL_Rect& cursor_region, SDL_FRect& anchor, float min = 0.0f, float max =1.0f, bool horizontal=true);
+    extern void get_text_input(uintptr_t id, std::string& text, SDL_Rect& text_box_region, SDL_FRect& anchor);
     extern void show_text(uintptr_t id, std::string& text, SDL_Rect& draw_region, SDL_FRect& anchor,Font_ID font_id, SDL_Color& c, float scale = 1.f );
     extern bool inside(Vector2<int> pos, SDL_Rect rect);
     extern void process_rect_with_anchor(SDL_Rect& rect, SDL_FRect& anchor, int width, int height);

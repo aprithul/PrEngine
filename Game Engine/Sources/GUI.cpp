@@ -12,6 +12,8 @@ namespace Pringine
     int canvas_height = 360;
     std::map<uintptr_t,SDL_Texture*> rendered_texts;
     TTF_Font* fonts[FONT_ID_MAX];
+    SDL_Event event;
+    int text_box_width_in_chars = 0;
 
     void show_file_structure(std::string root, std::string prefix)
     {
@@ -92,7 +94,41 @@ namespace Pringine
         }
 
 
+        _texture = load_texture( get_resource_path("UIpack/PNG/blue_button03.png"), renderer->sdl_renderer);
+        slicing_params = TextureSlicingParameters(0,0,190,45,0,0);
+        if(!gui_graphics[GUI_ID_TEXTBOX].load_graphics(_texture, &slicing_params, *(renderer),1))
+        {
+            error_flag = 1;
+            LOG(LOGTYPE_GENERAL, "Failed to load text box graphics. Texture: ","UI_elements.png");
+        }
+        _texture = load_texture( get_resource_path("UIpack/PNG/green_button03.png"), renderer->sdl_renderer);
 
+        GraphicsFrame gf;
+        gf.region = SDL_Rect{0,0,190,45};
+        gf.texture =_texture;
+        gui_graphics[GUI_ID_TEXTBOX].add_frame_to_graphics(gf);
+
+        _texture = load_texture( get_resource_path("UIpack/PNG/grey_box.png"), renderer->sdl_renderer);
+        slicing_params = TextureSlicingParameters(0,0,38,36,0,0);
+        if(!gui_graphics[GUI_ID_TOGGLE].load_graphics(_texture, &slicing_params, *(renderer),1))
+        {
+            error_flag = 1;
+            LOG(LOGTYPE_GENERAL, "Failed to load toggle graphics. Texture: ","grey_box.png");
+        }
+
+        _texture = load_texture( get_resource_path("UIpack/PNG/green_boxCheckmark.png"), renderer->sdl_renderer);
+        if(_texture == nullptr)
+        {
+            error_flag = 1;
+            LOG(LOGTYPE_GENERAL, "Failed to load toggle graphics. Texture: ","green_boxCheckmark.png");
+        }
+        GraphicsFrame gf2;
+        gf2.region = SDL_Rect{0,0,38,36};
+        gf2.texture =_texture;
+        gui_graphics[GUI_ID_TOGGLE].add_frame_to_graphics(gf2);
+
+
+        //LOG(LOGTYPE_WARNING, "New len of graphics frames ", std::to_string(gui_graphics[GUI_ID_TEXTBOX].number_of_frames));
         return error_flag;
     }
 
@@ -147,9 +183,34 @@ namespace Pringine
             hot.id = 0;
             active.id = 0;
         }
-
         return false;
     }
+
+    bool do_toggle(uintptr_t id,bool val, SDL_Rect& draw_region, SDL_FRect& anchor)
+    {
+        //LOG(LOGTYPE_GENERAL, std::to_string(val));
+        process_rect_with_anchor(draw_region, anchor, renderer->window_width, renderer->window_height);
+
+        gui_graphics[GUI_ID_TOGGLE].dst_dimension = draw_region;
+        gui_graphics[GUI_ID_TOGGLE].current_frame_index = 0;
+        gui_graphics[GUI_ID_TOGGLE].draw(renderer, false, false);
+
+        if(val) 
+        {
+            gui_graphics[GUI_ID_TOGGLE].current_frame_index = 1;
+            gui_graphics[GUI_ID_TOGGLE].draw(renderer,false,false);
+        }
+
+        if(inside(mouse->position, gui_graphics[GUI_ID_TOGGLE].dst_dimension))
+        {
+            if(mouse->get_mouse_button_down(1))
+            {
+                val = !val;
+            }
+        }
+        return val;
+    }
+
 
     float get_slider(uintptr_t id, float value, SDL_Rect& slider_base_region, SDL_Rect& slider_knob_region, SDL_FRect& anchor, float min, float max, bool horizontal)
     {
@@ -202,25 +263,86 @@ namespace Pringine
         return value;
     }
 
+    
     void show_text(uintptr_t id, std::string& text, SDL_Rect& draw_region, SDL_FRect& anchor,Font_ID font_id, SDL_Color& c, float scale)
     {
-        if(fonts[font_id] != nullptr)
+        if(text.length() >0)
         {
-            SDL_Texture* texTure = renderer->get_text_texture(text, fonts[font_id], c);
-            process_rect_with_anchor(draw_region, anchor, renderer->window_width, renderer->window_height);
-            
-            draw_region.x += ((1.f-scale)*draw_region.w/2);
-            draw_region.y += ((1.f-scale)*draw_region.h/2);
-            draw_region.w = scale*draw_region.w;
-            draw_region.h = scale*draw_region.h;
-
-            SDL_RenderCopy(renderer->sdl_renderer, texTure, NULL, &draw_region);
-        }   
-        else
-        {
-            LOG(LOGTYPE_ERROR, "Font hasn't been loaded; please load in load_fonts() ");
+            if( fonts[font_id] != nullptr)
+            {
+                SDL_Texture* texTure = renderer->get_text_texture(text, fonts[font_id], c);
+                process_rect_with_anchor(draw_region, anchor, renderer->window_width, renderer->window_height);
+                renderer->draw_text(texTure, Vector2<int>(draw_region.x+draw_region.w/2,draw_region.y+draw_region.h/2), MIDDLE_CENTER, draw_region.h*scale);
+                SDL_DestroyTexture(texTure);
+            }   
+            else
+            {
+                LOG(LOGTYPE_ERROR, "Font hasn't been loaded; please load in load_fonts() ");
+            }
         }
     }
+
+    void get_text_input(uintptr_t id, std::string& text, SDL_Rect& text_box_region, SDL_FRect& anchor)
+    {
+        process_rect_with_anchor(text_box_region, anchor, renderer->window_width, renderer->window_height);
+        gui_graphics[GUI_ID_TEXTBOX].dst_dimension = text_box_region;
+        gui_graphics[GUI_ID_TEXTBOX].current_frame_index = 0;
+        if(active.id == id) gui_graphics[GUI_ID_TEXTBOX].current_frame_index = 1;
+        gui_graphics[GUI_ID_TEXTBOX].draw(renderer,false,false);
+
+        SDL_Color c{0,0,0,255};
+        //SDL_FRect tb_a = {(text_box_region.x+text_box_region.w/2.f)/(float)canvas_width, anchor.y,
+        //                    0.f, anchor.h};
+        //show_text(id, text, text_box_region, tb_a, FONT_SAMPLE_TTF_32,c, 0.6f);
+        
+        //LOG(LOGTYPE_GENERAL, std::to_string(text_box_width_in_chars));
+        //std::string sub_text = text;
+
+        if(text.length() > 0)
+        {
+            //if(text_box_width_in_chars < sub_text.length() && text_box_width_in_chars>0)
+            //    sub_text = text.substr(text.length()-text_box_width_in_chars, text_box_width_in_chars);
+
+            SDL_Texture* texTure = renderer->get_text_texture(text, fonts[FONT_SAMPLE_TTF_48], c);
+
+            renderer->draw_text(texTure,&text_box_region, MIDDLE_LEFT, text_box_region.h*0.6f);
+            //if(text_box_width_in_chars==0) text_box_width_in_chars = (text_box_region.w/width_of_chars);
+            SDL_DestroyTexture(texTure);
+            
+        }
+
+
+        if(active.id == id) 
+        {
+            //if(textinput_modified)
+            text = textinput;
+            if(mouse->get_mouse_button_down(1))
+                if(hot.id != id)
+                    active.id = 0;
+        }
+        else
+        {
+            if(hot.id == id)
+            {
+                if(mouse->get_mouse_button_down(1))
+                {
+                    textinput = text;
+                    active.id = id;
+                }
+            }
+        }
+
+        if(inside(mouse->position, gui_graphics[GUI_ID_TEXTBOX].dst_dimension))
+        {
+            hot.id = id;
+        }
+        else if(hot.id == id)
+        {
+            hot.id = 0;
+        }
+
+    }
+
 
     bool inside(Vector2<int> pos, SDL_Rect rect)
     {

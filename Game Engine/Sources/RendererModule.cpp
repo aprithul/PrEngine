@@ -402,16 +402,39 @@ namespace Pringine {
 
     }
 
-    void Renderer2D::draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification)
+    void Renderer2D::draw_text(SDL_Texture* texture, SDL_Rect* dst_region, TextJustification text_justification, int height)
     {
         #if !IS_SERVER
-            SDL_Rect text_rect;
-            text_rect.x = screen_position.x;
-            text_rect.y = screen_position.y;
-            SDL_QueryTexture(texture, NULL, NULL, &text_rect.w, &text_rect.h);
-            justify_text(text_justification, text_rect);
+            SDL_Rect tex_dim;
+            SDL_QueryTexture(texture, NULL, NULL, &tex_dim.w, &tex_dim.h);
+            int c = dst_region->h/2 + dst_region->y;
+            SDL_Rect source_dim{0,0,dst_region->w, dst_region->h};
+            float factor = tex_dim.h/(float)height;
 
-            SDL_RenderCopy(sdl_renderer, texture, NULL, &text_rect);
+            source_dim.x = tex_dim.w-(source_dim.w*factor) ;
+            if(source_dim.x < 0)
+            {
+                source_dim.x = 0;
+                source_dim.w = tex_dim.w;
+                dst_region->w = tex_dim.w/factor;
+            }
+            else
+            {
+                source_dim.w *= factor;
+            }
+            
+            source_dim.h = tex_dim.h;
+            dst_region->h = tex_dim.h/factor;
+            dst_region->y = c;
+            justify_text(text_justification, *dst_region);
+            
+            SDL_RenderCopy(sdl_renderer, texture, &source_dim, dst_region);
+            tex_dim.x = dst_region->x;
+            tex_dim.y = dst_region->y;
+            //set_draw_color(SDL_Color{166,155,155,255});
+            //SDL_RenderDrawRect(sdl_renderer, &tex_dim);
+            //set_draw_color(SDL_Color{66,55,55,255});
+            //SDL_RenderDrawRect(sdl_renderer, dst_region);
         #endif
     }
 
@@ -421,11 +444,33 @@ namespace Pringine {
             SDL_Texture *texture =  get_text_texture(text,font,color);
             if(texture != nullptr)
             {
-                draw_text(texture, screen_position,text_justification);
+                draw_text(texture, screen_position, text_justification);
                 SDL_DestroyTexture(texture);
             }
         #endif
     }
+
+    void Renderer2D::draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification, int height)
+    {
+        #if !IS_SERVER
+            SDL_Rect text_rect;
+            text_rect.x = screen_position.x;
+            text_rect.y = screen_position.y;
+            SDL_QueryTexture(texture, NULL, NULL, &text_rect.w, &text_rect.h);
+
+            if(height != -1)
+            {
+                text_rect.w = ((height/(float)text_rect.h)*text_rect.w);
+                text_rect.h = height;
+            }
+
+            justify_text(text_justification, text_rect);
+            SDL_RenderCopy(sdl_renderer, texture, nullptr, &text_rect);
+        #endif
+    }
+
+
+
 
     SDL_Texture* Renderer2D::draw_text_debug(const std::string& text, TTF_Font* font, SDL_Color& color, Vector2<int> screen_position, TextJustification text_justification)
     {
@@ -695,6 +740,23 @@ namespace Pringine {
             return false;
         #endif
     }
+
+    void Graphics::add_frame_to_graphics(const GraphicsFrame& frame)
+    {
+        this->number_of_frames++;
+        GraphicsFrame* _temp = new GraphicsFrame[this->number_of_frames];
+        for(int i=0; i<number_of_frames-1; i++)
+        {
+            _temp[i].texture = graphics_frames[i].texture;
+            _temp[i].region = graphics_frames[i].region;
+        }
+        _temp[number_of_frames-1].region = frame.region;
+        _temp[number_of_frames-1].texture = frame.texture;
+        
+        delete[] graphics_frames;
+        graphics_frames = _temp;
+    }
+
 
 
     GraphicsFrame* Graphics::get_current_frame()
