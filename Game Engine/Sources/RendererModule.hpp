@@ -24,6 +24,7 @@
 #include "TimeModule.hpp"
 #include "Logger.hpp"
 #include "Transform.hpp"
+#include "Component.hpp"
 
 namespace Pringine {
     class Graphics;
@@ -146,7 +147,7 @@ namespace Pringine {
 
 
 
-    class Graphics
+    class Graphics : public Component
     {
     private:
         

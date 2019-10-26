@@ -4,6 +4,7 @@
 #include <string>
 #include "Transform.hpp"
 #include "Utils.hpp"
+#include "Component.hpp"
 
 namespace Pringine
 {
@@ -14,6 +15,7 @@ namespace Pringine
         ENTITY_TYPE_PLAYER = 2,
         ENTITY_TYPE_COUNT
     }EntityType;
+
 
 
     class Entity
@@ -28,7 +30,10 @@ namespace Pringine
             std::string name;
             bool is_sleeping;
             Rect bounding_box;
-            
+            bool has_component[COMP_COUNT_MAX];
+            Component* components[COMP_COUNT_MAX];
+
+            void add_componenet(Component* comp);
             virtual void awake();
             virtual void start();
             virtual void update();

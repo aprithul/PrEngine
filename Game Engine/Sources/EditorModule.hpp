@@ -3,16 +3,23 @@
 
 #include "Module.hpp"
 #include "GUI.hpp"
+#include "RendererModule.hpp"
+#include <string>
 
 namespace Pringine
 {
     class Editor : public Module
     {
-        Editor();
-        ~Editor();
+        public:
+            Editor(std::string name, int priority, Renderer2D* renderer);
+            ~Editor();
 
-        
+            void start() override;
+            void update() override;
+            void end() override;
 
+        private:
+            Renderer2D* renderer;
     };
 
 }

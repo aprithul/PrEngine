@@ -72,38 +72,6 @@ namespace Pringine {
         #if !IS_SERVER
             if(text_texture != nullptr) 
                 renderer2D->draw_text(text_texture ,Vector2<int>{0,0}, TOP_LEFT);
-                TextJustification tj;
-                //SDL_FRect anchor{0,0.0306f,0.3125f,0.0306f};  // fraction!!!!!!!
-                //SDL_FRect anchor{0,0.027777f,0,0.1389f};
-                SDL_Rect text_region{100,120,200,32};
-                SDL_Rect button_region{100,120,200,64};
-                SDL_Rect toggle_region{100,100, 38,36};
-
-                //SDL_Rect _region{0,0,20,32};
-                SDL_FRect button_anchor{ text_region.x/(float)canvas_width, text_region.y/(float)canvas_height,
-                                  text_region.w/(float)canvas_width, text_region.h/(float)canvas_height };//0.1388f};
-                SDL_FRect text_anchor{ (text_region.x+(text_region.w/2))/(float)canvas_width, text_region.y/(float)canvas_height,
-                                        0, text_region.h/(float)canvas_height};
-                SDL_FRect toggle_anchor{toggle_region.x/(float)canvas_width, toggle_region.y/(float)canvas_height,
-                                  toggle_region.w/(float)canvas_width, toggle_region.h/(float)canvas_height};
-
-                /*if(do_button( (uintptr_t)(&this->is_active), button_region, button_anchor,"",tj))
-                {
-                //    ;
-                }*/
-                SDL_Color c{0,0,0,255};
-                std::string t = "Hello World";
-                //show_text((uintptr_t)(&this->name), t, text_region, text_anchor, FONT_SAMPLE_TTF_48,c, 0.7f);
-                //_v = Pringine::get_slider((uintptr_t)(&frame_count), _v, region, _region, anchor);
-                //LOG(LOGTYPE_GENERAL, std::to_string( _v = Pringine::get_slider((uintptr_t)(&frame_count), _v, region, _region, anchor)));
-                //get_text_input((uintptr_t)(&this->priority), text, text_region, text_anchor);
-                //SDL_Rect text_region2{100,120,200,64};
-                //show_text((uintptr_t)(&this->name), t, text_region, text_anchor, FONT_SAMPLE_TTF_48,c, 1.f);
-                //get_text_input((uintptr_t)(&this->frame_count), text, text_region, text_anchor);
-
-                toggle = do_toggle((uintptr_t)(&this->name),toggle, toggle_region, toggle_anchor);
-                //LOG(LOGTYPE_GENERAL, std::to_string(toggle));
-
         #endif
     }
     

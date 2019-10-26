@@ -8,8 +8,8 @@ namespace Pringine
     Graphics gui_graphics[256];
     UI hot{0};
     UI active{0};
-    int canvas_width = 640;
-    int canvas_height = 360;
+    int canvas_width = 1280;
+    int canvas_height = 720;
     std::map<uintptr_t,SDL_Texture*> rendered_texts;
     TTF_Font* fonts[FONT_ID_MAX];
     SDL_Event event;
@@ -62,14 +62,24 @@ namespace Pringine
         int error_flag = 0;
 
         // load all the texture we'll need
-        SDL_Texture* _texture = load_texture( get_resource_path("UI_elements.png"), renderer->sdl_renderer);
-        TextureSlicingParameters slicing_params(0,0,96,0);
+        SDL_Texture* _texture = load_texture( get_resource_path("UIpack/PNG/blue_panel.png"), renderer->sdl_renderer);
+        TextureSlicingParameters slicing_params(5,10,20,20,0,0);
+        
         if(!gui_graphics[GUI_ID_PANEL].load_graphics(_texture, &slicing_params, *(renderer), 1))
         {
             error_flag = 1;
-            LOG(LOGTYPE_GENERAL, "Failed to load panel graphics. Texture: ","UI_elements.png");
+            LOG(LOGTYPE_GENERAL, "Failed to load panel graphics. Texture: ","blue_panel.png");
         }
 
+        _texture = load_texture( get_resource_path("UIpack/PNG/green_panel.png"), renderer->sdl_renderer);
+        if(!gui_graphics[GUI_ID_PANEL_2].load_graphics(_texture, &slicing_params, *(renderer), 1))
+        {
+            error_flag = 1;
+            LOG(LOGTYPE_GENERAL, "Failed to load panel graphics. Texture: ","green_panel.png");
+        }
+
+
+        _texture = load_texture( get_resource_path("UI_elements.png"), renderer->sdl_renderer);
         slicing_params = TextureSlicingParameters(96,0,96,32,0,0);
         if(!gui_graphics[GUI_ID_BUTTON].load_graphics(_texture, &slicing_params, *(renderer), 3, true))
         {
@@ -132,12 +142,12 @@ namespace Pringine
         return error_flag;
     }
 
-    void draw_panel(uintptr_t id, SDL_Rect draw_region)
+    void draw_panel(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor,GUI_ID gui_id)
     {
         //render
-        Graphics* graphics = &gui_graphics[GUI_ID_PANEL];
-        graphics->dst_dimension = draw_region;
-        graphics->draw(renderer);
+        process_rect_with_anchor(draw_region, anchor, renderer->window_width, renderer->window_height);
+        gui_graphics[gui_id].dst_dimension = draw_region;
+        gui_graphics[gui_id].draw(renderer,false,false);
     }
 
     bool do_button(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor, const std::string& text, const TextJustification& justification)
@@ -383,5 +393,28 @@ namespace Pringine
         rect.h = f2.y - f1.y;
     }
 
+    void get_anchor_full(SDL_Rect& region, SDL_FRect& anchor)
+    {
+        anchor.x = region.x/(float)canvas_width;
+        anchor.y = region.y/(float)canvas_height;
+        anchor.w = region.w/(float)canvas_width;
+        anchor.h = region.h/(float)canvas_height;
+    }
+
+    void get_anchor_const_width(SDL_Rect& region, SDL_FRect& anchor)
+    {
+        anchor.x = (region.x+region.w/2.f)/(float)canvas_width;
+        anchor.y = region.y/(float)(float)canvas_height;
+        anchor.w = 0.f;
+        anchor.h = region.h/(float)(float)canvas_height;
+    }
+
+    void get_anchor_const_height(SDL_Rect& region, SDL_FRect& anchor)
+    {
+        anchor.x = region.x/(float)canvas_width;
+        anchor.y = (region.y+region.h/2.f)/(float)canvas_height;
+        anchor.w = region.w/(float)canvas_width;
+        anchor.h = 0.f;
+    }
     
 }

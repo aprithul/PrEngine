@@ -2,11 +2,12 @@
 #define TRANSFORM_HPP
 #include "Vector2.hpp"
 #include "Logger.hpp"
+#include "Component.hpp"
 #include <string>
 
 namespace Pringine{
     
-    class Transform
+    class Transform : public Component
     {
         public:
             Vector2<float> position;

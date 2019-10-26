@@ -20,6 +20,9 @@ namespace Pringine
                 this->bounding_box.h= graphics.get_current_frame()->region.h / this->pixel_to_world;
                 
             }
+            
+            add_componenet(&graphics);
+            add_componenet(&transform);
 
             //LOG(LOGTYPE_GENERAL, std::to_string(graphics.get_current_frame()->region.w));
             //LOG(LOGTYPE_GENERAL, std::to_string(graphics.get_current_frame()->region.h));
@@ -50,6 +53,7 @@ namespace Pringine
 
     void Sprite::start()
     {
+        
     }
 
     void Sprite::update()

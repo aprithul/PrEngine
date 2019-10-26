@@ -23,6 +23,7 @@ namespace Pringine
     enum GUI_ID
     {
         GUI_ID_PANEL,
+        GUI_ID_PANEL_2,
         GUI_ID_BUTTON,
         GUI_ID_SLIDER_BASE,
         GUI_ID_SLIDER_KNOB,
@@ -37,7 +38,7 @@ namespace Pringine
 
     extern bool initialize_gui(Mouse* mouse, Renderer2D* renderer);
     extern void show_file_structure(std::string root, std::string prefix);
-    extern void draw_panel(uintptr_t id, SDL_Rect draw_region);
+    extern void draw_panel(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor, GUI_ID gui_id = GUI_ID_PANEL);
     extern bool do_button(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor, const std::string& text, const TextJustification& justification);
     extern bool do_toggle(uintptr_t id, bool val, SDL_Rect& draw_region, SDL_FRect& anchor);
     extern float get_slider(uintptr_t id, float value, SDL_Rect& slide_region, SDL_Rect& cursor_region, SDL_FRect& anchor, float min = 0.0f, float max =1.0f, bool horizontal=true);
@@ -53,6 +54,9 @@ namespace Pringine
     extern int canvas_width;
     extern int canvas_height;
     extern void initalize_text_resources();
+    extern void get_anchor_full(SDL_Rect& region, SDL_FRect& anchor);
+    extern void get_anchor_const_width(SDL_Rect& region, SDL_FRect& anchor);
+    extern void get_anchor_const_height(SDL_Rect& region, SDL_FRect& anchor);
 
     extern std::map<uintptr_t,SDL_Texture*> rendered_texts;
     extern TTF_Font* fonts[];

@@ -9,6 +9,8 @@ namespace Pringine
         this->aspect_ratio = width/height;
         this->zoom_amount = 1.0f;
         this->renderer2d = renderer2d;
+
+        add_componenet(&transform);
     }
 
     Camera::~Camera()
