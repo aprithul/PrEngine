@@ -57,12 +57,12 @@ namespace Pringine {
         }
 
 
-        Vector2 operator*(const double d) const{
-            return Vector2<T>( this->x * d, this->y * d);
+        Vector2<double> operator*(const double d) const{
+            return Vector2<double>( (double)this->x * d, (double)this->y * d);
         }
 
-        Vector2 operator*(const float f) const{
-            return Vector2<T>( this->x * f, this->y * f);
+        Vector2<float> operator*(const float f) const{
+            return Vector2<float>( (float)this->x * f, (float)this->y * f);
         }
 
         Vector2 operator/(const T v) const{

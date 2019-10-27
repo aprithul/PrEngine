@@ -29,6 +29,7 @@ namespace Pringine
     uintptr_t editor_text_id_6 = 6;
     
 
+
     Editor::Editor(std::string name, int priority, Renderer2D* renderer):Module(name,priority)
     {
         this->renderer = renderer;
@@ -50,21 +51,31 @@ namespace Pringine
 
     }
 
+    Sprite* sprite_cube;
+    Camera* camera;
+    long selected_entity_id = -1;
+    Vector2<float> selection_offset;
+
     void Editor::start()
     {
+        Pringine::TextureSlicingParameters slicing_param_2(0,0,1024,1024,0,0);
+        sprite_cube = new Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer, 1, 100, 10);
+        sprite_cube->transform.position = Pringine::Vector2<float>(4,2);
+        sprite_cube->transform.scale = Pringine::Vector2<float>(0.5f,0.5f);
+        LOG(LOGTYPE_GENERAL, "Editor started");
+        Pringine::entity_management_system->assign_id_and_store_entity(*sprite_cube);
 
+        camera = (Camera*)entity_management_system->get_entity(ENTITY_TYPE_CAMERA);
     }
 
     void Editor::update()
     {
+        //// EDITOR GUI DRAWING ///////////
         // left panel
         left_panel_outer_region = {0, 0, (canvas_width/8),canvas_height};
         draw_panel(editor_panel_id_2, left_panel_outer_region, left_panel_outer_anchor, GUI_ID_PANEL_2);
         left_panel_inner_region = {5, 5, (canvas_width/8)-10,canvas_height-10};
         draw_panel(editor_panel_id_3, left_panel_inner_region, left_panel_inner_anchor);
-
-
-
 
         // right panel
         right_panel_outer_region = {canvas_width - (canvas_width/8), 0, (canvas_width/8),canvas_height};
@@ -72,8 +83,40 @@ namespace Pringine
         right_panel_inner_region = {canvas_width - (canvas_width/8)+5, 5, (canvas_width/8)-10,canvas_height-10};
         draw_panel(editor_panel_id_1, right_panel_inner_region, right_panel_inner_anchor);
 
+        ////////////////////////////////////
+        Vector2<float> wsp = camera->get_screen_to_world_position(input_manager->mouse.position);
+        if(input_manager->mouse.get_mouse_button_down(1))
+        {
+            for(int i=0;i <= entity_management_system->current_max_entity_pos;i++)
+            {
+                Entity* et = entity_management_system->entities[i];
+                if(et)
+                {
+                    if(et->type == ENTITY_TYPE_SPRITE)
+                    {
+                        if(inside( wsp, ((Sprite*)et)->screen_rect,true))
+                        {
+                            selected_entity_id = et->id;
+                            selection_offset = wsp - Vector2<float>( ((Sprite*)et)->screen_rect.x,((Sprite*)et)->screen_rect.y);
+                        }
+                    }
+                }
+            }
+        }
+        else if(input_manager->mouse.get_mouse_button_up(1))
+        {
+            selected_entity_id = -1;
+        }
+        else
+        {
+            if(selected_entity_id!=-1)
+            {
+                Sprite* sp = (Sprite*)entity_management_system->get_entity(selected_entity_id);
+                if(sp)
+                    sp->transform.position = wsp - selection_offset;
 
-
+            }
+        }
 
     }
 

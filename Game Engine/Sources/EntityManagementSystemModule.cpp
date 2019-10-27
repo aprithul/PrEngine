@@ -2,19 +2,24 @@
 
 namespace Pringine
 {
-    int EntityManagementSystem::current_max_entity_id = 0;
+    EntityManagementSystem* entity_management_system;    
+    long EntityManagementSystem::next_entity_id = 0;
+    int EntityManagementSystem::current_max_entity_pos = 0;
+    
     int EntityManagementSystem::entity_count = 0;
     
     EntityManagementSystem::EntityManagementSystem(std::string name, int priority) : Module(name, priority)
     {
         //entities = new (*Entity)[MAX_ENTITY_COUNT];
-        for(int i=0;i<MAX_ENTITY_ID;i++)
+        for(int i=0;i<MAX_ENTITY_COUNT;i++)
             entities[i] = nullptr;
+        started = false;
+        Pringine::entity_management_system = this;
     }
 
     EntityManagementSystem::~EntityManagementSystem()
     {
-        for(int i=0; i<=current_max_entity_id; i++)
+        for(int i=0; i<=next_entity_id; i++)
         {
             if(entities[i] != nullptr)
             {
@@ -24,24 +29,34 @@ namespace Pringine
         }
     }
 
-
-    Entity* EntityManagementSystem::get_entity(int id)
+    Entity* EntityManagementSystem::get_entity(EntityType type)
     {
-        if(id<MAX_ENTITY_ID)
+        for(int i=0;i < next_entity_id; i++)
+        {
+            if(entities[i]->type == type)
+                return entities[i];
+        }
+        return nullptr;
+    }    
+
+    Entity* EntityManagementSystem::get_entity(long id)
+    {
+        std::unordered_map<long,int>::iterator it = id_map.find(id);
+        if(it != id_map.end())
         {   
-            Entity* _entity = entities[id];    
+            Entity* _entity = entities[it->second];    
             if(_entity)
             {
                 return _entity;
             }
             else
             {
-                LOG(LOGTYPE_ERROR, "No entity of with id exists");
+                LOG(LOGTYPE_ERROR, "No entity  with id exists");
             }
         }
         else
         {
-            LOG(LOGTYPE_ERROR, "requested entity id is out of range ");
+            LOG(LOGTYPE_ERROR, "requested entity couldn't be found ");
         }
 
         return nullptr;
@@ -49,17 +64,22 @@ namespace Pringine
     }
 
 
-    bool EntityManagementSystem::delete_entity(int id)
+    bool EntityManagementSystem::delete_entity(long id)
     {
-        if(id<=current_max_entity_id)
+        if(id<=next_entity_id)
         {   
-            Entity* _entity = entities[id];    
+            Entity* _entity = nullptr;
+            std::unordered_map<long,int>::iterator it = id_map.find(id);
+            if(it != id_map.end())
+                _entity = entities[it->second];
+
             if(_entity!= nullptr)
             {
+                
                 delete _entity;
-                entities[id] = nullptr;
+                entities[it->second] = nullptr;
                 entity_count--;
-                released_ids.push(id);
+                released_positions.push(it->second);
                 LOG(LOGTYPE_GENERAL, std::string("Entity id: ").append(std::to_string(id)).append(" deleted"));
                 return true;
             }
@@ -70,10 +90,16 @@ namespace Pringine
         }
         else
         {
-            LOG(LOGTYPE_WARNING, std::string("Requested entity id: ").append(std::to_string(id)).append(" is out of id range"));
+            LOG(LOGTYPE_WARNING, std::string("No entity with id: ").append(std::to_string(id)).append(" exists"));
         }
         return false;
     }
+
+    Entity* EntityManagementSystem:: create_entity(EntityType type)
+    {
+        
+    }
+
 
     Entity* EntityManagementSystem::assign_id_and_store_entity(Entity& entity)
     {
@@ -85,26 +111,42 @@ namespace Pringine
         }
 
         // get next id either from freed id queue or create a new id if none available in queue
-        int next_id = -1;
-        if(!released_ids.empty())
+        int next_pos = -1;
+        //LOG(LOGTYPE_GENERAL, "Length:   ",std::to_string(released_ids.size()));
+
+        if(!released_positions.empty())
         {
-            next_id = released_ids.front();
-            released_ids.pop();
-        }
-        else if(current_max_entity_id < MAX_ENTITY_ID)
-        {
-            next_id = (current_max_entity_id++);
+            next_pos = released_positions.front();
+            released_positions.pop();
         }
         else
         {
-            LOG(LOGTYPE_ERROR, "Ran out of entity ids");
+            next_pos = (current_max_entity_pos++);
+        }
+        
+        
+        if(next_entity_id < LONG_MAX)
+        {
+            next_entity_id++;
+        }
+        else
+        {
+            LOG(LOGTYPE_ERROR, "Ran out of unique entity ids");
             return nullptr;
 
         }
 
-        entity.id = next_id;
-        entities[next_id] = &entity;
+        entity.id = next_entity_id;
+        entities[next_pos] = &entity;
+        id_map[next_entity_id] = next_pos; 
         entity_count++;
+
+        if(started)
+        {
+            entity.awake();
+            entity.start();
+        }
+
         return &entity;
     }
 
@@ -112,21 +154,23 @@ namespace Pringine
     void EntityManagementSystem::start()
     {
         LOG(LOGTYPE_GENERAL, "Entity Management System started");
-        for(int _i=0; _i<current_max_entity_id; _i++)
+        for(int _i=0; _i<next_entity_id; _i++)
             if(entities[_i] != nullptr)
                 entities[_i]->awake();
         LOG(LOGTYPE_GENERAL, "Entity Management callled awake() on all entities");
         
-        for(int _i=0; _i<current_max_entity_id; _i++)
+        for(int _i=0; _i<next_entity_id; _i++)
             if(entities[_i] != nullptr)
                 entities[_i]->start();
         LOG(LOGTYPE_GENERAL, "Entity Management System called start() on all entities");
+
+        started = true;
     }
 
     void EntityManagementSystem::update()
     {
         //LOG(LOGTYPE_GENERAL, std::string("Entity count: ").append(std::to_string(entity_count)).append("  max id: ").append(std::to_string(current_max_entity_id).append("  queue_size: ").append(std::to_string(this->released_ids.size()))));
-        for(int _i=0; _i<current_max_entity_id; _i++)
+        for(int _i=0; _i<next_entity_id; _i++)
             if(entities[_i] != nullptr)
                 entities[_i]->update();
         
@@ -136,7 +180,7 @@ namespace Pringine
 
     void EntityManagementSystem::end()
     {
-        for(int _i=0; _i<current_max_entity_id; _i++)
+        for(int _i=0; _i<next_entity_id; _i++)
             if(entities[_i] != nullptr)
                 entities[_i]->end();
         LOG(LOGTYPE_GENERAL, "Entity Management System called end() on all entities");

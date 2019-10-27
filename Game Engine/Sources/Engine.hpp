@@ -12,6 +12,7 @@
 #include "Module.hpp"
 #include "Utils.hpp"
 #include "InputModule.hpp"
+#include "EntityManagementSystemModule.hpp"
 #include "Logger.hpp"
 #include <map>
 #include <vector>
@@ -35,7 +36,6 @@ namespace Pringine {
     class Engine
     {
     public:
-        InputManager* input_manager;
         Engine();
         ~Engine();
         Module* add_module(Module* _module);

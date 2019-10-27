@@ -353,15 +353,6 @@ namespace Pringine
 
     }
 
-
-    bool inside(Vector2<int> pos, SDL_Rect rect)
-    {
-        if(pos.x<=rect.x+rect.w && pos.x>=rect.x &&
-            pos.y<=rect.y+rect.h && pos.y>=rect.y)
-                return true;
-        else return false;
-    }
-
     void process_rect_with_anchor(SDL_Rect& rect, SDL_FRect& anchor, int width, int height)
     {
         // anchor to pixel position in original canvas 

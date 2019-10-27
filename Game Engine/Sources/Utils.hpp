@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <SDL2/SDL.h>
+#include "Vector2.hpp"
 #include "Logger.hpp"
 
 namespace Pringine
@@ -56,5 +57,10 @@ namespace Pringine
         else
             return 0;
     }
+
+    bool inside(Vector2<int> pos, SDL_Rect& rect, bool centered = false);
+    bool inside(Vector2<float> pos, SDL_Rect& rect, bool centered = false);
+    bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered = false);
+
 }
 #endif

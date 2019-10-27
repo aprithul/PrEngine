@@ -11,8 +11,8 @@ namespace Pringine
     typedef enum
     {
         ENTITY_TYPE_SPRITE = 0,
-        ENTITY_TYPE_CAMERA = 1,
-        ENTITY_TYPE_PLAYER = 2,
+        ENTITY_TYPE_CAMERA,
+        ENTITY_TYPE_PLAYER,
         ENTITY_TYPE_COUNT
     }EntityType;
 
@@ -26,7 +26,7 @@ namespace Pringine
             virtual ~Entity();
 
             const EntityType type;
-            int id;
+            long id;
             std::string name;
             bool is_sleeping;
             Rect bounding_box;

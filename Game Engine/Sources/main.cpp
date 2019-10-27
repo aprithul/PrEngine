@@ -42,7 +42,7 @@ int main(int argc, const char * argv[])
         game_engine->add_module(new Pringine::InputManager("Input",1));
         Pringine::EntityManagementSystem* entity_management_system = 
                         ( Pringine::EntityManagementSystem*)game_engine->
-                                add_module(new Pringine::EntityManagementSystem("Entity Management System", 2));
+                                add_module(new Pringine::EntityManagementSystem("EMS", 2));
         
         Pringine::FrameRateRegulator* frame_rate_regulator = 
                         (Pringine::FrameRateRegulator*)game_engine->
@@ -79,7 +79,7 @@ int main(int argc, const char * argv[])
         Pringine::initialize_gui(mouse, renderer2d);
 
         Pringine::Camera* camera = new Pringine::Camera(16,9,renderer2d);
-        camera->transform.position = Pringine::Vector2<float>(0,0);
+        camera->transform.position = Pringine::Vector2<float>(2,0);
         entity_management_system->assign_id_and_store_entity(*camera);
 
         //Pringine::Sprite** entities = new Pringine::Sprite*[500];
@@ -90,18 +90,6 @@ int main(int argc, const char * argv[])
         //sprite->transform.position = Pringine::Vector2<float>(0,0);
         //entity_management_system->assign_id_and_store_entity(*sprite);
 
-        Pringine::TextureSlicingParameters slicing_param_2(0,0,1024,1024,0,0);
-        //Pringine::TextureSlicingParameters slicing_params(64,64,32,32,0,0);
-        //for(int i=0; i<10; i++)
-        //{
-        //        Pringine::Sprite* sprite_ui = new Pringine::Sprite(Pringine::get_resource_path("bats.png"), &slicing_params, *renderer2d, 17, 10, 10);
-                Pringine::Sprite* sprite_cube = new Pringine::Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer2d, 1, 100, 10);
-        //        sprite_ui->transform.position = Pringine::Vector2<float>(0,0);
-                sprite_cube->transform.position = Pringine::Vector2<float>(0,0);
-                
-                //sprite_cube->set_animation(true, 4);
-        //        sprite_ui->set_animation(true, 1);
-                entity_management_system->assign_id_and_store_entity(*sprite_cube);
         //        entity_management_system->assign_id_and_store_entity(*sprite_ui);
         //}
         

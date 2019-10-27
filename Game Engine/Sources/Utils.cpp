@@ -97,5 +97,60 @@ namespace Pringine{
         this->w = w;
         this->h = h;
     }
+    
+    bool inside(Vector2<int> pos, SDL_Rect& rect, bool centered)
+    {
+        if(!centered)
+        {
+            if(pos.x<=rect.x+rect.w && pos.x>=rect.x &&
+                pos.y<=rect.y+rect.h && pos.y>=rect.y)
+                    return true;
+        }
+        else
+        {
+            if(pos.x<=rect.x+rect.w/2 && pos.x>=rect.x-rect.w/2 &&
+                pos.y<=rect.y+rect.h/2 && pos.y>=rect.y-rect.h/2)
+                    return true;
+        }
+        
+        return false;
+    }
+
+    bool inside(Vector2<float> pos, SDL_Rect& rect, bool centered)
+    {
+        if(!centered)
+        {
+            if(pos.x<=rect.x+rect.w && pos.x>=rect.x &&
+                pos.y<=rect.y+rect.h && pos.y>=rect.y)
+                    return true;
+        }
+        else
+        {
+            if(pos.x<=rect.x+rect.w/2 && pos.x>=rect.x-rect.w/2 &&
+                pos.y<=rect.y+rect.h/2 && pos.y>=rect.y-rect.h/2)
+                    return true;
+        }
+        
+        return false;
+    }
+
+    bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered)
+    {
+        if(!centered)
+        {
+            if(pos.x<=rect.x+rect.w && pos.x>=rect.x &&
+                pos.y<=rect.y+rect.h && pos.y>=rect.y)
+                    return true;
+        }
+        else
+        {
+            if(pos.x<=rect.x+rect.w/2 && pos.x>=rect.x-rect.w/2 &&
+                pos.y<=rect.y+rect.h/2 && pos.y>=rect.y-rect.h/2)
+                    return true;
+        }
+        
+        return false;
+    }
+
 
 }

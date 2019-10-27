@@ -26,6 +26,10 @@ namespace Pringine
             void zoom_out(float zoom_speed);
             void start() override;
             void update() override;
+            void end() override;
+
+            Vector2<float> get_screen_to_world_position(Vector2<int> screen_pos);
+            
 
         private:
             Vector2<float> speed;

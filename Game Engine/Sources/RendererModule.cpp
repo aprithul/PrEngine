@@ -93,7 +93,7 @@ namespace Pringine {
             SDL_SetHint(SDL_HINT_RENDER_BATCHING, "1");
             #endif
 
-            sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height,  SDL_WINDOW_SHOWN);
+            sdl_window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->window_width, this->window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN);
             sdl_renderer = SDL_CreateRenderer(sdl_window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
             render_texture = SDL_CreateTexture( sdl_renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, this->window_width, this->window_height );
             SDL_SetTextureBlendMode(render_texture, SDL_BLENDMODE_BLEND);
@@ -121,8 +121,8 @@ namespace Pringine {
             {
                 LOG(LOGTYPE_WARNING, "Renderer found texture to be null while cleaning up");
             }
-            
         }
+        SDL_DestroyTexture(render_texture);
 
         TTF_Quit();
         SDL_DestroyRenderer(sdl_renderer);
@@ -332,6 +332,11 @@ namespace Pringine {
 
     }
 
+    SDL_Rect Renderer2D::get_world_to_screen_rect(SDL_FRect& rect)
+    {
+        
+    }
+
     // private    
     void Renderer2D::draw()
     {
@@ -341,7 +346,7 @@ namespace Pringine {
                 Graphics* _graphics = render_list[_i];
                 if(_graphics != nullptr)
                 {
-                    _graphics->draw(this, true, true, view_position,world_unit_to_pixels * zoom_amount);
+                    _graphics->draw(this, true,world_unit_to_pixels * zoom_amount);
                 }
             }
         #endif
@@ -786,8 +791,8 @@ namespace Pringine {
             
             dst_dimension.x = (((dst_dimension.x - view_position.x)*scale) - (centered * dst_dimension.w/2) +  world_space*renderer->window_width/2);
             dst_dimension.y = (( (world_space?-1:1) *(dst_dimension.y - view_position.y)*scale) - (centered * dst_dimension.h/2) + world_space*renderer->window_height/2);
-
-            SDL_RenderCopyEx(renderer->sdl_renderer, get_current_frame()->texture , &(get_current_frame()->region), 
+            
+            SDL_RenderCopyExF(renderer->sdl_renderer, get_current_frame()->texture , &(get_current_frame()->region), 
                                     &dst_dimension, angle, NULL, SDL_FLIP_NONE) ;
     }
 }

@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include <string>
-#include <map>
+#include <unordered_map>
 #include <SDL2/SDL.h>
 #include "Module.hpp"
 #include "Vector2.hpp"
@@ -68,11 +68,11 @@ namespace Pringine {
             KeyboardGameController();
             ~KeyboardGameController();
 
-            std::map<SDL_Keycode, std::pair<SDL_GameControllerAxis,float> > axis_binding;
+            std::unordered_map<SDL_Keycode, std::pair<SDL_GameControllerAxis,float> > axis_binding;
             //std::string axis_names[SDL_CONTROLLER_AXIS_MAX];
             //float axis_state[SDL_CONTROLLER_AXIS_MAX];
 
-            std::map<SDL_Keycode, SDL_GameControllerButton> button_binding;
+            std::unordered_map<SDL_Keycode, SDL_GameControllerButton> button_binding;
             //bool button_state[SDL_CONTROLLER_BUTTON_MAX];
             //bool button_pressed_flags[SDL_CONTROLLER_BUTTON_MAX];
             //bool button_released_flags[SDL_CONTROLLER_BUTTON_MAX];
@@ -98,9 +98,9 @@ namespace Pringine {
             int click_count[MAX_MOUSE_BUTTON_COUNT];
             bool button_released_flags[MAX_MOUSE_BUTTON_COUNT];
             bool button_pressed_flags[MAX_MOUSE_BUTTON_COUNT];
-            std::map<SDL_Keycode, bool> kb_down;
-            std::map<SDL_Keycode, bool> kb_up;
-            std::map<SDL_Keycode, bool> kb;
+            std::unordered_map<SDL_Keycode, bool> kb_down;
+            std::unordered_map<SDL_Keycode, bool> kb_up;
+            std::unordered_map<SDL_Keycode, bool> kb;
             void map_mb_to_mb(int from, int to);
             void map_mb_to_kb(int from, SDL_Keycode to);
 
@@ -111,12 +111,12 @@ namespace Pringine {
         public:
             Keyboard();
             ~Keyboard();
-            std::map<SDL_Keycode, SDL_Keycode> key_binding;
-            std::map<SDL_Keycode, std::string> key_names;
+            std::unordered_map<SDL_Keycode, SDL_Keycode> key_binding;
+            std::unordered_map<SDL_Keycode, std::string> key_names;
             
-            std::map<SDL_Keycode, bool> key_state;
-            std::map<SDL_Keycode, bool> key_pressed_flags;
-            std::map<SDL_Keycode, bool> key_released_flags;
+            std::unordered_map<SDL_Keycode, bool> key_state;
+            std::unordered_map<SDL_Keycode, bool> key_pressed_flags;
+            std::unordered_map<SDL_Keycode, bool> key_released_flags;
 
             bool get_key(SDL_Keycode k);
             bool get_key_down(SDL_Keycode k);
@@ -146,13 +146,9 @@ namespace Pringine {
             GameController game_controllers[MAX_GAMECONTROLLER_COUNT];
             //KeyboardGameController keyboardgc;
             SDL_Event event;
-
-            
-            
-
     };
 
-
+    extern InputManager* input_manager;
 
 }
 

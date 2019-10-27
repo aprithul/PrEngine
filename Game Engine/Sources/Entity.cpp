@@ -10,6 +10,7 @@ namespace Pringine
     }
     ///////////////////////////////
 
+
     Entity::Entity(EntityType type):type(type)
     {
         id = -1;

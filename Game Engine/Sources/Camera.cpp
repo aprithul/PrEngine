@@ -73,6 +73,10 @@ namespace Pringine
         renderer2d->draw_rectangle(camera_bounds, color);
 
     }
+    void Camera::end()
+    {
+
+    }
 
     void Camera::zoom_in(float zoom_speed)
     {
@@ -85,4 +89,16 @@ namespace Pringine
         zoom_amount -= zoom_speed  * Time::Frame_time;
         zoom_amount = Pringine::clamp(zoom_amount,1.0f, 5.0f);
     }
+
+    Vector2<float> Camera::get_screen_to_world_position(Vector2<int> screen_pos)
+    {
+        screen_pos.x -= renderer2d->window_width/2;
+        screen_pos.y -= renderer2d->window_height/2;
+        screen_pos.y *= -1;
+        Vector2<float> ss_to_cs = (screen_pos * (1.f/(float)renderer2d->world_unit_to_pixels/zoom_amount));
+        ss_to_cs += transform.position;
+        return ss_to_cs;
+    }
+
+
 }

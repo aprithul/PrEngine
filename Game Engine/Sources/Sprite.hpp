@@ -1,3 +1,5 @@
+#ifndef SPRITE_HPP
+#define SPRITE_HPP
 #include "Entity.hpp"
 #include "RendererModule.hpp"
 #include "TimeModule.hpp"
@@ -15,6 +17,7 @@ namespace Pringine
             Graphics graphics;
             Renderer2D& renderer2d;
             int pixel_to_world;
+            SDL_FRect world_space_bounds;
 
             void set_animation(bool do_animate, int fps);
             void awake() override;
@@ -32,3 +35,5 @@ namespace Pringine
     };
 
 }
+
+#endif

@@ -4,6 +4,11 @@
 #include "Module.hpp"
 #include "GUI.hpp"
 #include "RendererModule.hpp"
+#include "Sprite.hpp"
+#include "Engine.hpp"
+#include "EntityManagementSystemModule.hpp"
+#include "Logger.hpp"
+#include "Camera.hpp"
 #include <string>
 
 namespace Pringine

@@ -66,11 +66,7 @@ namespace Pringine {
         }
 
         // get the reference to the input module
-        input_manager = (Pringine::InputManager*)this->get_module("Input");
-
-
-        LOG(LOGTYPE_GENERAL, "Engine started");
-        
+        input_manager = (InputManager*)this->get_module("Input");
     }
     
     // called every frame

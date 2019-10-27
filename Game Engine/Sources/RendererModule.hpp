@@ -18,7 +18,6 @@
 #include <SDL2/SDL_ttf.h>
 #include <queue>
 #include <utility>
-#include <map>
 #include "Engine.hpp"
 #include "Module.hpp"
 #include "TimeModule.hpp"
@@ -108,6 +107,7 @@ namespace Pringine {
         void set_draw_color(SDL_Color color);
         int add_graphics_to_draw(Graphics* graphics);
         void remove_graphics(int id);
+        SDL_Rect get_world_to_screen_rect(SDL_FRect& rect);
 
         void draw_rectangle(SDL_FRect rect, SDL_Color color, bool screen_space = false, bool centered = false);
         void draw_rectangle(SDL_Rect rect, SDL_Color color, bool screen_space = false, bool centered = false);
@@ -163,7 +163,7 @@ namespace Pringine {
         ~Graphics();
         GraphicsFrame* get_current_frame();
         GraphicsFrame* get_frame_at(int index);
-        void draw(Renderer2D* renderer, bool world_space = true, bool centered = true, Vector2<float> view_position  = Vector2<float>{0,0}, float scale = 1.0f);
+        void draw(Renderer2D* renderer, bool centered = true, float scale = 1.0f);
         bool load_graphics(std::string graphics_file, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
         bool load_graphics(SDL_Texture* texture, const TextureSlicingParameters* slicing_params, const Renderer2D& renderer2d, int num_of_frames = 1, bool is_subregion = false);
         void add_frame_to_graphics(const GraphicsFrame& frame);

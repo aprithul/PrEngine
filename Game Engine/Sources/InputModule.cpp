@@ -8,7 +8,8 @@
 #include "InputModule.hpp"
 
 namespace Pringine {
-    
+
+    InputManager* input_manager;
     std::string textinput = "";
     bool textinput_modified = false;
 
@@ -25,6 +26,8 @@ namespace Pringine {
             LOG(LOGTYPE_GENERAL, "Text input is active");
         else
             LOG(LOGTYPE_GENERAL, "Text input is not active");
+
+        Pringine::input_manager = this;
     }
     
     InputManager::~InputManager()
@@ -77,10 +80,10 @@ namespace Pringine {
             mouse.kb_down[ mouse.mb_to_kb_binding[i]] = false;
         }
     
-        for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_pressed_flags.begin(); it!=keyboard.key_pressed_flags.end(); ++it)
+        for (std::unordered_map<SDL_Keycode,bool>::iterator it=keyboard.key_pressed_flags.begin(); it!=keyboard.key_pressed_flags.end(); ++it)
             keyboard.key_pressed_flags[it->first] = false;
         
-        for (std::map<SDL_Keycode,bool>::iterator it=keyboard.key_released_flags.begin(); it!=keyboard.key_released_flags.end(); ++it)
+        for (std::unordered_map<SDL_Keycode,bool>::iterator it=keyboard.key_released_flags.begin(); it!=keyboard.key_released_flags.end(); ++it)
             keyboard.key_released_flags[it->first] = false;
 
 //        LOG(LOGTYPE_GENERAL, std::to_string(Time::get_time()));
@@ -405,6 +408,7 @@ namespace Pringine {
     ////////// KeyboardGameController
     KeyboardGameController::KeyboardGameController()
     {
+        /*
         for(int i=SDL_CONTROLLER_AXIS_LEFTX; i<SDL_CONTROLLER_AXIS_MAX; i++)
             axis_state[i] = 0.f;
         
@@ -423,6 +427,7 @@ namespace Pringine {
 
         button_binding[SDLK_j] = SDL_CONTROLLER_BUTTON_X;
         button_binding[SDLK_i] = SDL_CONTROLLER_BUTTON_Y;
+        */
 
     }
 
@@ -472,7 +477,7 @@ namespace Pringine {
 
     SDL_Keycode Keyboard::find_down_key()
     {
-        for (std::map<SDL_Keycode,bool>::iterator it=key_pressed_flags.begin(); it!=key_pressed_flags.end(); ++it)
+        for (std::unordered_map<SDL_Keycode,bool>::iterator it=key_pressed_flags.begin(); it!=key_pressed_flags.end(); ++it)
         {
             if(it->second == true)
             {

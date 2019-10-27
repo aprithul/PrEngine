@@ -44,7 +44,6 @@ namespace Pringine
     extern float get_slider(uintptr_t id, float value, SDL_Rect& slide_region, SDL_Rect& cursor_region, SDL_FRect& anchor, float min = 0.0f, float max =1.0f, bool horizontal=true);
     extern void get_text_input(uintptr_t id, std::string& text, SDL_Rect& text_box_region, SDL_FRect& anchor);
     extern void show_text(uintptr_t id, std::string& text, SDL_Rect& draw_region, SDL_FRect& anchor,Font_ID font_id, SDL_Color& c, float scale = 1.f );
-    extern bool inside(Vector2<int> pos, SDL_Rect rect);
     extern void process_rect_with_anchor(SDL_Rect& rect, SDL_FRect& anchor, int width, int height);
     extern Mouse* mouse;
     extern Renderer2D* renderer;
