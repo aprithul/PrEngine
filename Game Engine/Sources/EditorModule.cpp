@@ -94,10 +94,10 @@ namespace Pringine
                 {
                     if(et->type == ENTITY_TYPE_SPRITE)
                     {
-                        if(inside( wsp, ((Sprite*)et)->screen_rect,true))
+                        if(inside( wsp, ((Sprite*)et)->world_space_bounds,true))
                         {
                             selected_entity_id = et->id;
-                            selection_offset = wsp - Vector2<float>( ((Sprite*)et)->screen_rect.x,((Sprite*)et)->screen_rect.y);
+                            selection_offset = wsp - Vector2<float>( ((Sprite*)et)->world_space_bounds.x,((Sprite*)et)->world_space_bounds.y);
                         }
                     }
                 }

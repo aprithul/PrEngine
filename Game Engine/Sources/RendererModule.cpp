@@ -332,9 +332,18 @@ namespace Pringine {
 
     }
 
-    SDL_Rect Renderer2D::get_world_to_screen_rect(SDL_FRect& rect)
+    SDL_Rect Renderer2D::get_world_to_screen_rect(SDL_FRect rect)
     {
-        
+        SDL_Rect srect;
+        rect.x -= view_position.x;
+        rect.y -= view_position.y;
+
+        srect.x = (rect.x * world_unit_to_pixels * zoom_amount) + window_width/2;
+        srect.y = (-(rect.y * world_unit_to_pixels * zoom_amount)) + window_height/2;
+        srect.h = rect.h * world_unit_to_pixels * zoom_amount;
+        srect.w = rect.w * world_unit_to_pixels * zoom_amount;
+
+        return srect;
     }
 
     // private    
@@ -346,7 +355,7 @@ namespace Pringine {
                 Graphics* _graphics = render_list[_i];
                 if(_graphics != nullptr)
                 {
-                    _graphics->draw(this, true,world_unit_to_pixels * zoom_amount);
+                    _graphics->draw(this, true);
                 }
             }
         #endif
@@ -781,18 +790,18 @@ namespace Pringine {
         return nullptr;
     }  
 
-    void Graphics::draw(Renderer2D* renderer, bool world_space, bool centered, Vector2<float> view_position, float scale)
+    void Graphics::draw(Renderer2D* renderer, bool centered)
     {
             // dst_dimension has world unit values, convert to screen space
             // also make drawing relative to camera position
             // also make center of screen 0,0
-            dst_dimension.w *= scale;
-            dst_dimension.h *= scale;
+            //dst_dimension.w *= scale;
+            //dst_dimension.h *= scale;
             
-            dst_dimension.x = (((dst_dimension.x - view_position.x)*scale) - (centered * dst_dimension.w/2) +  world_space*renderer->window_width/2);
-            dst_dimension.y = (( (world_space?-1:1) *(dst_dimension.y - view_position.y)*scale) - (centered * dst_dimension.h/2) + world_space*renderer->window_height/2);
+            dst_dimension.x = dst_dimension.x - (centered * dst_dimension.w/2);// +  world_space*renderer->window_width/2);
+            dst_dimension.y = dst_dimension.y - (centered * dst_dimension.h/2);//+ world_space*renderer->window_height/2);
             
-            SDL_RenderCopyExF(renderer->sdl_renderer, get_current_frame()->texture , &(get_current_frame()->region), 
+            SDL_RenderCopyEx(renderer->sdl_renderer, get_current_frame()->texture , &(get_current_frame()->region), 
                                     &dst_dimension, angle, NULL, SDL_FLIP_NONE) ;
     }
 }

@@ -147,7 +147,7 @@ namespace Pringine
         //render
         process_rect_with_anchor(draw_region, anchor, renderer->window_width, renderer->window_height);
         gui_graphics[gui_id].dst_dimension = draw_region;
-        gui_graphics[gui_id].draw(renderer,false,false);
+        gui_graphics[gui_id].draw(renderer,false);
     }
 
     bool do_button(uintptr_t id, SDL_Rect& draw_region, SDL_FRect& anchor, const std::string& text, const TextJustification& justification)
@@ -159,7 +159,7 @@ namespace Pringine
         gui_graphics[GUI_ID_BUTTON].current_frame_index = 0;
         if(hot.id == id) gui_graphics[GUI_ID_BUTTON].current_frame_index = 1;
         if(active.id == id) gui_graphics[GUI_ID_BUTTON].current_frame_index = 2;
-        gui_graphics[GUI_ID_BUTTON].draw(renderer, false, false);
+        gui_graphics[GUI_ID_BUTTON].draw(renderer, false);
 
         if(active.id == id) 
         {
@@ -203,12 +203,12 @@ namespace Pringine
 
         gui_graphics[GUI_ID_TOGGLE].dst_dimension = draw_region;
         gui_graphics[GUI_ID_TOGGLE].current_frame_index = 0;
-        gui_graphics[GUI_ID_TOGGLE].draw(renderer, false, false);
+        gui_graphics[GUI_ID_TOGGLE].draw(renderer, false);
 
         if(val) 
         {
             gui_graphics[GUI_ID_TOGGLE].current_frame_index = 1;
-            gui_graphics[GUI_ID_TOGGLE].draw(renderer,false,false);
+            gui_graphics[GUI_ID_TOGGLE].draw(renderer,false);
         }
 
         if(inside(mouse->position, gui_graphics[GUI_ID_TOGGLE].dst_dimension))
@@ -228,7 +228,7 @@ namespace Pringine
         process_rect_with_anchor(slider_base_region, anchor, renderer->window_width, renderer->window_height);
         _h = _h/(float)slider_base_region.h;
         gui_graphics[GUI_ID_SLIDER_BASE].dst_dimension = slider_base_region;
-        gui_graphics[GUI_ID_SLIDER_BASE].draw(renderer, false, false);
+        gui_graphics[GUI_ID_SLIDER_BASE].draw(renderer, false);
         if(active.id == id) 
         {
             if(mouse->get_mouse_button(1))
@@ -269,7 +269,7 @@ namespace Pringine
         slider_knob_region.w = _s * slider_knob_region.w;
         slider_knob_region.y = slider_base_region.y + slider_base_region.h/2.f - slider_knob_region.h/2.f;
         gui_graphics[GUI_ID_SLIDER_KNOB].dst_dimension = slider_knob_region;
-        gui_graphics[GUI_ID_SLIDER_KNOB].draw(renderer, false, false);
+        gui_graphics[GUI_ID_SLIDER_KNOB].draw(renderer, false);
         return value;
     }
 
@@ -298,7 +298,7 @@ namespace Pringine
         gui_graphics[GUI_ID_TEXTBOX].dst_dimension = text_box_region;
         gui_graphics[GUI_ID_TEXTBOX].current_frame_index = 0;
         if(active.id == id) gui_graphics[GUI_ID_TEXTBOX].current_frame_index = 1;
-        gui_graphics[GUI_ID_TEXTBOX].draw(renderer,false,false);
+        gui_graphics[GUI_ID_TEXTBOX].draw(renderer,false);
 
         SDL_Color c{0,0,0,255};
         //SDL_FRect tb_a = {(text_box_region.x+text_box_region.w/2.f)/(float)canvas_width, anchor.y,

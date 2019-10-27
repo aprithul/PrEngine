@@ -71,16 +71,22 @@ namespace Pringine
                 }
             }
 
+            world_space_bounds.x = transform.position.x;
+            world_space_bounds.y = transform.position.y;
+            world_space_bounds.w = bounding_box.w * transform.scale.x;
+            world_space_bounds.h = bounding_box.h * transform.scale.y;
+
+            graphics.dst_dimension = renderer2d.get_world_to_screen_rect(world_space_bounds);
+            graphics.angle = transform.angle;
 
             //convert world space position of sprite to camera space
-            graphics.dst_dimension.x = transform.position.x;//  (int)transform.position.x - (graphics.dst_dimension.w/2);
-            graphics.dst_dimension.y = transform.position.y;// (int)transform.position.y - (graphics.dst_dimension.h/2);
+            //graphics.dst_dimension.x = transform.position.x;//  (int)transform.position.x - (graphics.dst_dimension.w/2);
+            //graphics.dst_dimension.y = transform.position.y;// (int)transform.position.y - (graphics.dst_dimension.h/2);
 
-            graphics.dst_dimension.w = bounding_box.w * transform.scale.x;
-            graphics.dst_dimension.h = bounding_box.h * transform.scale.y;
-            world_space_bounds = graphics.dst_dimension;
+            //graphics.dst_dimension.w = bounding_box.w * transform.scale.x;
+            //graphics.dst_dimension.h = bounding_box.h * transform.scale.y;
+            //world_space_bounds = graphics.dst_dimension;
 
-            graphics.angle = transform.angle;
             
 
             SDL_FRect bounds{transform.position.x, transform.position.y, bounding_box.w, bounding_box.h};
