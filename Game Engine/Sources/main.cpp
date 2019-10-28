@@ -18,7 +18,8 @@
 #include "InputModule.hpp"
 #include "EntityManagementSystemModule.hpp"
 #include <SDL2/SDL.h>
-#include "RendererModule.hpp"
+//#include "RendererModule.hpp"
+#include "Renderer3D.hpp"
 #include "FrameRateRegulatorModule.hpp"
 #include "FrameRateCounterModule.hpp"
 #include "Sprite.hpp"
@@ -60,15 +61,17 @@ int main(int argc, const char * argv[])
         Pringine::NetworkManager* network_manager = (Pringine::NetworkManager*) game_engine->
                                 add_module(new Pringine::NetworkManager("Network manager", 5));
         #endif
-
-        Pringine::Renderer2D* renderer2d =
-                        (Pringine::Renderer2D*)game_engine->
-                                add_module(new Pringine::Renderer2D(1280,720,"Pringine",false, 25, "Renderer", 99999));
         
-        frame_rate_counter->renderer2D = renderer2d;
+        Pringine::Renderer3D* renderer3d = (Pringine::Renderer3D*) game_engine->
+                                                add_module(new Pringine::Renderer3D(800,600,"Hello Opengl"));
+        //Pringine::Renderer2D* renderer2d =
+        //                (Pringine::Renderer2D*)game_engine->
+        //                        add_module(new Pringine::Renderer2D(1280,720,"Pringine",false, 25, "Renderer", 99999));
         
-        Pringine::Editor* editor = (Pringine::Editor*) game_engine->
-                                                add_module(new Pringine::Editor("Editor", 6, renderer2d));
+        //frame_rate_counter->renderer2D = renderer2d;
+        
+        //Pringine::Editor* editor = (Pringine::Editor*) game_engine->
+        //                                        add_module(new Pringine::Editor("Editor", 6, renderer2d));
         
         Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
         Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
@@ -76,11 +79,11 @@ int main(int argc, const char * argv[])
         //mouse->map_mb_to_mb(1,0);
         //mouse->map_mb_to_mb(3,1);
 
-        Pringine::initialize_gui(mouse, renderer2d);
+        //Pringine::initialize_gui(mouse, renderer2d);
 
-        Pringine::Camera* camera = new Pringine::Camera(16,9,renderer2d);
-        camera->transform.position = Pringine::Vector2<float>(2,0);
-        entity_management_system->assign_id_and_store_entity(*camera);
+        //Pringine::Camera* camera = new Pringine::Camera(16,9,renderer2d);
+        //camera->transform.position = Pringine::Vector2<float>(2,0);
+        //entity_management_system->assign_id_and_store_entity(*camera);
 
         //Pringine::Sprite** entities = new Pringine::Sprite*[500];
         //std::string graphics_file_location = Pringine::get_resource_path("highres.jpg");
@@ -96,12 +99,12 @@ int main(int argc, const char * argv[])
         if(gc == nullptr)
                 Pringine::LOG( Pringine::LOGTYPE_ERROR,"Didn't return a valid gamecontroller");
 
-        Pringine::Player* player = new Pringine::Player(gc);
+        /*Pringine::Player* player = new Pringine::Player(gc);
         player->keyboard = kb;
         player->mouse = mouse;
         player->main_camera = camera;
         entity_management_system->assign_id_and_store_entity(*player);
-
+        */
         //std::cout<<sprite->graphics.layer<<","<<sprite_cube->graphics.layer<<","<<sprite_cube_2->graphics.layer<<std::endl;
         game_engine->start();
         

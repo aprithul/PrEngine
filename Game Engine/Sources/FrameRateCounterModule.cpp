@@ -59,19 +59,23 @@ namespace Pringine {
                 black.b = 0;
                 black.a = 255;
 
-                if(text_texture != nullptr)
-                    SDL_DestroyTexture(text_texture);
-                text_texture = renderer2D->get_text_texture(fr, font, black);// 
+                //if(text_texture != nullptr)
+                //    SDL_DestroyTexture(text_texture);
+                //text_texture = renderer2D->get_text_texture(fr, font, black);// 
             #endif
+
+            LOG(LOGTYPE_GENERAL,"frame rate: ",std::to_string(frame_count));
+
 
             frame_count = 0;
             one_second -= 1.0;
+
         }
 
         // not destroying texture every frame to save on performance, instead doing it once a second
         #if !IS_SERVER
-            if(text_texture != nullptr) 
-                renderer2D->draw_text(text_texture ,Vector2<int>{0,0}, TOP_LEFT);
+            //if(text_texture != nullptr) 
+            //    renderer2D->draw_text(text_texture ,Vector2<int>{0,0}, TOP_LEFT);
         #endif
     }
     

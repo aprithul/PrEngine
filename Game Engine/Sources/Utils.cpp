@@ -46,17 +46,13 @@ namespace Pringine{
         *(buffer+read_char_count) = '\0'; 
         return buffer;
     }
-
+    
 
     std::string get_resource_path(const std::string &subDir){
         //We need to choose the path separator properly based on which
         //platform we're running on, since Windows uses a different
         //separator than most systems
-    #ifdef _WIN32
-        const char PATH_SEP = '\\';
-    #else
-        const char PATH_SEP = '/';
-    #endif
+    
         //This will hold the base resource path: Lessons/res/
         //We give it static lifetime so that we'll only need to call
         //SDL_GetBasePath once to get the executable path
