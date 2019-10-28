@@ -26,7 +26,7 @@ namespace Pringine {
                     return nullptr;
                 }
 
-                SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"linear");
+                SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY,"best");
                 SDL_Texture *texture = IMG_LoadTexture(ren, file_name.c_str());
                 if (texture == nullptr){
                     LOG(LOGTYPE_ERROR, std::string("Couldn't load texture : ").append(file_name));
@@ -45,9 +45,8 @@ namespace Pringine {
 
     //////////////////////////////////////////////////////////////////////
     
-    // publics
 
-    void insertionSort(Graphics** arr, int n)  
+    void insertion_sort(Graphics** arr, int n)  
     {  
         int i, j;  
         //LOG(LOGTYPE_GENERAL, std::to_string(n));
@@ -70,7 +69,13 @@ namespace Pringine {
 
     } 
 
-
+    // publics
+    void Renderer2D::sort_render_order()
+    {
+        insertion_sort(render_list, render_array_head);
+    }
+    
+    
     Renderer2D::Renderer2D(int width, int height, std::string title, bool vsync, int world_unit_to_pixels, std::string name, int priority):Module(name,priority)
     {
         #if !IS_SERVER
@@ -233,7 +238,7 @@ namespace Pringine {
 
                 render_list[next_pos] = graphics;
                 
-                insertionSort(render_list, render_array_head);
+                insertion_sort(render_list, render_array_head);
                 return next_pos;
                 
             }
@@ -350,6 +355,7 @@ namespace Pringine {
     void Renderer2D::draw()
     {
         #if !IS_SERVER
+            //insertionSort(render_list, render_array_head);
             for(int _i=0; _i<=render_array_head; _i++)
             {
                 Graphics* _graphics = render_list[_i];

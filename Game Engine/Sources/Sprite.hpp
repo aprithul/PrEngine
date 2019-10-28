@@ -19,6 +19,7 @@ namespace Pringine
             int pixel_to_world;
             SDL_FRect world_space_bounds;
 
+            void set_layer(int layer);
             void set_animation(bool do_animate, int fps);
             void awake() override;
             void start() override;
@@ -30,6 +31,8 @@ namespace Pringine
             double animation_accumulator;
             double animation_delta;
             bool do_animate;
+            int layer;
+
 
 
     };

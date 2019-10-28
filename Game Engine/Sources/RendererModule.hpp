@@ -119,6 +119,7 @@ namespace Pringine {
         void draw_text(SDL_Texture* texture, Vector2<int> screen_position, TextJustification text_justification, int height = -1);
         void draw_text(const std::string& text, TTF_Font* font, SDL_Color& color,Vector2<int> screen_position, TextJustification text_justification);
         void close_font(TTF_Font* font);
+        void sort_render_order();
 
         void start() override;
         void update() override;

@@ -52,7 +52,7 @@ int main(int argc, const char * argv[])
                                 add_module(new Pringine::FrameRateCounter("Frame Counter", 100001));
         
         // can't exceed 60fps if vsync is on
-        frame_rate_regulator->set_frame_rate(60);
+        frame_rate_regulator->set_frame_rate(120);
         //frame_rate_regulator->set_uncapped();
         //frame_rate_regulator->set_frame_rate(15);
 
@@ -63,7 +63,7 @@ int main(int argc, const char * argv[])
 
         Pringine::Renderer2D* renderer2d =
                         (Pringine::Renderer2D*)game_engine->
-                                add_module(new Pringine::Renderer2D(1280,720,"Pringine",true, 25, "Renderer", 99999));
+                                add_module(new Pringine::Renderer2D(1280,720,"Pringine",false, 25, "Renderer", 99999));
         
         frame_rate_counter->renderer2D = renderer2d;
         

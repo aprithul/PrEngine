@@ -9,6 +9,7 @@ namespace Pringine
             name = graphics_file_name;
             //LOG(LOGTYPE_GENERAL,"Created sprite");
             graphics.load_graphics(graphics_file_name, slicing_param, _renderer2d, num_of_animation_frames, false) ;
+            this->layer = layer;
             graphics.layer = layer;
             do_animate = false;
             this->renderer2d_id = _renderer2d.add_graphics_to_draw(&graphics);
@@ -105,4 +106,10 @@ namespace Pringine
 
     }
 
+    void Sprite::set_layer(int layer)
+    {
+        this->layer = layer;
+        graphics.layer = layer;
+        renderer2d.sort_render_order();   
+    }
 }

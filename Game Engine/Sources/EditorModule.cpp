@@ -51,7 +51,10 @@ namespace Pringine
 
     }
 
-    Sprite* sprite_cube;
+    Sprite* sprite_cube1;
+    Sprite* sprite_cube2;
+    Sprite* sprite_cube3;
+
     Camera* camera;
     long selected_entity_id = -1;
     Vector2<float> selection_offset;
@@ -59,11 +62,30 @@ namespace Pringine
     void Editor::start()
     {
         Pringine::TextureSlicingParameters slicing_param_2(0,0,1024,1024,0,0);
-        sprite_cube = new Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer, 1, 100, 10);
-        sprite_cube->transform.position = Pringine::Vector2<float>(4,2);
-        sprite_cube->transform.scale = Pringine::Vector2<float>(0.5f,0.5f);
+        sprite_cube1 = new Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer, 1, 100, 9);
+        sprite_cube1->transform.position = Pringine::Vector2<float>(4,2);
+        sprite_cube1->transform.scale = Pringine::Vector2<float>(0.5f,0.5f);
+        sprite_cube1->set_layer(15);
         LOG(LOGTYPE_GENERAL, "Editor started");
-        Pringine::entity_management_system->assign_id_and_store_entity(*sprite_cube);
+        Pringine::entity_management_system->assign_id_and_store_entity(*sprite_cube1);
+
+       /*         sprite_cube2 = new Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer, 1, 100, 12);
+        sprite_cube2->transform.position = Pringine::Vector2<float>(0,0);
+        sprite_cube2->transform.scale = Pringine::Vector2<float>(0.5f,0.5f);
+        LOG(LOGTYPE_GENERAL, "Editor started");
+       // sprite_cube1->set_layer(0);
+
+        Pringine::entity_management_system->assign_id_and_store_entity(*sprite_cube2);
+
+
+                sprite_cube2 = new Sprite(Pringine::get_resource_path("cube.png"), &slicing_param_2, *renderer, 1, 100, 11);
+        sprite_cube2->transform.position = Pringine::Vector2<float>(-6.2f,-2.8f);
+        sprite_cube2->transform.scale = Pringine::Vector2<float>(0.5f,0.5f);
+        LOG(LOGTYPE_GENERAL, "Editor started");
+        //sprite_cube1->set_layer(2);
+        
+        Pringine::entity_management_system->assign_id_and_store_entity(*sprite_cube2);*/
+        
 
         camera = (Camera*)entity_management_system->get_entity(ENTITY_TYPE_CAMERA);
     }
