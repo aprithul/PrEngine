@@ -442,7 +442,7 @@ namespace Pringine {
         // test binding
         key_binding[SDLK_ESCAPE] = SDLK_ESCAPE;
         key_binding[SDLK_c] = SDLK_c;
-        key_binding[SDLK_t] = SDLK_r;
+        key_binding[SDLK_t] = SDLK_t;
     }
 
     Keyboard::~Keyboard()

@@ -14,15 +14,49 @@
 #include <SDL2/SDL.h>
 #include <OpenGL/gl3.h>
 #include <SDL2/SDL_ttf.h>
+#include <sstream>
 #include "Module.hpp"
 #include "Vertex.hpp"
 #include "Mesh.hpp"
 #include "Logger.hpp"
 #include "Utils.hpp"
-#include <sstream>
+#include "InputModule.hpp"
+
+#define DEBUG true
+
+#define Assert(x) if(!x) __builtin_trap();
+
+#ifdef DEBUG
+    #define GL_CALL(x) gl_clear_error(); x; Assert(gl_get_error(#x, __FILE__, __LINE__))
+#else
+    #define GL_CALL(x) x
+#endif
+
+
 
 namespace Pringine {
     
+
+    static void gl_clear_error()
+    {
+        while(glGetError() != GL_NO_ERROR); 
+    }
+
+    static bool gl_get_error(char* func_name, char* file_name, int line_no)
+    {
+        bool no_error = true;
+        GLuint err = GL_NO_ERROR;
+        while((err = glGetError())!=GL_NO_ERROR){
+            
+            std::cout<<"OpenGL error [ code: "<<err<<" ], in function: "<<func_name
+                    <<","<<" (line:"<<line_no<<") file: "<<file_name<<std::endl;
+            no_error = false;
+        }
+        
+        return no_error;
+        
+    }
+
     enum ShaderType
     {
         SHADER_PASSTHROUGH,
@@ -31,6 +65,7 @@ namespace Pringine {
 
     class Renderer3D : public Module
     {
+
     public:
         // display attributes
         int height;

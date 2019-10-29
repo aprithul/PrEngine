@@ -10,36 +10,33 @@
 #define Vertex_hpp
 
 #include <stdio.h>  
+#include <memory>
 #include "Vector3.hpp"
 #include <OpenGL/gl3.h>
 
 namespace Pringine {
-    
-    enum ATTRIBUTE_INDEX
+
+    static const int ATTRIB_POSITION_LENGTH = 3;
+    static const int ATTRIB_POSITION_OFFSET = 0*sizeof(float);
+    static const int ATTRIB_COLOR_LENGTH = 4;
+    static const int ATTRIB_COLOR_OFFSET = 3*sizeof(float);
+
+    enum AttributeIndex
     {
-        ATTIRB_POSITION = 0,
+        ATTRIB_POSITION = 0,
+        ATTRIB_COLOR = 1
     };
     
-    class Vertex
+    struct Vertex
     {
-    public:
-        Vertex();
-        Vertex(Vector3<float> position);
-        Vertex(GLfloat  x,GLfloat y, GLfloat z);
-        GLfloat get_x();
-        GLfloat get_y();
-        GLfloat get_z();
+        float x;
+        float y;
+        float z;
+        float r;
+        float g;
+        float b;
+        float a;
 
-        GLfloat data[3];
-
-        // need to change with more attributes added
-        static const GLint ATTRIB_POSITION_INDEX = 0; 
-        static const GLint NUM_OF_ATTRIB = 1;
-        static const GLint ATTRIB_POSITION_LENGTH = 3;
-        static const GLint ATTRIB_POSITION_OFFSET = 0;
-        static const GLint LENGTH = 3;
-        static const GLint SIZE = sizeof(GLfloat)*Vertex::LENGTH;
-        //-------------------------------------------------------------------------------------------//
     };
 }
 

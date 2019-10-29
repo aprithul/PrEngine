@@ -38,7 +38,7 @@ namespace Pringine {
         else
             printf("Context created with OpenGL version  (%s)\n", glGetString(GL_VERSION));
 
-
+        std::cout<<"Vector3 size"<<sizeof(Vector3<float>)<<std::endl;
     }
     
     
@@ -61,10 +61,9 @@ namespace Pringine {
         SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE,32);
         SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,16);
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,1);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3 );
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2 );
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1 );
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        
         
         //glCullFace(GL_BACK);    // cull the back face
         //glEnable(GL_CULL_FACE); // enalbe face culling
@@ -97,24 +96,37 @@ namespace Pringine {
 
         LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
-        Vertex vertices[3];
-        vertices[0] = (Vector3<float>(-0.5f,-0.5f,0.5f));
-        vertices[1] = (Vector3<float>( 0.5f,-0.5f,0.5f));
-        vertices[2] = (Vector3<float>( 0.f,  0.5f,0.5f));
-        meshes[0].set_vertices(vertices, 3);
+        Vertex vertices[4];
+                    // pos,   color
+                    // x,y,z, r,g,b,a
+        vertices[0] = {-0.5f,-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
+        vertices[1] = {0.5f,-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f};
+        vertices[2] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f};
+        vertices[3] = {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
+        GLuint element_array[] = {
+            0, 1, 2,
+            2, 3, 0
+        };
+
+        meshes[0].set_vertices(vertices, 4);
+        meshes[0].set_indices(element_array, 6);
+
         upload_mesh(meshes[0]);
         if(make_shader_program("shaders"+PATH_SEP+"PassThrough.shader", shader_programs[SHADER_PASSTHROUGH]))
         {
             glUseProgram(shader_programs[SHADER_PASSTHROUGH]);
-            glDeleteProgram(shader_programs[SHADER_PASSTHROUGH]);
+            //glDeleteProgram(shader_programs[SHADER_PASSTHROUGH]);
         }
     }
+
 
     void Renderer3D::update()
     {
         Clear(0,0,0,1);
         for(int i=0; i<number_of_meshes; i++)
-            glDrawArrays(GL_TRIANGLES, 0, meshes[i].vertex_count);
+            GL_CALL(
+                //glDrawArrays(GL_TRIANGLES, 0, 6))
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
         SwapBuffers();
     }
 
@@ -215,32 +227,49 @@ namespace Pringine {
 
     void Renderer3D::upload_mesh(const Mesh& mesh)
     {
-        GLenum err = GL_NO_ERROR;
-
+        // vertex buffer
         GLuint vertexBuffer;
-        glGenBuffers(1, &vertexBuffer);
-        while( (err = glGetError()) != GL_NO_ERROR)
-            std::cout<<err<<std::endl;
-        glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-        while( (err = glGetError()) != GL_NO_ERROR)
-            std::cout<<err<<std::endl;
-        
-        // what????
+        GL_CALL( 
+            glGenBuffers(1, &vertexBuffer))
+        GL_CALL( 
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer))
+        GL_CALL( 
+            glBufferData(GL_ARRAY_BUFFER, mesh.vertices_array_size, mesh.vertices, GL_STATIC_DRAW))
+        ////////////////////
+
+        // vertex array object
         GLuint vao;
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
+        GL_CALL(
+            glGenVertexArrays(1, &vao))
+        GL_CALL(
+            glBindVertexArray(vao))
         ///////////
+
+        // index buffer
+        GLuint index_buffer;        
+        GL_CALL(
+            glGenBuffers(1, &index_buffer))
+        GL_CALL(
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer))
+        GL_CALL(
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices_array_size, mesh.indices, GL_STATIC_DRAW))
+
+        // attribute pointer position
+        GL_CALL(
+            glEnableVertexAttribArray(AttributeIndex::ATTRIB_POSITION))
+        GL_CALL(
+            glVertexAttribPointer(AttributeIndex::ATTRIB_POSITION, ATTRIB_POSITION_LENGTH, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)ATTRIB_POSITION_OFFSET))
         
-        glBufferData(GL_ARRAY_BUFFER, mesh.size, mesh.vertices, GL_STATIC_DRAW);
-        while( (err = glGetError()) != GL_NO_ERROR)
-            std::cout<<err<<std::endl;
-            
-        glEnableVertexAttribArray(Vertex::ATTRIB_POSITION_INDEX);
-        while( (err = glGetError()) != GL_NO_ERROR)
-            std::cout<<"attrib position index: "<< (err==GL_INVALID_OPERATION) <<std::endl;
-        glVertexAttribPointer(Vertex::ATTRIB_POSITION_INDEX, Vertex::ATTRIB_POSITION_LENGTH, GL_FLOAT, GL_FALSE, Vertex::SIZE, (const void*)Vertex::ATTRIB_POSITION_OFFSET);
-        while( (err = glGetError()) != GL_NO_ERROR)
-            std::cout<<err<<std::endl;
-        //LOG(LOGTYPE_GENERAL, std::to_string(Vertex::ATTRIB_POSITION_INDEX),",", std::to_string(Vertex::ATTRIB_POSITION_LENGTH),",",std::to_string(Vertex::ATTRIB_POSITION_OFFSET),",", std::to_string(Vertex::SIZE));
+        //GL_CALL(
+        //    glDisableVertexAttribArray(AttributeIndex::ATTRIB_POSITION))
+
+        // attribute pointer color
+        GL_CALL(
+            glEnableVertexAttribArray(AttributeIndex::ATTRIB_COLOR))
+        GL_CALL(
+            glVertexAttribPointer(AttributeIndex::ATTRIB_COLOR, ATTRIB_COLOR_LENGTH, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)ATTRIB_COLOR_OFFSET))
+        //GL_CALL(
+        //    glDisableVertexAttribArray(AttributeIndex::ATTRIB_COLOR))
+
     }
 }
