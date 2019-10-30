@@ -14,9 +14,10 @@ void main()
 #fragment
 #version 330 core
 
+uniform float u_red;
 in vec4 out_color;
 out vec4 color;
 void main()
 {
-    color = out_color;//vec4(0.0,1.0,1.0,1.0);
+    color = vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
 }

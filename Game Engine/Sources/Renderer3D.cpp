@@ -9,6 +9,291 @@
 
 namespace Pringine {
     
+    VertexArray::VertexArray()
+    {
+        GL_CALL(
+            glGenVertexArrays(1, &id))
+        
+    }
+    VertexArray::~VertexArray()
+    {
+        GL_CALL(
+            glDeleteVertexArrays(1, &id))
+    }
+
+    void VertexArray::Bind()
+    {
+        GL_CALL(
+            glBindVertexArray(id))
+    }
+
+    void VertexArray::Unbind()
+    {
+        GL_CALL(
+            glBindVertexArray(0))
+    }
+
+    VertexBuffer::VertexBuffer(const Vertex* vertices, GLuint size)
+    {
+        GL_CALL( 
+            glGenBuffers(1, &id))
+        Bind(); 
+        GL_CALL( 
+            glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW))
+        Unbind();
+    }
+
+    VertexBuffer::~VertexBuffer()
+    {
+        GL_CALL( 
+            glDeleteBuffers(1, &id));
+    }
+
+    void VertexBuffer::Bind()
+    {
+        GL_CALL(
+            glBindBuffer(GL_ARRAY_BUFFER, id));
+    }
+
+    void VertexBuffer::Unbind()
+    {
+        GL_CALL(
+            glBindBuffer(GL_ARRAY_BUFFER, 0));
+    }
+
+
+    IndexBuffer::IndexBuffer(const GLuint* indices, GLuint indices_size, GLsizei count)
+    {
+        this->count = count;
+        GL_CALL( 
+            glGenBuffers(1, &id));
+        Bind();
+        GL_CALL(
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW))
+        Unbind();
+    }
+
+    IndexBuffer::~IndexBuffer()
+    {
+        GL_CALL( 
+            glDeleteBuffers(1, &id));
+
+    }
+
+    void IndexBuffer::Bind()
+    {
+        GL_CALL(
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
+    }
+
+    void IndexBuffer::Unbind()
+    {
+        GL_CALL(
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+    }
+
+    Graphics3D::Graphics3D(const Vertex* vertices, GLuint vertices_size, const GLuint* indices, 
+                                    GLuint indices_size, GLsizei indices_count, Material material, 
+                                        VertexLayout layout)
+                                :vbo(vertices,vertices_size),ibo(indices,indices_size,indices_count),
+                                    material(material),layout(layout)
+    {
+        vao.Bind();
+        vbo.Bind();
+        for(std::vector<VertexAttribute>::iterator attr = layout.vertex_attributes.begin(); attr !=  layout.vertex_attributes.end(); attr++)
+        {
+            GL_CALL(
+                glEnableVertexAttribArray( attr->index))
+            GL_CALL(
+                glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+        }
+        vbo.Unbind();
+        vao.Unbind();
+    }
+
+    Graphics3D::~Graphics3D()
+    {
+        std::cout<<"DESTROYED"<<std::endl;   
+    }
+
+    Material::Material(const std::string& path)
+    {
+        this->source_file_path = std::string(path);
+        make_shader_program(this->source_file_path);
+        GL_CALL(
+            glUseProgram(shader_program))
+    }
+
+    Material::~Material()
+    {
+        GL_CALL(
+            glDeleteProgram(shader_program))
+    }
+
+    void Material::load_uniform_location(const char* uniform)
+    {
+        GLint loc = -1;
+        GL_CALL(
+            loc = glGetUniformLocation(shader_program, uniform))
+        
+        if(loc != -1)
+            uniform_locations[uniform] = loc;
+    }
+
+    bool Material::make_shader_program(const std::string& path)
+    {
+        std::string _source = read_file(get_resource_path(path).c_str());
+        std::stringstream shader_source;
+        shader_source << _source;
+        
+        std::string vert = "";
+        std::string frag = "";
+        std::string line = "";
+        GLenum type = GL_VERTEX_SHADER;
+        while(std::getline(shader_source, line))
+        {
+            //std::cout<<line<<std::endl;
+            if(line.find("#vertex") != std::string::npos){
+                type = GL_VERTEX_SHADER;
+
+            }
+            else if(line.find("#fragment")!= std::string::npos){
+                type = GL_FRAGMENT_SHADER;
+            }
+            else
+            {
+                if(type == GL_VERTEX_SHADER)
+                    vert += line+"\n";
+                else if(type == GL_FRAGMENT_SHADER)
+                    frag += line+"\n";
+            }
+        }
+
+        shader_program = glCreateProgram();
+        if(shader_program == 0)
+        {
+            std::cout<<"Couldn't create shader program"<<std::endl;
+            return false;
+        }
+
+        GLuint v = make_shader( GL_VERTEX_SHADER, vert);
+        GLuint f = make_shader( GL_FRAGMENT_SHADER, frag);
+        if(v != -1 && f != -1)
+        {
+            glAttachShader(shader_program, v);
+            glAttachShader(shader_program, f);
+            glLinkProgram(shader_program);
+            GLint program_linked;
+
+            glGetProgramiv(shader_program, GL_LINK_STATUS, &program_linked);
+            if (program_linked != GL_TRUE)
+            {
+                int length;
+                glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &length);
+                GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
+                glGetProgramInfoLog(shader_program, length, &length, log);
+                LOG(LOGTYPE_ERROR, "Shader linking error\n",std::string(log));
+                
+                glDetachShader(shader_program, v);
+                glDeleteShader(v);
+                glDetachShader(shader_program, f);
+                glDeleteShader(f);       
+            }
+            else
+            {   
+                glDetachShader(shader_program, v);
+                glDeleteShader(v);
+                glDetachShader(shader_program, f);
+                glDeleteShader(f);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    GLuint Material::make_shader( GLenum type,  const std::string& source)
+    {
+        GLuint shader =  glCreateShader(type);
+        if(shader == 0)
+            std::cout<<"Couldn't create shader"<<std::endl;
+            
+        const char* _source = source.c_str();
+        glShaderSource(shader,1, &(_source) , NULL);
+        glCompileShader(shader);
+        
+        // check
+        GLint compilation_status;
+        glGetShaderiv(shader, GL_COMPILE_STATUS, &compilation_status);
+        if(compilation_status != GL_TRUE)
+        {
+            int length;
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
+
+            GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
+            glGetShaderInfoLog(shader, length, &length, log);
+            LOG(LOGTYPE_ERROR, "Shader compilation error in ",(type==GL_VERTEX_SHADER?"Vertex":"Fragment"),"shader: \n"+std::string(log)+"\n");
+            glDeleteShader(shader);
+            shader = -1;
+        }
+        return shader;
+    }
+
+
+
+    VertexLayout::VertexLayout()
+    {
+        stride = 0;
+    }
+
+    VertexAttribute::VertexAttribute(GLuint index, GLuint count, int type, GLboolean normalized)
+    {
+        this->index = index;
+        this->count = count;
+        this->type  = type;
+        this->normalized = normalized;
+        this->offset = 0;
+        this->size = 0;
+    }
+
+    void VertexLayout::add_attribute(VertexAttribute& attribute)
+    {
+        if(vertex_attributes.size() >= 1)
+        {
+            attribute.offset = (vertex_attributes.back().size);
+        }
+
+        switch (attribute.type)
+        {
+        case GL_FLOAT:
+            attribute.size = (sizeof(GLfloat) * attribute.count);
+            break;
+        case GL_UNSIGNED_INT:
+            attribute.size = (sizeof(GLuint) * attribute.count);
+            break;
+        case GL_INT:
+            attribute.size = (sizeof(GLint) * attribute.count);
+            break;
+            //....
+            //....
+            //....
+        default:
+            LOG(LOGTYPE_ERROR, "Attribute type not found");
+            break;
+        }
+
+        stride += attribute.size;
+        vertex_attributes.push_back(attribute);
+
+    }
+
+
+
+
+
+
+
+
+
     Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 4)
     {
         this->width = width;
@@ -94,6 +379,7 @@ namespace Pringine {
     void Renderer3D::start()
     {
 
+
         LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
         Vertex vertices[4];
@@ -107,26 +393,42 @@ namespace Pringine {
             0, 1, 2,
             2, 3, 0
         };
-
         meshes[0].set_vertices(vertices, 4);
         meshes[0].set_indices(element_array, 6);
+        
+ 
+        
+        VertexLayout layout;
+        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        layout.add_attribute(attribute_0);
+        layout.add_attribute(attribute_1);
 
-        upload_mesh(meshes[0]);
-        if(make_shader_program("shaders"+PATH_SEP+"PassThrough.shader", shader_programs[SHADER_PASSTHROUGH]))
-        {
-            glUseProgram(shader_programs[SHADER_PASSTHROUGH]);
-            //glDeleteProgram(shader_programs[SHADER_PASSTHROUGH]);
-        }
+        Graphics3D* graphics = new Graphics3D(meshes[0].vertices, meshes[0].vertices_array_size, 
+                                    meshes[0].indices, meshes[0].indices_array_size, meshes[0].index_count,
+                                        Material("shaders"+PATH_SEP+"PassThrough.shader"),layout);
+       
+        graphics->material.load_uniform_location("u_red");
+        graphics3d_list.push_back(graphics);
     }
 
 
     void Renderer3D::update()
     {
+
         Clear(0,0,0,1);
-        for(int i=0; i<number_of_meshes; i++)
+        for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
+        {
+            (*it)->vao.Bind();
+            (*it)->ibo.Bind();
             GL_CALL(
-                //glDrawArrays(GL_TRIANGLES, 0, 6))
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+                glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
+            GL_CALL(
+                glDrawElements(GL_TRIANGLES, (*it)->ibo.count, GL_UNSIGNED_INT, nullptr));
+            
+            (*it)->vao.Unbind();
+            (*it)->ibo.Unbind();
+        }
         SwapBuffers();
     }
 
@@ -135,126 +437,23 @@ namespace Pringine {
 
     }
 
-    bool Renderer3D::make_shader_program(const std::string& path, GLuint& shader_program)
-    {
-        std::string _source = read_file(get_resource_path(path).c_str());
-        std::stringstream shader_source;
-        shader_source << _source;
-        
-        std::string vert = "";
-        std::string frag = "";
-        std::string line = "";
-        GLenum type = GL_VERTEX_SHADER;
-        while(std::getline(shader_source, line))
-        {
-            //std::cout<<line<<std::endl;
-            if(line.find("#vertex") != std::string::npos){
-                type = GL_VERTEX_SHADER;
-
-            }
-            else if(line.find("#fragment")!= std::string::npos){
-                type = GL_FRAGMENT_SHADER;
-            }
-            else
-            {
-                if(type == GL_VERTEX_SHADER)
-                    vert += line+"\n";
-                else if(type == GL_FRAGMENT_SHADER)
-                    frag += line+"\n";
-            }
-        }
-
-        shader_program = glCreateProgram();
-        if(shader_program == 0)
-        {
-            std::cout<<"Couldn't create shader program"<<std::endl;
-            return false;
-        }
-
-        GLuint v = make_shader( GL_VERTEX_SHADER, vert);
-        GLuint f = make_shader( GL_FRAGMENT_SHADER, frag);
-        if(v != -1 && f != -1)
-        {
-            glAttachShader(shader_program, v);
-            glAttachShader(shader_program, f);
-            glLinkProgram(shader_program);
-            GLint program_linked;
-
-            glGetProgramiv(shader_program, GL_LINK_STATUS, &program_linked);
-            if (program_linked != GL_TRUE)
-            {
-                int length;
-                glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &length);
-                GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
-                glGetProgramInfoLog(shader_program, length, &length, log);
-                LOG(LOGTYPE_ERROR, "Shader linking error\n",std::string(log));
-            }
-            else
-            {   
-                return true;
-            }
-        }
-        return false;
-    }
-
-    GLuint Renderer3D::make_shader( GLenum type,  const std::string& source)
-    {
-        GLuint shader =  glCreateShader(type);
-        if(shader == 0)
-            std::cout<<"Couldn't create shader"<<std::endl;
-            
-        const char* _source = source.c_str();
-        glShaderSource(shader,1, &(_source) , NULL);
-        glCompileShader(shader);
-        
-        // check
-        GLint compilation_status;
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &compilation_status);
-        if(compilation_status != GL_TRUE)
-        {
-            int length;
-            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-
-            GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
-            glGetShaderInfoLog(shader, length, &length, log);
-            LOG(LOGTYPE_ERROR, "Shader compilation error in ",(type==GL_VERTEX_SHADER?"Vertex":"Fragment"),"shader: \n"+std::string(log)+"\n");
-            glDeleteShader(shader);
-            shader = -1;
-        }
-        return shader;
-        
-    }
-
     void Renderer3D::upload_mesh(const Mesh& mesh)
     {
+        
+
         // vertex buffer
-        GLuint vertexBuffer;
-        GL_CALL( 
-            glGenBuffers(1, &vertexBuffer))
-        GL_CALL( 
-            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer))
-        GL_CALL( 
-            glBufferData(GL_ARRAY_BUFFER, mesh.vertices_array_size, mesh.vertices, GL_STATIC_DRAW))
+        //vbo.init(mesh.vertices, mesh.vertices_array_size);
+        //std::cout<<"VBO ID: "<<vbo.id<<std::endl;
         ////////////////////
 
-        // vertex array object
-        GLuint vao;
-        GL_CALL(
-            glGenVertexArrays(1, &vao))
-        GL_CALL(
-            glBindVertexArray(vao))
-        ///////////
-
+        
         // index buffer
         GLuint index_buffer;        
         GL_CALL(
             glGenBuffers(1, &index_buffer))
         GL_CALL(
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer))
-        GL_CALL(
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices_array_size, mesh.indices, GL_STATIC_DRAW))
-
-        // attribute pointer position
+               // attribute pointer position
         GL_CALL(
             glEnableVertexAttribArray(AttributeIndex::ATTRIB_POSITION))
         GL_CALL(

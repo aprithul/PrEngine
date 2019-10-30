@@ -4,6 +4,8 @@
 //  Created by Aniruddha Prithul on 7/22/17.
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 
+#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+
 #include "Module.hpp"
 #include <stdlib.h>
 #include <iostream>

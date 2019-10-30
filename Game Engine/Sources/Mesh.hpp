@@ -21,12 +21,16 @@ namespace Pringine {
         ~Mesh();
         void set_vertices(Vertex* _vertices, int vertex_count);
         void set_indices(GLuint* indices, int count);
+        void upload();
+        void draw();
+        
         GLint vertices_array_size; 
         GLint indices_array_size; 
         GLint vertex_count;
         GLint index_count;
         Vertex* vertices;
         GLuint* indices;
+
         
     };
 }

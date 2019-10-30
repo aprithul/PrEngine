@@ -9,6 +9,8 @@
 #ifndef Display_h
 #define Display_h
 
+#include "tiny_obj_loader.h"
+
 #include <GL/glew.h>
 #include <iostream>
 #include <SDL2/SDL.h>
@@ -21,6 +23,8 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 #include "InputModule.hpp"
+#include <vector>
+#include <unordered_map>
 
 #define DEBUG true
 
@@ -32,11 +36,8 @@
     #define GL_CALL(x) x
 #endif
 
-
-
 namespace Pringine {
     
-
     static void gl_clear_error()
     {
         while(glGetError() != GL_NO_ERROR); 
@@ -47,7 +48,6 @@ namespace Pringine {
         bool no_error = true;
         GLuint err = GL_NO_ERROR;
         while((err = glGetError())!=GL_NO_ERROR){
-            
             std::cout<<"OpenGL error [ code: "<<err<<" ], in function: "<<func_name
                     <<","<<" (line:"<<line_no<<") file: "<<file_name<<std::endl;
             no_error = false;
@@ -63,6 +63,83 @@ namespace Pringine {
         SHADER_COUNT
     };
 
+    struct Material
+    {
+        Material(const std::string& path);
+        ~Material();
+        GLuint shader_program;
+        std::string source_file_path;
+        std::unordered_map<const char*,GLint> uniform_locations;
+        bool make_shader_program(const std::string& path);
+        GLuint make_shader(GLenum type,  const std::string& source);
+        void load_uniform_location(const char* uniform);
+    };
+
+    struct VertexArray
+    {
+        GLuint id;
+        VertexArray();
+        ~VertexArray();
+        void Bind();
+        void Unbind();
+    };
+
+    struct VertexBuffer
+    {
+        GLuint id;
+        VertexBuffer(const Vertex* vertices, GLuint size);
+        ~VertexBuffer();
+        void Bind();
+        void Unbind();
+    };
+
+    struct IndexBuffer
+    {
+        GLuint id;
+        GLsizei count;
+        IndexBuffer(const GLuint* indices, GLuint size, GLsizei count);
+        ~IndexBuffer();
+        void Bind();
+        void Unbind();
+    };
+
+    struct VertexAttribute
+        {
+            GLuint index;     
+            GLuint count;
+            int type;
+            GLboolean normalized;
+            GLsizei offset;
+
+            GLsizei size;
+
+            VertexAttribute(GLuint index, GLuint count, int type, GLboolean normalized);
+    };
+
+    struct VertexLayout
+    {
+        VertexLayout();
+        GLsizei stride;
+        std::vector<VertexAttribute> vertex_attributes;
+        void add_attribute(VertexAttribute& attribute);
+    };
+
+
+    struct Graphics3D
+    {
+        VertexArray vao;
+        VertexBuffer vbo;
+        IndexBuffer ibo;
+        Material material;
+        Vertex* vertices;
+        GLuint* indices;  
+        VertexLayout layout;  
+
+        Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material, VertexLayout layout);
+        ~Graphics3D();
+    };
+
+
     class Renderer3D : public Module
     {
 
@@ -71,7 +148,7 @@ namespace Pringine {
         int height;
         int width;
         std::string title;
-        
+        std::vector<Graphics3D*> graphics3d_list;
         // constructor/ destructors
         Renderer3D(int width, int height, std::string title);
         ~Renderer3D();
