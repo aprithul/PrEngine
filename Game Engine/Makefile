@@ -7,7 +7,7 @@ CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11 -g
 CXXFLAGS := -Wall
 LDLIBS   := -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -framework OpenGL
 
-SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
+SOURCES := $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEPS    := $(wildcard $(OBJ_DIR)/*.d)
 

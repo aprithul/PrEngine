@@ -3,21 +3,27 @@
 #version 330 core
 layout(location=0) in vec4 position;
 layout(location=1) in vec4 _color;
+layout(location=2) in vec2 texco;
 
 out vec4 out_color;
+out vec2 out_texco;
 void main()
 {
     gl_Position = position;
     out_color = _color;
+    out_texco = texco;
 }
 
 #fragment
 #version 330 core
 
-uniform float u_red;
+//uniform float u_red;
+uniform sampler2D u_sampler2d;
 in vec4 out_color;
+in vec2 out_texco;
+
 out vec4 color;
 void main()
 {
-    color = vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
+    color = texture(u_sampler2d, out_texco);// vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
 }

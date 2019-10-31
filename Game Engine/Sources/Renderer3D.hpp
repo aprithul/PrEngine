@@ -23,6 +23,7 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 #include "InputModule.hpp"
+#include "stb_image.h"
 #include <vector>
 #include <unordered_map>
 
@@ -61,6 +62,20 @@ namespace Pringine {
     {
         SHADER_PASSTHROUGH,
         SHADER_COUNT
+    };
+    
+    struct Texture
+    {
+        GLuint id;
+        int width;
+        int height;
+        int no_of_channels;
+        stbi_uc* data;
+
+        Texture(const char* path);
+        ~Texture();
+        void Bind(int slot);
+        void Unbind();
     };
 
     struct Material
@@ -131,11 +146,12 @@ namespace Pringine {
         VertexBuffer vbo;
         IndexBuffer ibo;
         Material material;
+        Texture texture;
         Vertex* vertices;
         GLuint* indices;  
         VertexLayout layout;  
 
-        Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material, VertexLayout layout);
+        Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
     };
 

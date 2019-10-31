@@ -94,9 +94,9 @@ namespace Pringine {
 
     Graphics3D::Graphics3D(const Vertex* vertices, GLuint vertices_size, const GLuint* indices, 
                                     GLuint indices_size, GLsizei indices_count, Material material, 
-                                        VertexLayout layout)
+                                    Texture texture, VertexLayout layout)
                                 :vbo(vertices,vertices_size),ibo(indices,indices_size,indices_count),
-                                    material(material),layout(layout)
+                                    material(material),texture(texture),layout(layout)
     {
         vao.Bind();
         vbo.Bind();
@@ -114,6 +114,54 @@ namespace Pringine {
     Graphics3D::~Graphics3D()
     {
         std::cout<<"DESTROYED"<<std::endl;   
+    }
+
+    Texture::Texture(const char* path)
+    {
+        stbi_set_flip_vertically_on_load(true);
+        data = stbi_load(path,&width, &height, &no_of_channels, 0);
+        if(data == NULL)
+            LOG(LOGTYPE_ERROR, "Image ",std::string(path)," loading failed");
+        else
+        {
+            GL_CALL(glGenTextures(1, &id))
+            GL_CALL(glBindTexture(GL_TEXTURE_2D, id))
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER))
+            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER))
+            
+            GLenum type = GL_RGBA;
+            switch(no_of_channels)
+            {
+                case 1:type = GL_R;break;
+                case 2:type = GL_RG;break;
+                case 3:type = GL_RGB;break;
+                case 4:type = GL_RGBA;break;
+            }
+            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, type, GL_UNSIGNED_BYTE, data))
+            GL_CALL(glBindTexture(GL_TEXTURE_2D, 0))
+        }
+    }
+
+    Texture::~Texture()
+    {
+        if(data != NULL)
+            stbi_image_free(data);
+    }
+
+    void Texture::Bind(int slot)
+    {
+        GL_CALL(
+            glActiveTexture(GL_TEXTURE0 + slot))
+        GL_CALL(
+            glBindTexture(GL_TEXTURE_2D, id))
+    }
+
+    void Texture::Unbind()
+    {
+        GL_CALL(
+            glBindTexture(GL_TEXTURE_2D, 0))
     }
 
     Material::Material(const std::string& path)
@@ -259,7 +307,7 @@ namespace Pringine {
     {
         if(vertex_attributes.size() >= 1)
         {
-            attribute.offset = (vertex_attributes.back().size);
+            attribute.offset = (vertex_attributes.back().size + vertex_attributes.back().offset);
         }
 
         switch (attribute.type)
@@ -383,12 +431,12 @@ namespace Pringine {
         LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
         Vertex vertices[4];
-                    // pos,   color
-                    // x,y,z, r,g,b,a
-        vertices[0] = {-0.5f,-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
-        vertices[1] = {0.5f,-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f};
-        vertices[2] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f};
-        vertices[3] = {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f};
+                    // pos,   color     texcoord
+                    // x,y,z, r,g,b,a   
+        vertices[0] = {-0.5f,-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
+        vertices[1] = { 0.5f,-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
+        vertices[2] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
+        vertices[3] = {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
         GLuint element_array[] = {
             0, 1, 2,
             2, 3, 0
@@ -401,14 +449,20 @@ namespace Pringine {
         VertexLayout layout;
         VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
         VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_2(2,2,GL_FLOAT,GL_FALSE);
         layout.add_attribute(attribute_0);
         layout.add_attribute(attribute_1);
+        layout.add_attribute(attribute_2);
+        std::cout<<"Stride"<<layout.stride<<std::endl;
 
         Graphics3D* graphics = new Graphics3D(meshes[0].vertices, meshes[0].vertices_array_size, 
                                     meshes[0].indices, meshes[0].indices_array_size, meshes[0].index_count,
-                                        Material("shaders"+PATH_SEP+"PassThrough.shader"),layout);
+                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
+                                        Texture(get_resource_path("cube.png").c_str()),
+                                        layout);
        
         graphics->material.load_uniform_location("u_red");
+        graphics->material.load_uniform_location("u_sampler2d");
         graphics3d_list.push_back(graphics);
     }
 
@@ -421,8 +475,11 @@ namespace Pringine {
         {
             (*it)->vao.Bind();
             (*it)->ibo.Bind();
+            //GL_CALL(
+            //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
+            (*it)->texture.Bind(0);
             GL_CALL(
-                glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
+                glUniform1i((*it)->material.uniform_locations["u_sampler2d"], 0))
             GL_CALL(
                 glDrawElements(GL_TRIANGLES, (*it)->ibo.count, GL_UNSIGNED_INT, nullptr));
             
@@ -440,35 +497,5 @@ namespace Pringine {
     void Renderer3D::upload_mesh(const Mesh& mesh)
     {
         
-
-        // vertex buffer
-        //vbo.init(mesh.vertices, mesh.vertices_array_size);
-        //std::cout<<"VBO ID: "<<vbo.id<<std::endl;
-        ////////////////////
-
-        
-        // index buffer
-        GLuint index_buffer;        
-        GL_CALL(
-            glGenBuffers(1, &index_buffer))
-        GL_CALL(
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer))
-               // attribute pointer position
-        GL_CALL(
-            glEnableVertexAttribArray(AttributeIndex::ATTRIB_POSITION))
-        GL_CALL(
-            glVertexAttribPointer(AttributeIndex::ATTRIB_POSITION, ATTRIB_POSITION_LENGTH, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)ATTRIB_POSITION_OFFSET))
-        
-        //GL_CALL(
-        //    glDisableVertexAttribArray(AttributeIndex::ATTRIB_POSITION))
-
-        // attribute pointer color
-        GL_CALL(
-            glEnableVertexAttribArray(AttributeIndex::ATTRIB_COLOR))
-        GL_CALL(
-            glVertexAttribPointer(AttributeIndex::ATTRIB_COLOR, ATTRIB_COLOR_LENGTH, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)ATTRIB_COLOR_OFFSET))
-        //GL_CALL(
-        //    glDisableVertexAttribArray(AttributeIndex::ATTRIB_COLOR))
-
     }
 }
