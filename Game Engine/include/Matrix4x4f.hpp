@@ -56,7 +56,7 @@ namespace Pringine {
             return r;
         }
                 
-        Matrix4x4<T> operator*(Matrix4x4<T> m)
+        Matrix4x4<T> operator*(const Matrix4x4<T>& m) const
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)

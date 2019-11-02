@@ -22,7 +22,9 @@ namespace Pringine {
         
         Vector3()
         {
-
+            this->x = 0;
+            this->y = 0;
+            this->z = 0;
         }
 
         Vector3(T x, T y, T z)

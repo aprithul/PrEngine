@@ -18,6 +18,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <sstream>
 #include "Module.hpp"
+#include "Component.hpp"
 #include "Vertex.hpp"
 #include "Mesh.hpp"
 #include "Logger.hpp"
@@ -141,7 +142,7 @@ namespace Pringine {
     };
 
 
-    struct Graphics3D
+    struct Graphics3D : public Component
     {
         VertexArray vao;
         VertexBuffer vbo;
@@ -152,9 +153,12 @@ namespace Pringine {
         GLuint* indices;  
         VertexLayout layout;  
 
-        Matrix4x4<float> model;
+        const Matrix4x4<float>* model;
         Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
+        private:
+            Matrix4x4<float> _model;
+        
     };
 
 

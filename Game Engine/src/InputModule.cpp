@@ -447,6 +447,8 @@ namespace Pringine {
         key_binding[SDLK_DOWN] = SDLK_DOWN;
         key_binding[SDLK_LEFT] = SDLK_LEFT;
         key_binding[SDLK_RIGHT] = SDLK_RIGHT;
+        key_binding[SDLK_q] = SDLK_q;
+        key_binding[SDLK_e] = SDLK_e;
     }
 
     Keyboard::~Keyboard()

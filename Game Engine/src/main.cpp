@@ -119,10 +119,10 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         Vertex vertices[4];
                     // pos,   color     texcoord
                     // x,y,z, r,g,b,a   
-        vertices[0] = {-1.f,-1.f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
-        vertices[1] = { 1.f,-1.f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
-        vertices[2] = { 1.f, 1.f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
-        vertices[3] = {-1.f, 1.f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
+        vertices[0] = {-1.f,-1.f, 0.f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
+        vertices[1] = { 1.f,-1.f, 0.f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
+        vertices[2] = { 1.f, 1.f, 0.f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
+        vertices[3] = {-1.f, 1.f, 0.f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
         
         GLuint element_array[] = {
             0, 1, 2,
@@ -152,7 +152,7 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         graphics->material.load_uniform_location("u_MVP");
         renderer3d->graphics3d_list.push_back(graphics);
 
-        Cube* cube = new Cube(*graphics);
+        Cube* cube = new Cube(graphics);
         entity_management_system->assign_id_and_store_entity(*cube);
 
         /*Pringine::Player* player = new Pringine::Player(gc);

@@ -96,7 +96,7 @@ namespace Pringine {
                                     GLuint indices_size, GLsizei indices_count, Material material, 
                                     Texture texture, VertexLayout layout)
                                 :vbo(vertices,vertices_size),ibo(indices,indices_size,indices_count),
-                                    material(material),texture(texture),layout(layout)
+                                    material(material),texture(texture),layout(layout),Component(COMP_GRAPHICS_3D)
     {
         vao.Bind();
         vbo.Bind();
@@ -110,7 +110,8 @@ namespace Pringine {
         vbo.Unbind();
         vao.Unbind();
 
-        model = Matrix4x4<float>::identity();
+        _model = Matrix4x4<float>::identity();
+        model = &_model;
     }
 
     Graphics3D::~Graphics3D()
@@ -429,6 +430,7 @@ namespace Pringine {
     void Renderer3D::start()
     {
         projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
+        //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -1.f, 1.f,-1.f,1.f);
 
         
     }
@@ -441,7 +443,7 @@ namespace Pringine {
         {
             (*it)->vao.Bind();
             (*it)->ibo.Bind();
-            Matrix4x4<float> mvp = (*it)->model * projection;
+            Matrix4x4<float> mvp = (projection) * (*((*it)->model)) ;
             //GL_CALL(
             //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
             (*it)->texture.Bind(0);

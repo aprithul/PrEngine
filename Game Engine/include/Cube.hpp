@@ -1,22 +1,20 @@
 #ifndef CUBE_HPP
 #define CUBE_HPP
 
-#include "Entity.hpp"
+#include "Entity3D.hpp"
 #include "Renderer3D.hpp"
 
 namespace Pringine
 {
-    class Cube : public Entity
+    class Cube : public Entity3D
     {
         public:
-            Graphics3D* graphics;
-            
-            Cube(Graphics3D& graphics);
+            Cube(Graphics3D* graphics);
             ~Cube();
-
+            
             void start() override;
-            void update() override;
             void end() override;
+            void update() override;
     };
     
 }

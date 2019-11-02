@@ -2,7 +2,7 @@
 
 namespace Pringine{
 
-    Cube::Cube(Graphics3D& graphics):graphics(&graphics), Entity(ENTITY_TYPE_CUBE)
+    Cube::Cube(Graphics3D* graphics):Entity3D(ENTITY_TYPE_CUBE, graphics)
     {
 
     }
@@ -12,43 +12,37 @@ namespace Pringine{
 
     }
 
-    float s = 1.f;
-    float x = 0.f;
-    float y = 0.f;
-
-    Matrix4x4<float> scale;
-    Matrix4x4<float> translation;
     void Cube::start()
     {
-        scale = Matrix4x4<float>::identity();
-        translation = Matrix4x4<float>::identity();
     }
 
     void Cube::update()
     {
+        float factor = 1.f;
         if(input_manager->keyboard.get_key(SDLK_z))
-            s += 1.f*Time::Frame_time;
+            factor += (Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_x))
-            s -= 1.f*Time::Frame_time;
+            factor -= (Time::Frame_time*1.f);
+        transform.set_scale(transform.get_scale() * factor);
 
+        Vector3<float> pos = transform.get_position();
         if(input_manager->keyboard.get_key(SDLK_UP))
-            y += 1.f*Time::Frame_time;
+            pos.y = pos.y+(Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_DOWN))
-            y -= 1.f*Time::Frame_time;
+            pos.y = pos.y-(Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_RIGHT))
-            x += 1.f*Time::Frame_time;
+            pos.x = pos.x+(Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_LEFT))
-            x -= 1.f*Time::Frame_time;
-        
-        // scale 
-        scale.set(0,0,s);
-        scale.set(1,1,s);
+            pos.x = pos.x-(Time::Frame_time*1.f);
+        transform.set_position(pos);
 
-        // translate
-        translation.set(0,3,x);
-        translation.set(1,3,y);
+        Vector3<float> rot = transform.get_rotation();
+        if(input_manager->keyboard.get_key(SDLK_q))
+            rot.y = rot.y-(Time::Frame_time*20.f);
+        if(input_manager->keyboard.get_key(SDLK_e))
+            rot.y = rot.y+(Time::Frame_time*20.f);
+        transform.set_rotation(rot);
 
-        this->graphics->model = scale * translation;
     }
 
     void Cube::end()

@@ -19,7 +19,7 @@ namespace Pringine{
             ~Transform();
             Vector2<float> translate(const Vector2<float>& translation);
             void rotate(float amount);
- 
+    
     };
 }
 #endif
