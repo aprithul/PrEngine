@@ -15,7 +15,6 @@ namespace  Pringine
         this->scale = scale;
     }
 
-
     Transform::~Transform()
     {
 

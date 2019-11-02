@@ -9,7 +9,9 @@ namespace Pringine
     {
         COMP_UNKNOWN,
         COMP_TRANSFORM,
+        COMP_TRANSFORM_3D,
         COMP_GRAPHICS,
+        COMP_GRAPHICS_3D,
         COMP_COUNT_MAX
     };
 

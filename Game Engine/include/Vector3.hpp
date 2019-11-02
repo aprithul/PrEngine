@@ -71,6 +71,11 @@ namespace Pringine {
         return Vector3<T>( this->x / v, this->y / v, this->z / v);
 
         }
+
+        Vector3 operator==(const T v ) const{
+            return ( this->x == v.x && this->y == v.y && this->z == v.z);
+        }
+
         Vector3 normalize(){
         double len = length();
         x /= len;
