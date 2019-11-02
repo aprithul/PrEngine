@@ -37,7 +37,7 @@ namespace Pringine {
         float b;
         float a;
         float u;
-        float v;
+        float v;        
     };
 }
 

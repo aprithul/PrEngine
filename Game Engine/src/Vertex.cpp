@@ -9,6 +9,5 @@
 #include "Vertex.hpp"
 
 namespace Pringine {
-   
 
 }

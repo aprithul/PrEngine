@@ -29,6 +29,10 @@
 #include "Camera.hpp"
 #include "GUI.hpp"
 #include "EditorModule.hpp"
+#include "Cube.hpp"
+
+
+using namespace Pringine;
 
 void main_loop(void* game_engine);
 
@@ -100,6 +104,56 @@ int main(int argc, const char * argv[])
         
         if(gc == nullptr)
                 Pringine::LOG( Pringine::LOGTYPE_ERROR,"Didn't return a valid gamecontroller");
+
+
+        
+
+
+
+LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
+
+
+        const int number_of_meshes = 1;
+        Mesh meshes[number_of_meshes];
+
+        Vertex vertices[4];
+                    // pos,   color     texcoord
+                    // x,y,z, r,g,b,a   
+        vertices[0] = {-1.f,-1.f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
+        vertices[1] = { 1.f,-1.f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
+        vertices[2] = { 1.f, 1.f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
+        vertices[3] = {-1.f, 1.f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
+        
+        GLuint element_array[] = {
+            0, 1, 2,
+            2, 3, 0
+        };
+        meshes[0].set_vertices(vertices, 4);
+        meshes[0].set_indices(element_array, 6);
+        
+        VertexLayout layout;
+        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_2(2,2,GL_FLOAT,GL_FALSE);
+        layout.add_attribute(attribute_0);
+        layout.add_attribute(attribute_1);
+        layout.add_attribute(attribute_2);
+        std::cout<<"Stride"<<layout.stride<<std::endl;
+
+        Graphics3D* graphics = new Graphics3D(meshes[0].vertices, meshes[0].vertices_array_size, 
+                                    meshes[0].indices, meshes[0].indices_array_size, meshes[0].index_count,
+                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
+                                        Texture(get_resource_path("cube.png").c_str()),
+                                        layout);
+       
+
+        graphics->material.load_uniform_location("u_red");
+        graphics->material.load_uniform_location("u_sampler2d");
+        graphics->material.load_uniform_location("u_MVP");
+        renderer3d->graphics3d_list.push_back(graphics);
+
+        Cube* cube = new Cube(*graphics);
+        entity_management_system->assign_id_and_store_entity(*cube);
 
         /*Pringine::Player* player = new Pringine::Player(gc);
         player->keyboard = kb;

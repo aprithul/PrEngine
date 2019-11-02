@@ -23,7 +23,8 @@
 #include "Logger.hpp"
 #include "Utils.hpp"
 #include "InputModule.hpp"
-#include "stb_image.h"
+#include "Matrix4x4f.hpp"
+#include "../Vendor/include/stb_image.h"
 #include <vector>
 #include <unordered_map>
 
@@ -151,6 +152,7 @@ namespace Pringine {
         GLuint* indices;  
         VertexLayout layout;  
 
+        Matrix4x4<float> model;
         Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
     };

@@ -4,12 +4,13 @@
 layout(location=0) in vec4 position;
 layout(location=1) in vec4 _color;
 layout(location=2) in vec2 texco;
+uniform mat4 u_MVP;
 
 out vec4 out_color;
 out vec2 out_texco;
 void main()
 {
-    gl_Position = position;
+    gl_Position = u_MVP * position;
     out_color = _color;
     out_texco = texco;
 }

@@ -109,6 +109,8 @@ namespace Pringine {
         }
         vbo.Unbind();
         vao.Unbind();
+
+        model = Matrix4x4<float>::identity();
     }
 
     Graphics3D::~Graphics3D()
@@ -358,7 +360,8 @@ namespace Pringine {
 
         glFrontFace(GL_CCW);     // points are gonna get supplid in clockwise order
         glEnable(GL_CULL_FACE);        
-
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         if( glewInit() != GLEW_OK)
             printf("Glew not initialized properly");
@@ -422,64 +425,30 @@ namespace Pringine {
         SDL_GL_SetSwapInterval(value);
     }
 
-    const int number_of_meshes = 1;
-    Mesh meshes[number_of_meshes];
+    Matrix4x4<float> projection;
     void Renderer3D::start()
     {
+        projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
 
-
-        LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
-
-        Vertex vertices[4];
-                    // pos,   color     texcoord
-                    // x,y,z, r,g,b,a   
-        vertices[0] = {-0.5f,-0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
-        vertices[1] = { 0.5f,-0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
-        vertices[2] = { 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
-        vertices[3] = {-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
-        GLuint element_array[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
-        meshes[0].set_vertices(vertices, 4);
-        meshes[0].set_indices(element_array, 6);
         
- 
-        
-        VertexLayout layout;
-        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_2(2,2,GL_FLOAT,GL_FALSE);
-        layout.add_attribute(attribute_0);
-        layout.add_attribute(attribute_1);
-        layout.add_attribute(attribute_2);
-        std::cout<<"Stride"<<layout.stride<<std::endl;
-
-        Graphics3D* graphics = new Graphics3D(meshes[0].vertices, meshes[0].vertices_array_size, 
-                                    meshes[0].indices, meshes[0].indices_array_size, meshes[0].index_count,
-                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
-                                        Texture(get_resource_path("cube.png").c_str()),
-                                        layout);
-       
-        graphics->material.load_uniform_location("u_red");
-        graphics->material.load_uniform_location("u_sampler2d");
-        graphics3d_list.push_back(graphics);
     }
 
-
+    
     void Renderer3D::update()
     {
-
         Clear(0,0,0,1);
         for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
         {
             (*it)->vao.Bind();
             (*it)->ibo.Bind();
+            Matrix4x4<float> mvp = (*it)->model * projection;
             //GL_CALL(
             //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
             (*it)->texture.Bind(0);
             GL_CALL(
                 glUniform1i((*it)->material.uniform_locations["u_sampler2d"], 0))
+            GL_CALL(
+                glUniformMatrix4fv((*it)->material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
             GL_CALL(
                 glDrawElements(GL_TRIANGLES, (*it)->ibo.count, GL_UNSIGNED_INT, nullptr));
             
