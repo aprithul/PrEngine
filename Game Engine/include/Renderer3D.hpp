@@ -145,19 +145,20 @@ namespace Pringine {
 
     struct Graphics3D : public Component
     {
-        VertexArray vao;
-        VertexBuffer vbo;
-        IndexBuffer ibo;
-        Material material;
-        Texture texture;
-        Vertex* vertices;
-        GLuint* indices;  
+        std::vector<VertexArray> vao;
+        std::vector<VertexBuffer> vbo;
+        std::vector<IndexBuffer> ibo;
+        std::vector<Material> material;
+        std::vector<Texture> texture;
+        //std::vector<Vertex*> vertices;
+        //std::vector<GLuint*> indices;  
         VertexLayout layout;  
+        int num_of_triangles;
 
         const Matrix4x4<float>* model;
         const Matrix4x4<float>* normal;
 
-        Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
+        Graphics3D();// const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
         private:
             Matrix4x4<float> _model;
@@ -190,7 +191,7 @@ namespace Pringine {
         void upload_mesh(const Mesh& mesh);
         bool make_shader_program(const std::string& path, GLuint& shader_program);
         GLuint make_shader( GLenum type, const std::string& source);
-        Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name);
+        Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name, const char* texture_file_path);
         
         void start() override;
         void update() override;
