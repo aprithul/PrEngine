@@ -19,21 +19,23 @@ namespace Pringine {
     Mesh::~Mesh()
     {
         delete [] vertices;
-        delete [] indices;
+        delete [] vertex_indices;
     }
     
     void Mesh::set_vertices(Vertex* _vertices, int vertex_count)
     {
         this->vertex_count = vertex_count;
         vertices_array_size = this->vertex_count*sizeof(Vertex);
+        std::cout<<"SIZE: "<<vertices_array_size<<std::endl;
+        std::cout<<"Count: "<<vertex_count<<std::endl;
         this->vertices = new Vertex[vertices_array_size];
         std::copy(_vertices,_vertices+vertex_count, this->vertices);
     }
 
     void Mesh::set_indices(GLuint* indices, int count)
     {
-        this->indices = new GLuint[count];
-        std::copy(indices,indices+count,this->indices);
+        this->vertex_indices = new GLuint[count];
+        std::copy(indices,indices+count,this->vertex_indices);
         index_count = count;
         indices_array_size = index_count * sizeof(GLuint);
     }

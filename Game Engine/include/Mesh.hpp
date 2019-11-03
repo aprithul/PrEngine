@@ -29,7 +29,7 @@ namespace Pringine {
         GLint vertex_count;
         GLint index_count;
         Vertex* vertices;
-        GLuint* indices;
+        GLuint* vertex_indices;
 
         
     };

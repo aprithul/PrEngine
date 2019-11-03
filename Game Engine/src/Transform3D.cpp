@@ -9,6 +9,7 @@ namespace  Pringine
         rotation_y = Matrix4x4<float>::identity();
         rotation_z = Matrix4x4<float>::identity();
         transformation = Matrix4x4<float>::identity();
+        rotation_transformation = Matrix4x4<float>::identity();
         position = Vector3<float>(0,0,0);
         scale = Vector3<float>(1,1,1);
         rotation = Vector3<float>(0,0,0);
@@ -67,7 +68,7 @@ namespace  Pringine
         rotation_x.set(1,1, cosf(rotation.x*PI/180.f));
         rotation_x.set(1,2, -sinf(rotation.x*PI/180.f));
         rotation_x.set(2,1, sinf(rotation.x*PI/180.f));
-        rotation_x.set(1,2, cosf(rotation.x*PI/180.f));
+        rotation_x.set(2,2, cosf(rotation.x*PI/180.f));
         
         rotation_y.set(0,0, cosf(rotation.y*PI/180.f));
         rotation_y.set(0,2, sinf(rotation.y*PI/180.f));
@@ -90,7 +91,7 @@ namespace  Pringine
         rotation_x.set(1,1, cosf(rotation.x*PI/180.f));
         rotation_x.set(1,2, -sinf(rotation.x*PI/180.f));
         rotation_x.set(2,1, sinf(rotation.x*PI/180.f));
-        rotation_x.set(1,2, cosf(rotation.x*PI/180.f));
+        rotation_x.set(2,2, cosf(rotation.x*PI/180.f));
         
         rotation_y.set(0,0, cosf(rotation.y*PI/180.f));
         rotation_y.set(0,2, sinf(rotation.y*PI/180.f));
@@ -106,13 +107,19 @@ namespace  Pringine
 
     void Transform3D::update_transformation()
     {
-        transformation = translation * rotation_z * rotation_y* rotation_x* scale_m;
+        rotation_transformation = rotation_z * rotation_y* rotation_x;
+        transformation = translation * rotation_transformation * scale_m;
         dirty = true;
     }
 
     const Matrix4x4<float>& Transform3D::get_transformation()
     {
         return transformation;
+    }
+
+    const Matrix4x4<float>& Transform3D::get_rotation_transformation()
+    {
+        return rotation_transformation;
     }
 
     const Vector3<float>& Transform3D::get_scale()
@@ -125,7 +132,7 @@ namespace  Pringine
         return position;
     }
 
-        const Vector3<float>& Transform3D::get_rotation()
+    const Vector3<float>& Transform3D::get_rotation()
     {
         return rotation;
     }

@@ -24,6 +24,7 @@ namespace Pringine{
             void set_rotation(float x, float y, float z);
             
             const Matrix4x4<float>& get_transformation();
+            const Matrix4x4<float>& get_rotation_transformation();
             const Vector3<float>& get_position();
             const Vector3<float>& get_scale();
             const Vector3<float>& get_rotation();
@@ -49,6 +50,7 @@ namespace Pringine{
             Matrix4x4<float> rotation_y;
             Matrix4x4<float> rotation_z;
             Matrix4x4<float> transformation;
+            Matrix4x4<float> rotation_transformation;
 
             void update_transformation();
             

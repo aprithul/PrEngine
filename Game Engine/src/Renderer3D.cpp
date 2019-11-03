@@ -112,6 +112,8 @@ namespace Pringine {
 
         _model = Matrix4x4<float>::identity();
         model = &_model;
+        _normal = Matrix4x4<float>::identity();
+        model = &_normal;
     }
 
     Graphics3D::~Graphics3D()
@@ -293,7 +295,7 @@ namespace Pringine {
 
     VertexLayout::VertexLayout()
     {
-        stride = 0;
+        stride = sizeof(Vertex);
     }
 
     VertexAttribute::VertexAttribute(GLuint index, GLuint count, int type, GLboolean normalized)
@@ -332,7 +334,7 @@ namespace Pringine {
             break;
         }
 
-        stride += attribute.size;
+        //stride += attribute.size;
         vertex_attributes.push_back(attribute);
 
     }
@@ -350,7 +352,7 @@ namespace Pringine {
         this->width = width;
         this->height = height;
         this->title = title;
-        
+        light_direction = Vector3<float>(.5f,-.2f,1.f).normalize();
         // initialize sdl and opengl related settings for graphics
         init();
         
@@ -359,10 +361,13 @@ namespace Pringine {
         // create the openGL context from the window  that was created
         glContext = SDL_GL_CreateContext(window);
 
-        glFrontFace(GL_CCW);     // points are gonna get supplid in clockwise order
-        glEnable(GL_CULL_FACE);        
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order
+        GL_CALL(glEnable(GL_CULL_FACE))
+        GL_CALL(glEnable(GL_BLEND))
+        GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
+        GL_CALL(glEnable(GL_DEPTH_TEST))
+        GL_CALL(glDepthFunc(GL_LESS))
+
 
         if( glewInit() != GLEW_OK)
             printf("Glew not initialized properly");
@@ -446,11 +451,16 @@ namespace Pringine {
             Matrix4x4<float> mvp = (projection) * (*((*it)->model)) ;
             //GL_CALL(
             //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
-            (*it)->texture.Bind(0);
-            GL_CALL(
-                glUniform1i((*it)->material.uniform_locations["u_sampler2d"], 0))
+            //(*it)->texture.Bind(0);
+            //GL_CALL(
+            //    glUniform1i((*it)->material.uniform_locations["u_sampler2d"], 0))
             GL_CALL(
                 glUniformMatrix4fv((*it)->material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+            GL_CALL(
+                glUniformMatrix4fv((*it)->material.uniform_locations["u_Normal_M"],1, GL_TRUE, ((*it))->normal->data ))
+            GL_CALL(
+                glUniform3f((*it)->material.uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+            
             GL_CALL(
                 glDrawElements(GL_TRIANGLES, (*it)->ibo.count, GL_UNSIGNED_INT, nullptr));
             
@@ -464,6 +474,95 @@ namespace Pringine {
     {
 
     }
+
+    Graphics3D* Renderer3D::generate_graphics3d(const char* base_dir, const char* file_name)
+    {
+        tinyobj::attrib_t attrib;
+        std::vector<tinyobj::shape_t> shapes;
+        std::vector<tinyobj::material_t> materials;
+
+        std::string warn;
+        std::string err;
+        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name, base_dir);
+        if (!warn.empty())
+            LOG(LOGTYPE_WARNING, warn);
+        if (!err.empty())
+            LOG(LOGTYPE_ERROR, err);
+        if (!ret) {
+            LOG(LOGTYPE_ERROR,"Loading ", std::string(file_name)," failed");
+            return nullptr;
+        }   
+        else
+            LOG(LOGTYPE_GENERAL, "Successfully loaded mesh ", std::string(file_name));
+
+        int index_count = 0;
+        for(int i=0; i<shapes.size(); i++)
+            index_count += shapes[i].mesh.indices.size();
+        GLuint* indices = new GLuint[index_count];
+        for(int j=0; j<shapes.size(); j++)
+            for(int i=0; i<shapes[j].mesh.indices.size(); i++)
+                indices[ (j*shapes.size())+i] = shapes[j].mesh.indices[i].vertex_index;
+
+        int vertex_count = attrib.vertices.size()/3;
+        Vertex* vertices = new Vertex[vertex_count];
+        for(int i=0; i < vertex_count; i++)
+        {
+            vertices[i].p_x = attrib.vertices[ (i*3)+0 ];
+            vertices[i].p_y = attrib.vertices[ (i*3)+1 ];
+            vertices[i].p_z = attrib.vertices[ (i*3)+2 ];
+            vertices[i].c_r = 1.0f;
+            vertices[i].c_g = 1.0f;
+            vertices[i].c_b = 1.0f;
+            vertices[i].c_a = 1.0f;
+            vertices[i].n_x = attrib.normals[ (i*3)+0 ];
+            vertices[i].n_y = attrib.normals[ (i*3)+1 ];
+            vertices[i].n_z = attrib.normals[ (i*3)+2 ];
+            vertices[i].u = 0.f;
+            vertices[i].v = 1.f;
+        }
+
+        Mesh* mesh = new Mesh();
+        mesh->set_indices(indices, index_count);
+        mesh->set_vertices(vertices, vertex_count);
+        
+        delete indices;
+        delete vertices;
+
+        /*for(int i=0; i<mesh->vertex_count; i++)
+            std::cout<<mesh->vertices[i].p_x<<","<<mesh->vertices[i].p_y<<","<<mesh->vertices[i].p_z<<std::endl;
+        for(int i=0; i<mesh->index_count; i++)
+            std::cout<<mesh->vertex_indices[i]<<std::endl;
+*/
+        VertexLayout layout;
+        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_2(2,3,GL_FLOAT,GL_FALSE);
+        layout.add_attribute(attribute_0);
+        layout.add_attribute(attribute_1);
+        layout.add_attribute(attribute_2);
+
+        Graphics3D* graphics = new Graphics3D(mesh->vertices, mesh->vertices_array_size, 
+                                    mesh->vertex_indices, mesh->indices_array_size, mesh->index_count,
+                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
+                                        Texture(get_resource_path("cube.png").c_str()),
+                                        layout);
+        //graphics->material.load_uniform_location("u_red");
+        //graphics->material.load_uniform_location("u_sampler2d");
+        graphics->material.load_uniform_location("u_MVP");
+        graphics->material.load_uniform_location("u_Normal_M");
+        graphics->material.load_uniform_location("u_Dir_Light");
+
+        graphics3d_list.push_back(graphics);
+
+        return graphics;
+
+        //std::copy(shapes[0].mesh.indices.begin() ,shapes[0].mesh.indices.end(), mesh->indices); 
+        //mesh->index_count = shapes[0].mesh.indices.size();
+
+        //LOG(LOGTYPE_GENERAL, std::to_string(mesh->indices[mesh->index_count-1]));
+        //LOG(LOGTYPE_GENERAL, std::to_string(mesh->index_count));
+    }
+
 
     void Renderer3D::upload_mesh(const Mesh& mesh)
     {

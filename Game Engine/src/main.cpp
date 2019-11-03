@@ -4,8 +4,6 @@
 //  Created by Aniruddha Prithul on 7/22/17.
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 
-#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
-
 #include "Module.hpp"
 #include <stdlib.h>
 #include <iostream>
@@ -112,7 +110,7 @@ int main(int argc, const char * argv[])
 
 LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
-
+/*
         const int number_of_meshes = 1;
         Mesh meshes[number_of_meshes];
 
@@ -131,29 +129,15 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         meshes[0].set_vertices(vertices, 4);
         meshes[0].set_indices(element_array, 6);
         
-        VertexLayout layout;
-        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_2(2,2,GL_FLOAT,GL_FALSE);
-        layout.add_attribute(attribute_0);
-        layout.add_attribute(attribute_1);
-        layout.add_attribute(attribute_2);
-        std::cout<<"Stride"<<layout.stride<<std::endl;
+*/
+        //std::cout<<"Stride"<<layout.stride<<std::endl;
+        
 
-        Graphics3D* graphics = new Graphics3D(meshes[0].vertices, meshes[0].vertices_array_size, 
-                                    meshes[0].indices, meshes[0].indices_array_size, meshes[0].index_count,
-                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
-                                        Texture(get_resource_path("cube.png").c_str()),
-                                        layout);
-       
-
-        graphics->material.load_uniform_location("u_red");
-        graphics->material.load_uniform_location("u_sampler2d");
-        graphics->material.load_uniform_location("u_MVP");
-        renderer3d->graphics3d_list.push_back(graphics);
-
+        Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("").c_str(), get_resource_path("teapot.obj").c_str());
         Cube* cube = new Cube(graphics);
         entity_management_system->assign_id_and_store_entity(*cube);
+        //std::cout<<graphics->normal->data[0]<<std::endl;
+
 
         /*Pringine::Player* player = new Pringine::Player(gc);
         player->keyboard = kb;

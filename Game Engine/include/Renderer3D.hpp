@@ -26,6 +26,7 @@
 #include "InputModule.hpp"
 #include "Matrix4x4f.hpp"
 #include "../Vendor/include/stb_image.h"
+#include "../Vendor/include/tiny_obj_loader.h"
 #include <vector>
 #include <unordered_map>
 
@@ -154,10 +155,13 @@ namespace Pringine {
         VertexLayout layout;  
 
         const Matrix4x4<float>* model;
+        const Matrix4x4<float>* normal;
+
         Graphics3D( const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
         private:
             Matrix4x4<float> _model;
+            Matrix4x4<float> _normal;
         
     };
 
@@ -170,7 +174,10 @@ namespace Pringine {
         int height;
         int width;
         std::string title;
+        std::vector<Mesh*>meshes;
         std::vector<Graphics3D*> graphics3d_list;
+        Vector3<float> light_direction;
+
         // constructor/ destructors
         Renderer3D(int width, int height, std::string title);
         ~Renderer3D();
@@ -183,7 +190,8 @@ namespace Pringine {
         void upload_mesh(const Mesh& mesh);
         bool make_shader_program(const std::string& path, GLuint& shader_program);
         GLuint make_shader( GLenum type, const std::string& source);
-
+        Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name);
+        
         void start() override;
         void update() override;
         void end() override;

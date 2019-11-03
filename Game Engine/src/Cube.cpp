@@ -38,9 +38,20 @@ namespace Pringine{
 
         Vector3<float> rot = transform.get_rotation();
         if(input_manager->keyboard.get_key(SDLK_q))
-            rot.y = rot.y-(Time::Frame_time*20.f);
+            rot.x = rot.x-(Time::Frame_time*20.f);
         if(input_manager->keyboard.get_key(SDLK_e))
+            rot.x = rot.x+(Time::Frame_time*20.f);
+
+        if(input_manager->keyboard.get_key(SDLK_a))
+            rot.y = rot.y-(Time::Frame_time*20.f);
+        if(input_manager->keyboard.get_key(SDLK_d))
             rot.y = rot.y+(Time::Frame_time*20.f);
+
+        if(input_manager->keyboard.get_key(SDLK_r))
+            rot.z = rot.z-(Time::Frame_time*20.f);
+        if(input_manager->keyboard.get_key(SDLK_t))
+            rot.z = rot.z+(Time::Frame_time*20.f);
+
         transform.set_rotation(rot);
 
     }
