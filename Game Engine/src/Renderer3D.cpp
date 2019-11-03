@@ -113,7 +113,7 @@ namespace Pringine {
         _model = Matrix4x4<float>::identity();
         model = &_model;
         _normal = Matrix4x4<float>::identity();
-        model = &_normal;
+        normal = &_normal;
     }
 
     Graphics3D::~Graphics3D()
@@ -452,26 +452,26 @@ namespace Pringine {
 
             for(int i=0; i<grp->vao.size(); i++)
             {
-                grp->vao[i].Bind();
+                grp->vao[i]->Bind();
                 //grp->ibo[i].Bind();
 
                 Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
                 //GL_CALL(
                 //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
-                //(*it)->texture.Bind(0);
-                //GL_CALL(
-                //    glUniform1i((*it)->material.uniform_locations["u_sampler2d"], 0))
+                grp->texture->Bind(0);
                 GL_CALL(
-                    glUniformMatrix4fv(grp->material[i].uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+                    glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
                 GL_CALL(
-                    glUniformMatrix4fv(grp->material[i].uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
+                    glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
                 GL_CALL(
-                    glUniform3f(grp->material[i].uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+                    glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
                 GL_CALL(
-                    glDrawArrays(GL_TRIANGLES,0, grp->num_of_triangles))
+                    glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+                GL_CALL(
+                    glDrawArrays(GL_TRIANGLES,0, grp->num_of_triangles[i]*3))
                     //glDrawElements(GL_TRIANGLES, grp->ibo[i].count, GL_UNSIGNED_INT, nullptr));
                 
-                grp->vao[i].Unbind();
+                grp->vao[i]->Unbind();
                 //grp->ibo[i].Unbind();
             }
         }
@@ -528,30 +528,7 @@ namespace Pringine {
         else
             LOG(LOGTYPE_GENERAL, "Successfully loaded mesh ", std::string(file_name));
 
-/*
-        int vertex_count = attrib.vertices.size()/3;
-        Vertex* vertices = new Vertex[vertex_count];
-        std::cout<<"Vert: "<<attrib.vertices.size()<<std::endl;
-        std::cout<<"Texco: "<<attrib.texcoords.size()<<std::endl;
-        for(int i=0; i < vertex_count; i++)
-        {
-            vertices[i].p_x = attrib.vertices[ (i*3)+0 ];
-            vertices[i].p_y = attrib.vertices[ (i*3)+1 ];
-            vertices[i].p_z = attrib.vertices[ (i*3)+2 ];
-            vertices[i].c_r = 1.0f;
-            vertices[i].c_g = 1.0f;
-            vertices[i].c_b = 1.0f;
-            vertices[i].c_a = 1.0f;
-            vertices[i].n_x = attrib.normals[ (i*3)+0 ];
-            vertices[i].n_y = attrib.normals[ (i*3)+1 ];
-            vertices[i].n_z = attrib.normals[ (i*3)+2 ];
-            vertices[i].u = attrib.texcoords[ (i*3)+0 ];
-            vertices[i].v = attrib.texcoords[ (i*3)+1 ];
-        }
-    */
-        Graphics3D* graphics = new Graphics3D();
-
-                
+        Graphics3D* graphics = new Graphics3D();                
         VertexLayout layout;
         VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
         VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
@@ -567,8 +544,7 @@ namespace Pringine {
 
         for (size_t s = 0; s < shapes.size(); s++) 
         {
-            std::vector<Vertex> buffer;  // pos(3float), normal(3float), color(3float)
-
+            std::vector<Vertex> buffer;
             for (size_t f = 0; f < shapes[s].mesh.indices.size() / 3; f++) 
             {
                 tinyobj::index_t idx0 = shapes[s].mesh.indices[3 * f + 0];
@@ -576,33 +552,35 @@ namespace Pringine {
                 tinyobj::index_t idx2 = shapes[s].mesh.indices[3 * f + 2];
 
                 float tc[3][2];
-                if (attrib.texcoords.size() > 0) {
-                if ((idx0.texcoord_index < 0) || (idx1.texcoord_index < 0) ||
-                    (idx2.texcoord_index < 0)) {
-                    // face does not contain valid uv index.
-                    tc[0][0] = 0.0f;
-                    tc[0][1] = 0.0f;
-                    tc[1][0] = 0.0f;
-                    tc[1][1] = 0.0f;
-                    tc[2][0] = 0.0f;
-                    tc[2][1] = 0.0f;
-                } 
-                else 
+                if (attrib.texcoords.size() > 0) 
                 {
-                    assert(attrib.texcoords.size() >
-                        size_t(2 * idx0.texcoord_index + 1));
-                    assert(attrib.texcoords.size() >
-                        size_t(2 * idx1.texcoord_index + 1));
-                    assert(attrib.texcoords.size() >
-                        size_t(2 * idx2.texcoord_index + 1));
+                    if ((idx0.texcoord_index < 0) || (idx1.texcoord_index < 0) ||
+                        (idx2.texcoord_index < 0)) 
+                    {
+                        // face does not contain valid uv index.
+                        tc[0][0] = 0.0f;
+                        tc[0][1] = 0.0f;
+                        tc[1][0] = 0.0f;
+                        tc[1][1] = 0.0f;
+                        tc[2][0] = 0.0f;
+                        tc[2][1] = 0.0f;
+                    } 
+                    else 
+                    {
+                        assert(attrib.texcoords.size() >
+                            size_t(2 * idx0.texcoord_index + 1));
+                        assert(attrib.texcoords.size() >
+                            size_t(2 * idx1.texcoord_index + 1));
+                        assert(attrib.texcoords.size() >
+                            size_t(2 * idx2.texcoord_index + 1));
 
                         // Flip Y coord.
                         tc[0][0] = attrib.texcoords[2 * idx0.texcoord_index];
-                        tc[0][1] = 1.0f - attrib.texcoords[2 * idx0.texcoord_index + 1];
+                        tc[0][1] = attrib.texcoords[2 * idx0.texcoord_index + 1];
                         tc[1][0] = attrib.texcoords[2 * idx1.texcoord_index];
-                        tc[1][1] = 1.0f - attrib.texcoords[2 * idx1.texcoord_index + 1];
+                        tc[1][1] = attrib.texcoords[2 * idx1.texcoord_index + 1];
                         tc[2][0] = attrib.texcoords[2 * idx2.texcoord_index];
-                        tc[2][1] = 1.0f - attrib.texcoords[2 * idx2.texcoord_index + 1];
+                        tc[2][1] = attrib.texcoords[2 * idx2.texcoord_index + 1];
                     }
                 } 
                 else 
@@ -616,113 +594,125 @@ namespace Pringine {
                 }
 
                 float v[3][3];
-        for (int k = 0; k < 3; k++) 
-        {
-          int f0 = idx0.vertex_index;
-          int f1 = idx1.vertex_index;
-          int f2 = idx2.vertex_index;
-          assert(f0 >= 0);
-          assert(f1 >= 0);
-          assert(f2 >= 0);
+                for (int k = 0; k < 3; k++) 
+                {
+                    int f0 = idx0.vertex_index;
+                    int f1 = idx1.vertex_index;
+                    int f2 = idx2.vertex_index;
+                    assert(f0 >= 0);
+                    assert(f1 >= 0);
+                    assert(f2 >= 0);
 
-          v[0][k] = attrib.vertices[3 * f0 + k];
-          v[1][k] = attrib.vertices[3 * f1 + k];
-          v[2][k] = attrib.vertices[3 * f2 + k];
-          bmin[k] = std::min(v[0][k], bmin[k]);
-          bmin[k] = std::min(v[1][k], bmin[k]);
-          bmin[k] = std::min(v[2][k], bmin[k]);
-          bmax[k] = std::max(v[0][k], bmax[k]);
-          bmax[k] = std::max(v[1][k], bmax[k]);
-          bmax[k] = std::max(v[2][k], bmax[k]);
-        }
+                    v[0][k] = attrib.vertices[3 * f0 + k];
+                    v[1][k] = attrib.vertices[3 * f1 + k];
+                    v[2][k] = attrib.vertices[3 * f2 + k];
+                    bmin[k] = std::min(v[0][k], bmin[k]);
+                    bmin[k] = std::min(v[1][k], bmin[k]);
+                    bmin[k] = std::min(v[2][k], bmin[k]);
+                    bmax[k] = std::max(v[0][k], bmax[k]);
+                    bmax[k] = std::max(v[1][k], bmax[k]);
+                    bmax[k] = std::max(v[2][k], bmax[k]);
+                }
 
-        float n[3][3];
-        {
-          bool invalid_normal_index = false;
-          if (attrib.normals.size() > 0) {
-            int nf0 = idx0.normal_index;
-            int nf1 = idx1.normal_index;
-            int nf2 = idx2.normal_index;
+                float n[3][3];
+                {
+                    bool invalid_normal_index = false;
+                    if (attrib.normals.size() > 0) 
+                    {
+                        int nf0 = idx0.normal_index;
+                        int nf1 = idx1.normal_index;
+                        int nf2 = idx2.normal_index;
 
-            if ((nf0 < 0) || (nf1 < 0) || (nf2 < 0)) {
-              // normal index is missing from this face.
-              invalid_normal_index = true;
-            } else {
-              for (int k = 0; k < 3; k++) {
-                assert(size_t(3 * nf0 + k) < attrib.normals.size());
-                assert(size_t(3 * nf1 + k) < attrib.normals.size());
-                assert(size_t(3 * nf2 + k) < attrib.normals.size());
-                n[0][k] = attrib.normals[3 * nf0 + k];
-                n[1][k] = attrib.normals[3 * nf1 + k];
-                n[2][k] = attrib.normals[3 * nf2 + k];
-              }
-            }
-          } else {
-            invalid_normal_index = true;
-          }
+                    if ((nf0 < 0) || (nf1 < 0) || (nf2 < 0)) 
+                    {
+                        // normal index is missing from this face.
+                        invalid_normal_index = true;
+                    } 
+                    else
+                    {
+                        for (int k = 0; k < 3; k++) 
+                        {
+                            assert(size_t(3 * nf0 + k) < attrib.normals.size());
+                            assert(size_t(3 * nf1 + k) < attrib.normals.size());
+                            assert(size_t(3 * nf2 + k) < attrib.normals.size());
+                            n[0][k] = attrib.normals[3 * nf0 + k];
+                            n[1][k] = attrib.normals[3 * nf1 + k];
+                            n[2][k] = attrib.normals[3 * nf2 + k];
+                        }
+                    }
+                } 
+                else 
+                {
+                    invalid_normal_index = true;
+                }
 
-          if (invalid_normal_index) {
-            // compute geometric normal
-            CalcNormal(n[0], v[0], v[1], v[2]);
-            n[1][0] = n[0][0];
-            n[1][1] = n[0][1];
-            n[1][2] = n[0][2];
-            n[2][0] = n[0][0];
-            n[2][1] = n[0][1];
-            n[2][2] = n[0][2];
-          }
-        }
-
-        Vertex vert;
-        for (int k = 0; k < 3; k++) {
-            vert.p_x = (v[k][0]);
-            vert.p_y = (v[k][1]);
-            vert.p_z = (v[k][2]);
-            vert.n_x = (n[k][0]);
-            vert.n_y = (n[k][1]);
-            vert.n_z = (n[k][2]);
-            // Combine normal and diffuse to get color.
-            float normal_factor = 0.2;
-            float diffuse_factor = 1 - normal_factor;
-            float c[3] = {1.f,1.f,1.f};
-            float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
-            if (len2 > 0.0f) {
-                float len = sqrtf(len2);
-                c[0] /= len;
-                c[1] /= len;
-                c[2] /= len;
+                if (invalid_normal_index) 
+                {
+                    // compute geometric normal
+                    CalcNormal(n[0], v[0], v[1], v[2]);
+                    n[1][0] = n[0][0];
+                    n[1][1] = n[0][1];
+                    n[1][2] = n[0][2];
+                    n[2][0] = n[0][0];
+                    n[2][1] = n[0][1];
+                    n[2][2] = n[0][2];
+                }
             }
 
-            vert.c_r = (c[0] * 0.5 + 0.5);
-            vert.c_g = (c[1] * 0.5 + 0.5);
-            vert.c_b = (c[2] * 0.5 + 0.5);
-            vert.c_a = 1.f;
+            for (int k = 0; k < 3; k++) 
+            {
+                Vertex vert;
+                vert.p_x = (v[k][0]);
+                vert.p_y = (v[k][1]);
+                vert.p_z = (v[k][2]);
+                vert.n_x = (n[k][0]);
+                vert.n_y = (n[k][1]);
+                vert.n_z = (n[k][2]);
+                // Combine normal and diffuse to get color.
+                float normal_factor = 0.2;
+                float diffuse_factor = 1 - normal_factor;
+                float c[3] = {1.f,1.f,1.f};
+                float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
+                if (len2 > 0.0f) 
+                {
+                    float len = sqrtf(len2);
+                    c[0] /= len;
+                    c[1] /= len;
+                    c[2] /= len;
+                }
 
-            vert.u = (tc[k][0]);
-            vert.v = (tc[k][1]);
+                vert.c_r = (c[0] * 0.5 + 0.5);
+                vert.c_g = (c[1] * 0.5 + 0.5);
+                vert.c_b = (c[2] * 0.5 + 0.5);
+                vert.c_a = 1.f;
+
+                vert.u = (tc[k][0]);
+                vert.v = (tc[k][1]);
+                buffer.push_back(vert);
+            }
         }
-        buffer.push_back(vert);
-      }
 
+        std::cout<<"Buffer: "<<buffer.size()<<std::endl;
 
-        VertexBuffer vb(&buffer[0], buffer.size()*sizeof(Vertex));
       //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
-        VertexArray va;
-        graphics->vbo.push_back(vb);
-        graphics->vao.push_back(va);
+        //for(int i=0; i<buffer.size(); i++)
+        //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
 
-        Material material("shaders"+PATH_SEP+"PassThrough.shader");
-        material.load_uniform_location("u_sampler2d");
-        material.load_uniform_location("u_MVP");
-        material.load_uniform_location("u_Normal_M");
-        material.load_uniform_location("u_Dir_Light");
-        graphics->material.push_back(material);
-        graphics3d_list.push_back(graphics);
+        graphics->vbo.push_back((new VertexBuffer (&buffer[0], buffer.size()*sizeof(Vertex))));
+        graphics->vao.push_back((new VertexArray()));
+        graphics->material = ((new Material("shaders"+PATH_SEP+"PassThrough.shader")));
+        graphics->texture = new Texture(texture_file_path);
+        graphics->material->load_uniform_location("u_sampler2d");
+        graphics->material->load_uniform_location("u_MVP");
+        graphics->material->load_uniform_location("u_Normal_M");
+        graphics->material->load_uniform_location("u_Dir_Light");
+        graphics->num_of_triangles.push_back(buffer.size()/3);
+    }
 
         for(int i=0; i<graphics->vbo.size(); i++)
         {
-            graphics->vao[i].Bind();
-            graphics->vbo[i].Bind();
+            graphics->vao[i]->Bind();
+            graphics->vbo[i]->Bind();
             for(std::vector<VertexAttribute>::iterator attr = graphics->layout.vertex_attributes.begin(); attr !=  graphics->layout.vertex_attributes.end(); attr++)
             {
                 GL_CALL(
@@ -730,116 +720,14 @@ namespace Pringine {
                 GL_CALL(
                     glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
             }
-            graphics->vbo[i].Unbind();
-            graphics->vao[i].Unbind();
+            graphics->vbo[i]->Unbind();
+            graphics->vao[i]->Unbind();
         }
-        graphics->num_of_triangles = buffer.size()/3;
-        graphics3d_list.push_back(graphics);
-        /*
-        std::unordered_map<int,Vertex> vertices_map;
-        std::unordered_map<int,int> index_map;
-        int index_count =0;
-        for(int j=0;j<shapes.size(); j++)
-            for(int i=0; i<shapes[j].mesh.indices.size(); i++)
-                index_count++;
-        std::cout<<"indices count: "<<index_count<<std::endl;
-        GLuint* indices = new GLuint[index_count];
-
-        for(int j=0;j<shapes.size(); j++)
-            for(int i=0; i<shapes[j].mesh.indices.size(); i++)
-                std::cout<<shapes[j].mesh.indices[i].vertex_index<<"  "<< attrib.vertices[shapes[j].mesh.indices[i].vertex_index*3+0]<<","<<
-                attrib.vertices[shapes[j].mesh.indices[i].vertex_index*3+1]<<" "<<attrib.vertices[shapes[j].mesh.indices[i].vertex_index*3+2]<<std::endl;
-
-        int index = 0;
-        int k=0;
-        for(int j=0;j<shapes.size(); j++)
-            for(int i=0; i<shapes[j].mesh.indices.size(); i++)
-            {
-                int val = (100*shapes[j].mesh.indices[i].vertex_index) + (10*shapes[j].mesh.indices[i].texcoord_index) + shapes[j].mesh.indices[i].normal_index;
-                Vertex _vertex;
-                _vertex.p_x = attrib.vertices[ (shapes[j].mesh.indices[i].vertex_index *3)+0 ];
-                _vertex.p_y = attrib.vertices[ (shapes[j].mesh.indices[i].vertex_index*3)+1 ];
-                _vertex.p_z = attrib.vertices[ (shapes[j].mesh.indices[i].vertex_index*3)+2 ];
-                _vertex.c_r = 1.0f;
-                _vertex.c_g = 1.0f;
-                _vertex.c_b = 1.0f;
-                _vertex.c_a = 1.0f;
-                vertices_map[val] = _vertex;
-                //std::cout<<"v: "<<_vertex.p_x<<std::endl;
-                
-                if(index_map.count(val)==0)
-                {
-                    index_map[val] = index;
-                    index++;
-                }
-                indices[k] = index_map[val];
-                std::cout<<"i:"<<index_map[val]<<" "<<_vertex.p_x<<","<<_vertex.p_y<<","<<_vertex.p_z<<std::endl;
-                k++;
-                    
-                //_vertex.n_x = attrib.normals[ (i*3)+0 ];
-                //_vertex.n_y = attrib.normals[ (i*3)+1 ];
-                //_vertex.n_z = attrib.normals[ (i*3)+2 ];
-                //_vertex.u = attrib.texcoords[ (i*3)+0 ];
-                //_vertex.v = attrib.texcoords[ (i*3)+1 ];
-            }
-
-        int vertex_count = vertices_map.size();
-        Vertex* vertices = new Vertex[vertex_count];
-        std::cout<<"vertex count: "<<vertex_count<<std::endl;
-        int i=0;
-        for(std::unordered_map<int,Vertex>::iterator it = vertices_map.begin(); it!=vertices_map.end(); it++)
-        {
-            vertices[i] = it->second;
-            i++;
-        }
-
-        //for(int i=0; i<index_count;i++)
-        //    std::cout<<indices[i]<<","<<vertices[indices[i]].p_x<<","<<vertices[indices[i]].p_y<<std::endl;
-
-        Mesh* mesh = new Mesh();
-        mesh->set_indices(indices, index_count);
-        mesh->set_vertices(vertices, vertex_count);
-
-        /*for(int i=0; i<mesh->vertex_count; i++)
-            std::cout<<mesh->vertices[i].p_x<<","<<mesh->vertices[i].p_y<<","<<mesh->vertices[i].p_z<<std::endl;
-        for(int i=0; i<mesh->index_count; i++)
-            std::cout<<mesh->vertex_indices[i]<<std::endl;
-        VertexLayout layout;
-        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_2(2,3,GL_FLOAT,GL_FALSE);
-        VertexAttribute attribute_3(3,2,GL_FLOAT,GL_FALSE);
-        layout.add_attribute(attribute_0);
-        layout.add_attribute(attribute_1);
-        layout.add_attribute(attribute_2);
-        layout.add_attribute(attribute_3);
-        graphics->layout = layout;
         
-        Material material("shaders"+PATH_SEP+"PassThrough.shader");
-        material.load_uniform_location("u_sampler2d");
-        material.load_uniform_location("u_MVP");
-        material.load_uniform_location("u_Normal_M");
-        material.load_uniform_location("u_Dir_Light");
-        graphics->material.push_back(material);
+        std::cout<<"VBO: "<<graphics->vbo.size()<<std::endl;
         graphics3d_list.push_back(graphics);
-
-        /*Graphics3D* graphics = new Graphics3D(mesh->vertices, mesh->vertices_array_size, 
-                                    mesh->vertex_indices, mesh->indices_array_size, mesh->index_count,
-                                        Material("shaders"+PATH_SEP+"PassThrough.shader"), 
-                                        Texture(texture_file_path),
-                                        layout);
-
-        
-        delete indices;
-        delete vertices;
-        */
         return graphics;
 
-        //std::copy(shapes[0].mesh.indices.begin() ,shapes[0].mesh.indices.end(), mesh->indices); 
-        //mesh->index_count = shapes[0].mesh.indices.size();
-
-        //LOG(LOGTYPE_GENERAL, std::to_string(mesh->indices[mesh->index_count-1]));
-        //LOG(LOGTYPE_GENERAL, std::to_string(mesh->index_count));
     }
 
 /*

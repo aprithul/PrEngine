@@ -145,15 +145,15 @@ namespace Pringine {
 
     struct Graphics3D : public Component
     {
-        std::vector<VertexArray> vao;
-        std::vector<VertexBuffer> vbo;
-        std::vector<IndexBuffer> ibo;
-        std::vector<Material> material;
-        std::vector<Texture> texture;
+        std::vector<VertexArray*> vao;
+        std::vector<VertexBuffer*> vbo;
+        std::vector<IndexBuffer*> ibo;
+        Material* material;
+        Texture* texture;
         //std::vector<Vertex*> vertices;
         //std::vector<GLuint*> indices;  
         VertexLayout layout;  
-        int num_of_triangles;
+        std::vector<int> num_of_triangles;
 
         const Matrix4x4<float>* model;
         const Matrix4x4<float>* normal;

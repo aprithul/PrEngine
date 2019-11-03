@@ -53,7 +53,6 @@ namespace Pringine{
             rot.z = rot.z+(Time::Frame_time*20.f);
 
         transform.set_rotation(rot);
-
     }
 
     void Cube::end()
