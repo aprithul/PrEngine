@@ -168,7 +168,15 @@ namespace Pringine {
         }
 
         if(data == NULL)
-            LOG(LOGTYPE_ERROR, "Image ",std::string(path)," loading failed");
+        {
+            LOG(LOGTYPE_ERROR, "Image ",std::string(path)," loading failed, loading default");
+            data = stbi_load( get_resource_path("default.jpg").c_str() ,&width, &height, &no_of_channels, 0);
+            if(data!=nullptr)
+                texture_library[path] = data;
+        }
+
+        if(data == NULL)
+            LOG(LOGTYPE_ERROR, "Couldn't load defualt texture");
         else
         {
             LOG(LOGTYPE_GENERAL, "Image ",std::string(path)," loaded");
@@ -238,8 +246,9 @@ namespace Pringine {
         GL_CALL(
             loc = glGetUniformLocation(shader_program, uniform))
         
-        if(loc != -1)
-            uniform_locations[uniform] = loc;
+        std::cout<<"Location: "<<loc<<std::endl;
+        //if(loc != -1)
+        uniform_locations[uniform] = loc;
     }
 
     bool Material::make_shader_program(const std::string& path)
@@ -388,20 +397,12 @@ namespace Pringine {
 
     }
 
-
-
-
-
-
-
-
-
     Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 4)
     {
         this->width = width;
         this->height = height;
         this->title = title;
-        light_direction = Vector3<float>(.5f,-.2f,1.f).normalize();
+        light_direction = Vector3<float>(.2,.2,-0.1).normalize();
         // initialize sdl and opengl related settings for graphics
         init();
         
@@ -411,7 +412,7 @@ namespace Pringine {
         glContext = SDL_GL_CreateContext(window);
 
         GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order
-        GL_CALL(glEnable(GL_CULL_FACE))
+        GL_CALL(glDisable(GL_CULL_FACE))
         GL_CALL(glEnable(GL_BLEND))
         GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
         GL_CALL(glEnable(GL_DEPTH_TEST))
@@ -499,26 +500,36 @@ namespace Pringine {
             Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
 
             grp->material->texture->Bind(0);
-            GL_CALL(
-                glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
-            GL_CALL(
-                glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
-            GL_CALL(
-                glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
-            GL_CALL(
-                glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+            if(grp->material->uniform_locations["u_sampler2d"] != -1)
+                GL_CALL(
+                    glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
+            
+            if(grp->material->uniform_locations["u_MVP"] != -1)
+                GL_CALL(
+                    glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+            
+            if(grp->material->uniform_locations["u_Normal_M"] != -1)
+                GL_CALL(
+                    glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
+            
+            if(grp->material->uniform_locations["u_Dir_Light"] != -1)
+                GL_CALL(
+                    glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+            
             for(int i=0; i < grp->elements.size(); i++)
             {
                 grp->elements[i].vao.Bind();
+                grp->elements[i].ibo.Bind();
                 //grp->ibo[i].Bind();
 
                 //GL_CALL(
                 //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
                
                 GL_CALL(
-                    glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
-                    //glDrawElements(GL_TRIANGLES, grp->ibo[i].count, GL_UNSIGNED_INT, nullptr));
+                    //glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
+                    glDrawElements(GL_TRIANGLES, grp->elements[i].ibo.count, GL_UNSIGNED_INT, nullptr));
                 
+                grp->elements[i].ibo.Unbind();
                 grp->elements[i].vao.Unbind();
                 //grp->ibo[i].Unbind();
             }
@@ -588,12 +599,24 @@ namespace Pringine {
         layout.add_attribute(attribute_3);
         graphics->layout = layout;
 
+        /*
+        std::cout<<"ind size: "<<shapes[0].mesh.indices.size()<<std::endl;
+        std::cout<<"vertices size: "<<attrib.vertices.size()<<std::endl;
+        for( int i=0; i<shapes[0].mesh.indices.size(); i++)
+        {
+            std::cout<<"ind: "<<shapes[0].mesh.indices[i].vertex_index<<std::endl;
+            std::cout<<" v1: "<< attrib.vertices[shapes[0].mesh.indices[i].vertex_index + 0];
+            std::cout<<" v2: "<< attrib.vertices[shapes[0].mesh.indices[i].vertex_index + 1];
+            std::cout<<" v3: "<< attrib.vertices[shapes[0].mesh.indices[i].vertex_index + 2]<<std::endl;
+            
+        }*/
+
         float bmin[3], bmax[3];
         for (size_t s = 0; s < shapes.size(); s++) 
         {
             std::vector<GLuint> indices;
             std::vector<Vertex> buffer;
-            for (size_t f = 0; f < shapes[s].mesh.indices.size() / 3; f++) 
+            /*for (size_t f = 0; f < shapes[s].mesh.indices.size() / 3; f++) 
             {
                 tinyobj::index_t idx0 = shapes[s].mesh.indices[3 * f + 0];
                 tinyobj::index_t idx1 = shapes[s].mesh.indices[3 * f + 1];
@@ -739,6 +762,11 @@ namespace Pringine {
                     buffer.push_back(vert);
                 }
             }
+*/
+
+
+            
+
 
             std::unordered_map<std::string, GLuint> indices_map;
             GLuint index = 0;
@@ -752,13 +780,32 @@ namespace Pringine {
                 std::unordered_map<std::string, GLuint>::iterator item;
                 if( (item = indices_map.find(key)) != indices_map.end() )
                 {
+                    tinyobj::index_t ind = shapes[s].mesh.indices[i];
+                    //std::cout<<attrib.vertices[ind.vertex_index+0]<<","<<attrib.vertices[ind.vertex_index+1]<<","<<attrib.vertices[ind.vertex_index+2]<<std::endl;
                     indices.push_back(item->second);
                 }
                 else
                 {
+                    tinyobj::index_t ind = shapes[s].mesh.indices[i];
                     
+                    Vertex vert;
+                    vert.p_x = attrib.vertices[(ind.vertex_index*3)+0];
+                    vert.p_y = attrib.vertices[(ind.vertex_index*3)+1];
+                    vert.p_z = attrib.vertices[(ind.vertex_index*3)+2];
+                    vert.c_r = 1.f;
+                    vert.c_g = 1.f;
+                    vert.c_b = 1.f;
+                    vert.c_a = 1.f;
+                    vert.n_x = attrib.normals[ (ind.normal_index*3) + 0];
+                    vert.n_y = attrib.normals[ (ind.normal_index*3) + 1];
+                    vert.n_z = attrib.normals[ (ind.normal_index*3) + 2];
+                    vert.u   = attrib.texcoords[ (ind.texcoord_index*2) +0];
+                    vert.v   = attrib.texcoords[ (ind.texcoord_index*2) +1];
+                    buffer.push_back(vert);
 
                     indices_map[key] = index;
+                    //std::cout<<ind.vertex_index<<"//"<<ind.normal_index<<<<":"<<attrib.vertices[ind.vertex_index+0]<<","<<attrib.vertices[ind.vertex_index+1]<<","<<attrib.vertices[ind.vertex_index+2]<<std::endl;
+
                     indices.push_back(index);
                     index++;
                 }
@@ -766,6 +813,13 @@ namespace Pringine {
 
             std::cout<<"Buffer: "<<buffer.size()<<std::endl;
             std::cout<<"Indices: "<<indices.size()<<std::endl;
+
+
+            /*for(int i=0; i<indices.size(); i++)
+                std::cout<<indices[i]<<std::endl;
+            for(int i=0; i<buffer.size(); i++)
+                std::cout<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;*/
+            //std::cout<<indices[i]<<" : "<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;
 
             //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
             //for(int i=0; i<buffer.size(); i++)
