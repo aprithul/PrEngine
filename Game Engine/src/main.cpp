@@ -135,9 +135,12 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
 
         Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("TreasureChest").c_str(), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")).c_str(), 
                                 get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")).c_str());
-        Cube* cube = new Cube(graphics);
-        cube->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-        entity_management_system->assign_id_and_store_entity(*cube);
+        if(graphics != nullptr)
+        {
+                Cube* cube = new Cube(graphics);
+                cube->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
+                entity_management_system->assign_id_and_store_entity(*cube);
+        }
         //std::cout<<graphics->normal->data[0]<<std::endl;
 
 

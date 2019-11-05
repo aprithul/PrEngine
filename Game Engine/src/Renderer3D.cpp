@@ -9,13 +9,23 @@
 
 namespace Pringine {
     
+    std::unordered_map<std::string, stbi_uc*> texture_library;
+
     VertexArray::VertexArray()
+    {
+    }
+
+    VertexArray::~VertexArray()
+    {
+    }
+    
+    void VertexArray::Generate()
     {
         GL_CALL(
             glGenVertexArrays(1, &id))
-        
     }
-    VertexArray::~VertexArray()
+
+    void VertexArray::Delete()
     {
         GL_CALL(
             glDeleteVertexArrays(1, &id))
@@ -33,7 +43,11 @@ namespace Pringine {
             glBindVertexArray(0))
     }
 
-    VertexBuffer::VertexBuffer(const Vertex* vertices, GLuint size)
+    VertexBuffer::VertexBuffer()
+    {
+    }
+
+    void VertexBuffer::Generate(const Vertex* vertices, GLuint size)
     {
         GL_CALL( 
             glGenBuffers(1, &id))
@@ -44,6 +58,10 @@ namespace Pringine {
     }
 
     VertexBuffer::~VertexBuffer()
+    {
+    }
+
+    void VertexBuffer::Delete()
     {
         GL_CALL( 
             glDeleteBuffers(1, &id));
@@ -62,7 +80,11 @@ namespace Pringine {
     }
 
 
-    IndexBuffer::IndexBuffer(const GLuint* indices, GLuint indices_size, GLsizei count)
+    IndexBuffer::IndexBuffer()
+    {
+    }
+
+    void IndexBuffer::Generate(const GLuint* indices, GLuint indices_size, GLsizei count)
     {
         this->count = count;
         GL_CALL( 
@@ -75,9 +97,13 @@ namespace Pringine {
 
     IndexBuffer::~IndexBuffer()
     {
+
+    }
+
+    void IndexBuffer::Delete()
+    {
         GL_CALL( 
             glDeleteBuffers(1, &id));
-
     }
 
     void IndexBuffer::Bind()
@@ -118,13 +144,29 @@ namespace Pringine {
 
     Graphics3D::~Graphics3D()
     {
+        delete material;
         std::cout<<"DESTROYED"<<std::endl;   
+    }
+
+    void GraphicsElement::Delete()
+    {
+        vao.Delete();
+        vbo.Delete();
+        ibo.Delete();
     }
 
     Texture::Texture(const char* path)
     {
         stbi_set_flip_vertically_on_load(true);
-        data = stbi_load(path,&width, &height, &no_of_channels, 0);
+        if(texture_library.count(path) > 0)
+            data = texture_library[path];
+        else
+        {
+            data = stbi_load(path,&width, &height, &no_of_channels, 0);
+            if(data!=nullptr)
+                texture_library[path] = data;
+        }
+
         if(data == NULL)
             LOG(LOGTYPE_ERROR, "Image ",std::string(path)," loading failed");
         else
@@ -153,8 +195,11 @@ namespace Pringine {
 
     Texture::~Texture()
     {
-        if(data != NULL)
-            stbi_image_free(data);
+        Unbind();
+        GL_CALL(
+            glDeleteTextures(1, &id))
+        //if(data != NULL)
+        //    stbi_image_free(data);
     }
 
     void Texture::Bind(int slot)
@@ -171,9 +216,10 @@ namespace Pringine {
             glBindTexture(GL_TEXTURE_2D, 0))
     }
 
-    Material::Material(const std::string& path)
+    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path)
     {
-        this->source_file_path = std::string(path);
+        texture = new Texture(diffuse_tex_path.c_str());
+        this->source_file_path = std::string(shader_path);
         make_shader_program(this->source_file_path);
         GL_CALL(
             glUseProgram(shader_program))
@@ -183,6 +229,7 @@ namespace Pringine {
     {
         GL_CALL(
             glDeleteProgram(shader_program))
+        delete texture;
     }
 
     void Material::load_uniform_location(const char* uniform)
@@ -449,29 +496,30 @@ namespace Pringine {
         for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
         {
             Graphics3D* grp = (*it);
+            Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
 
-            for(int i=0; i<grp->vao.size(); i++)
+            grp->material->texture->Bind(0);
+            GL_CALL(
+                glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
+            GL_CALL(
+                glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+            GL_CALL(
+                glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
+            GL_CALL(
+                glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+            for(int i=0; i < grp->elements.size(); i++)
             {
-                grp->vao[i]->Bind();
+                grp->elements[i].vao.Bind();
                 //grp->ibo[i].Bind();
 
-                Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
                 //GL_CALL(
                 //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
-                grp->texture->Bind(0);
+               
                 GL_CALL(
-                    glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
-                GL_CALL(
-                    glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
-                GL_CALL(
-                    glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
-                GL_CALL(
-                    glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
-                GL_CALL(
-                    glDrawArrays(GL_TRIANGLES,0, grp->num_of_triangles[i]*3))
+                    glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
                     //glDrawElements(GL_TRIANGLES, grp->ibo[i].count, GL_UNSIGNED_INT, nullptr));
                 
-                grp->vao[i]->Unbind();
+                grp->elements[i].vao.Unbind();
                 //grp->ibo[i].Unbind();
             }
         }
@@ -541,9 +589,9 @@ namespace Pringine {
         graphics->layout = layout;
 
         float bmin[3], bmax[3];
-
         for (size_t s = 0; s < shapes.size(); s++) 
         {
+            std::vector<GLuint> indices;
             std::vector<Vertex> buffer;
             for (size_t f = 0; f < shapes[s].mesh.indices.size() / 3; f++) 
             {
@@ -623,96 +671,126 @@ namespace Pringine {
                         int nf1 = idx1.normal_index;
                         int nf2 = idx2.normal_index;
 
-                    if ((nf0 < 0) || (nf1 < 0) || (nf2 < 0)) 
-                    {
-                        // normal index is missing from this face.
-                        invalid_normal_index = true;
-                    } 
-                    else
-                    {
-                        for (int k = 0; k < 3; k++) 
+                        if ((nf0 < 0) || (nf1 < 0) || (nf2 < 0)) 
                         {
-                            assert(size_t(3 * nf0 + k) < attrib.normals.size());
-                            assert(size_t(3 * nf1 + k) < attrib.normals.size());
-                            assert(size_t(3 * nf2 + k) < attrib.normals.size());
-                            n[0][k] = attrib.normals[3 * nf0 + k];
-                            n[1][k] = attrib.normals[3 * nf1 + k];
-                            n[2][k] = attrib.normals[3 * nf2 + k];
+                            // normal index is missing from this face.
+                            invalid_normal_index = true;
+                        } 
+                        else
+                        {
+                            for (int k = 0; k < 3; k++) 
+                            {
+                                assert(size_t(3 * nf0 + k) < attrib.normals.size());
+                                assert(size_t(3 * nf1 + k) < attrib.normals.size());
+                                assert(size_t(3 * nf2 + k) < attrib.normals.size());
+                                n[0][k] = attrib.normals[3 * nf0 + k];
+                                n[1][k] = attrib.normals[3 * nf1 + k];
+                                n[2][k] = attrib.normals[3 * nf2 + k];
+                            }
                         }
+                    } 
+                    else 
+                    {
+                        invalid_normal_index = true;
                     }
-                } 
-                else 
-                {
-                    invalid_normal_index = true;
+
+                    if (invalid_normal_index) 
+                    {
+                        // compute geometric normal
+                        CalcNormal(n[0], v[0], v[1], v[2]);
+                        n[1][0] = n[0][0];
+                        n[1][1] = n[0][1];
+                        n[1][2] = n[0][2];
+                        n[2][0] = n[0][0];
+                        n[2][1] = n[0][1];
+                        n[2][2] = n[0][2];
+                    }
                 }
 
-                if (invalid_normal_index) 
+                for (int k = 0; k < 3; k++) 
                 {
-                    // compute geometric normal
-                    CalcNormal(n[0], v[0], v[1], v[2]);
-                    n[1][0] = n[0][0];
-                    n[1][1] = n[0][1];
-                    n[1][2] = n[0][2];
-                    n[2][0] = n[0][0];
-                    n[2][1] = n[0][1];
-                    n[2][2] = n[0][2];
+                    Vertex vert;
+                    vert.p_x = (v[k][0]);
+                    vert.p_y = (v[k][1]);
+                    vert.p_z = (v[k][2]);
+                    vert.n_x = (n[k][0]);
+                    vert.n_y = (n[k][1]);
+                    vert.n_z = (n[k][2]);
+                    // Combine normal and diffuse to get color.
+                    float normal_factor = 0.2;
+                    float diffuse_factor = 1 - normal_factor;
+                    float c[3] = {1.f,1.f,1.f};
+                    float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
+                    if (len2 > 0.0f) 
+                    {
+                        float len = sqrtf(len2);
+                        c[0] /= len;
+                        c[1] /= len;
+                        c[2] /= len;
+                    }
+
+                    vert.c_r = (c[0] * 0.5 + 0.5);
+                    vert.c_g = (c[1] * 0.5 + 0.5);
+                    vert.c_b = (c[2] * 0.5 + 0.5);
+                    vert.c_a = 1.f;
+
+                    vert.u = (tc[k][0]);
+                    vert.v = (tc[k][1]);
+                    buffer.push_back(vert);
                 }
             }
 
-            for (int k = 0; k < 3; k++) 
+            std::unordered_map<std::string, GLuint> indices_map;
+            GLuint index = 0;
+            for(int i=0; i< shapes[s].mesh.indices.size(); i++)
             {
-                Vertex vert;
-                vert.p_x = (v[k][0]);
-                vert.p_y = (v[k][1]);
-                vert.p_z = (v[k][2]);
-                vert.n_x = (n[k][0]);
-                vert.n_y = (n[k][1]);
-                vert.n_z = (n[k][2]);
-                // Combine normal and diffuse to get color.
-                float normal_factor = 0.2;
-                float diffuse_factor = 1 - normal_factor;
-                float c[3] = {1.f,1.f,1.f};
-                float len2 = c[0] * c[0] + c[1] * c[1] + c[2] * c[2];
-                if (len2 > 0.0f) 
+                std::string key =   
+                            std::to_string(shapes[s].mesh.indices[i].normal_index).append(
+                            std::to_string(shapes[s].mesh.indices[i].texcoord_index)).append(
+                            std::to_string(shapes[s].mesh.indices[i].vertex_index));
+
+                std::unordered_map<std::string, GLuint>::iterator item;
+                if( (item = indices_map.find(key)) != indices_map.end() )
                 {
-                    float len = sqrtf(len2);
-                    c[0] /= len;
-                    c[1] /= len;
-                    c[2] /= len;
+                    indices.push_back(item->second);
                 }
+                else
+                {
+                    
 
-                vert.c_r = (c[0] * 0.5 + 0.5);
-                vert.c_g = (c[1] * 0.5 + 0.5);
-                vert.c_b = (c[2] * 0.5 + 0.5);
-                vert.c_a = 1.f;
+                    indices_map[key] = index;
+                    indices.push_back(index);
+                    index++;
+                }
+            }   
 
-                vert.u = (tc[k][0]);
-                vert.v = (tc[k][1]);
-                buffer.push_back(vert);
-            }
+            std::cout<<"Buffer: "<<buffer.size()<<std::endl;
+            std::cout<<"Indices: "<<indices.size()<<std::endl;
+
+            //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
+            //for(int i=0; i<buffer.size(); i++)
+            //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
+
+            GraphicsElement g_element;
+            graphics->elements.push_back(g_element);
+
+            graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
+            graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
+            graphics->elements.back().vao.Generate();
+            graphics->elements.back().num_of_triangles = (buffer.size()/3);
         }
 
-        std::cout<<"Buffer: "<<buffer.size()<<std::endl;
 
-      //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
-        //for(int i=0; i<buffer.size(); i++)
-        //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
-
-        graphics->vbo.push_back((new VertexBuffer (&buffer[0], buffer.size()*sizeof(Vertex))));
-        graphics->vao.push_back((new VertexArray()));
-        graphics->material = ((new Material("shaders"+PATH_SEP+"PassThrough.shader")));
-        graphics->texture = new Texture(texture_file_path);
+        graphics->material = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
         graphics->material->load_uniform_location("u_sampler2d");
         graphics->material->load_uniform_location("u_MVP");
         graphics->material->load_uniform_location("u_Normal_M");
         graphics->material->load_uniform_location("u_Dir_Light");
-        graphics->num_of_triangles.push_back(buffer.size()/3);
-    }
 
-        for(int i=0; i<graphics->vbo.size(); i++)
+        for(int i=0; i<graphics->elements.size(); i++)
         {
-            graphics->vao[i]->Bind();
-            graphics->vbo[i]->Bind();
+            graphics->elements[i].vao.Bind();
+            graphics->elements[i].vbo.Bind();
             for(std::vector<VertexAttribute>::iterator attr = graphics->layout.vertex_attributes.begin(); attr !=  graphics->layout.vertex_attributes.end(); attr++)
             {
                 GL_CALL(
@@ -720,11 +798,10 @@ namespace Pringine {
                 GL_CALL(
                     glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
             }
-            graphics->vbo[i]->Unbind();
-            graphics->vao[i]->Unbind();
+            graphics->elements[i].vbo.Unbind();
+            graphics->elements[i].vao.Unbind();
         }
         
-        std::cout<<"VBO: "<<graphics->vbo.size()<<std::endl;
         graphics3d_list.push_back(graphics);
         return graphics;
 
