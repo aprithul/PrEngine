@@ -1,3 +1,3 @@
-A custom C++ game engine in making. It's basically a higher level structure around SDL2. The target is to make SDL2 work more like a well structured engine while still using the SDL2 functinoalities internally.
+This is the main 'engine development' branch. Only 2D for now using SDL's 2d api. It's fast enough for most 2D needs if done properly. Added benifit is the many different platform support. 
 
-Also, don't know if Xcode project will still work or not ( leaving the configuration files as-is though). Using g++ ( cpp 11) now. 
+The 'opengl-test' branch has a experimental 3D renderer in making.
