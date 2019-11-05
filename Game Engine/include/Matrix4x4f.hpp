@@ -147,6 +147,20 @@ namespace Pringine {
             return ortho;
         }
 
+
+
+        static Matrix4x4 perspective(float n, float f, float width, float height)
+        {
+            Matrix4x4<float> perspective;
+            perspective.set(0,0, (n/(width/2.f)));
+            perspective.set(1,1, (n/(height/2.f)));
+            perspective.set(2,2, (-(f+n)/(f-n)));
+            perspective.set(2,3, (-(2*f*n)/(f-n)));
+            perspective.set(3, 2,-1);
+            perspective.set(3, 3, 0);
+            return perspective;
+        }
+
         T data[16];
     };
 }

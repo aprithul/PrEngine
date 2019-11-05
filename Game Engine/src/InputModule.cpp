@@ -441,8 +441,6 @@ namespace Pringine {
     {
         // test binding
         key_binding[SDLK_ESCAPE] = SDLK_ESCAPE;
-        key_binding[SDLK_z] = SDLK_z;
-        key_binding[SDLK_x] = SDLK_x;
         key_binding[SDLK_UP] = SDLK_UP;
         key_binding[SDLK_DOWN] = SDLK_DOWN;
         key_binding[SDLK_LEFT] = SDLK_LEFT;
@@ -453,7 +451,11 @@ namespace Pringine {
         key_binding[SDLK_d] = SDLK_d;
         key_binding[SDLK_r] = SDLK_r;
         key_binding[SDLK_t] = SDLK_t;
-
+        key_binding[SDLK_z] = SDLK_z;
+        key_binding[SDLK_c] = SDLK_c;
+        key_binding[SDLK_t] = SDLK_t;
+        key_binding[SDLK_y] = SDLK_y;
+        
     }
 
     Keyboard::~Keyboard()

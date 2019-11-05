@@ -484,8 +484,8 @@ namespace Pringine {
     Matrix4x4<float> projection;
     void Renderer3D::start()
     {
-        projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
-        //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -1.f, 1.f,-1.f,1.f);
+        //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
+        projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
 
         
     }
