@@ -43,8 +43,11 @@
 
 namespace Pringine {
     
-    extern std::unordered_map<std::string, stbi_uc*> texture_library;
-
+    class Texture;
+    
+    extern std::unordered_map<std::string, stbi_uc*> texture_data_library;
+    extern std::unordered_map<std::string, Texture*> texture_library;
+    
     static void gl_clear_error()
     {
         while(glGetError() != GL_NO_ERROR); 
@@ -72,6 +75,8 @@ namespace Pringine {
     
     struct Texture
     {
+        static int texture_create_status;
+
         GLuint id;
         int width;
         int height;
@@ -86,12 +91,14 @@ namespace Pringine {
 
     struct Material
     {
-        Material(const std::string& shader_path, const std::string& diffuse_tex_path);
+        Material();
+        void Generate(const std::string& shader_path, const std::string& diffuse_tex_path);
+        void Delete();
         ~Material();
         GLuint shader_program;
         std::string source_file_path;
         std::unordered_map<const char*,GLint> uniform_locations;
-        Texture* texture;
+        Texture* diffuse_texture;
         bool make_shader_program(const std::string& path);
         GLuint make_shader(GLenum type,  const std::string& source);
         void load_uniform_location(const char* uniform);
@@ -158,6 +165,8 @@ namespace Pringine {
         VertexArray vao;
         VertexBuffer vbo;
         IndexBuffer ibo;
+        Material material;
+        VertexLayout layout;
         int num_of_triangles;
         void Delete();
     };
@@ -165,8 +174,8 @@ namespace Pringine {
     struct Graphics3D : public Component
     {
         std::vector<GraphicsElement> elements;
-        Material* material;
-        VertexLayout layout;  
+        //Material* material;
+        //VertexLayout layout;  
 
         const Matrix4x4<float>* model;
         const Matrix4x4<float>* normal;

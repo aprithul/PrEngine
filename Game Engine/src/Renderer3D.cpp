@@ -9,7 +9,8 @@
 
 namespace Pringine {
     
-    std::unordered_map<std::string, stbi_uc*> texture_library;
+    std::unordered_map<std::string, Texture*> texture_library;
+    std::unordered_map<std::string, stbi_uc*> texture_data_library;
 
     VertexArray::VertexArray()
     {
@@ -144,7 +145,7 @@ namespace Pringine {
 
     Graphics3D::~Graphics3D()
     {
-        delete material;
+        //delete material;
         std::cout<<"DESTROYED"<<std::endl;   
     }
 
@@ -155,28 +156,24 @@ namespace Pringine {
         ibo.Delete();
     }
 
+    int Texture::texture_create_status;
     Texture::Texture(const char* path)
     {
+        texture_create_status = 0;
         stbi_set_flip_vertically_on_load(true);
-        if(texture_library.count(path) > 0)
-            data = texture_library[path];
+        if(texture_data_library.count(path) > 0)
+            data = texture_data_library[path];
         else
         {
             data = stbi_load(path,&width, &height, &no_of_channels, 0);
             if(data!=nullptr)
-                texture_library[path] = data;
+                texture_data_library[path] = data;
         }
 
-        if(data == NULL)
-        {
-            LOG(LOGTYPE_ERROR, "Image ",std::string(path)," loading failed, loading default");
-            data = stbi_load( get_resource_path("default.jpg").c_str() ,&width, &height, &no_of_channels, 0);
-            if(data!=nullptr)
-                texture_library[path] = data;
-        }
 
-        if(data == NULL)
-            LOG(LOGTYPE_ERROR, "Couldn't load defualt texture");
+        if(data == NULL){
+            LOG(LOGTYPE_ERROR, "Couldn't create texture");
+        }
         else
         {
             LOG(LOGTYPE_GENERAL, "Image ",std::string(path)," loaded");
@@ -198,6 +195,7 @@ namespace Pringine {
             }
             GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, type, GL_UNSIGNED_BYTE, data))
             GL_CALL(glBindTexture(GL_TEXTURE_2D, 0))
+            texture_create_status = 1;
         }
     }
 
@@ -224,20 +222,49 @@ namespace Pringine {
             glBindTexture(GL_TEXTURE_2D, 0))
     }
 
-    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path)
+    Material::Material()
     {
-        texture = new Texture(diffuse_tex_path.c_str());
+
+    }
+
+    void Material::Generate(const std::string& shader_path, const std::string& diffuse_tex_path)
+    {
+        // only create new texture on gpu if texture doesn't exist already
+        std::unordered_map<std::string, Texture*>::iterator _tex_it = texture_library.find(diffuse_tex_path);
+        if(_tex_it == texture_library.end()) // texture not in library, so create
+        {
+            Texture* _tex =  new Texture(diffuse_tex_path.c_str());
+            if(Texture::texture_create_status == 0){    // creating texture failed, so assign default
+                delete _tex;
+                diffuse_texture = texture_library[get_resource_path("default.jpg")];
+            }
+            else // successfully created texture, store in library and assign that
+            {
+                texture_library[diffuse_tex_path] = _tex;
+                diffuse_texture = _tex;
+
+            }
+        }
+        else    // texture found in library, so assign that
+            diffuse_texture = texture_library[diffuse_tex_path];
+    
+        // create shader, probably can be shared, will check later
         this->source_file_path = std::string(shader_path);
         make_shader_program(this->source_file_path);
         GL_CALL(
             glUseProgram(shader_program))
     }
 
-    Material::~Material()
+    void Material::Delete()
     {
         GL_CALL(
             glDeleteProgram(shader_program))
-        delete texture;
+        delete diffuse_texture;
+    }
+
+    Material::~Material()
+    {
+
     }
 
     void Material::load_uniform_location(const char* uniform)
@@ -431,6 +458,12 @@ namespace Pringine {
             printf("Context created with OpenGL version  (%s)\n", glGetString(GL_VERSION));
 
         std::cout<<"Vector3 size"<<sizeof(Vector3<float>)<<std::endl;
+
+        std::cout<<"Loading default texture"<<std::endl;
+        Texture* _tex = new Texture(get_resource_path("default.jpg").c_str());
+        texture_library[get_resource_path("default.jpg")] = _tex;
+        //data = stbi_load( get_resource_path("default.jpg").c_str() ,&width, &height, &no_of_channels, 0);
+
     }
     
     
@@ -490,7 +523,6 @@ namespace Pringine {
         
     }
 
-    
     void Renderer3D::update()
     {
         Clear(0,0,0,1);
@@ -498,26 +530,28 @@ namespace Pringine {
         {
             Graphics3D* grp = (*it);
             Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
-
-            grp->material->texture->Bind(0);
-            if(grp->material->uniform_locations["u_sampler2d"] != -1)
-                GL_CALL(
-                    glUniform1i(grp->material->uniform_locations["u_sampler2d"], 0))
-            
-            if(grp->material->uniform_locations["u_MVP"] != -1)
-                GL_CALL(
-                    glUniformMatrix4fv(grp->material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
-            
-            if(grp->material->uniform_locations["u_Normal_M"] != -1)
-                GL_CALL(
-                    glUniformMatrix4fv(grp->material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
-            
-            if(grp->material->uniform_locations["u_Dir_Light"] != -1)
-                GL_CALL(
-                    glUniform3f(grp->material->uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
             
             for(int i=0; i < grp->elements.size(); i++)
             {
+                grp->elements[i].material.diffuse_texture->Bind(0);
+
+                if(grp->elements[i].material.uniform_locations["u_sampler2d"] != -1)
+                GL_CALL(
+                    glUniform1i(grp->elements[i].material.uniform_locations["u_sampler2d"], 0))
+            
+                if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
+                GL_CALL(
+                    glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+            
+                if(grp->elements[i].material.uniform_locations["u_Normal_M"] != -1)
+                GL_CALL(
+                    glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
+            
+                if(grp->elements[i].material.uniform_locations["u_Dir_Light"] != -1)
+                GL_CALL(
+                    glUniform3f(grp->elements[i].material.uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+
+
                 grp->elements[i].vao.Bind();
                 grp->elements[i].ibo.Bind();
                 //grp->ibo[i].Bind();
@@ -597,7 +631,6 @@ namespace Pringine {
         layout.add_attribute(attribute_1);
         layout.add_attribute(attribute_2);
         layout.add_attribute(attribute_3);
-        graphics->layout = layout;
 
         /*
         std::cout<<"ind size: "<<shapes[0].mesh.indices.size()<<std::endl;
@@ -826,26 +859,29 @@ namespace Pringine {
             //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
 
             GraphicsElement g_element;
-            graphics->elements.push_back(g_element);
 
+            graphics->elements.push_back(g_element);
+            graphics->elements.back().material.Generate("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
+            graphics->elements.back().material.load_uniform_location("u_sampler2d");
+            graphics->elements.back().material.load_uniform_location("u_MVP");
+            graphics->elements.back().material.load_uniform_location("u_Normal_M");
+            graphics->elements.back().material.load_uniform_location("u_Dir_Light");
             graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
             graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();
+            graphics->elements.back().layout = layout;
+
             graphics->elements.back().num_of_triangles = (buffer.size()/3);
         }
 
 
-        graphics->material = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
-        graphics->material->load_uniform_location("u_sampler2d");
-        graphics->material->load_uniform_location("u_MVP");
-        graphics->material->load_uniform_location("u_Normal_M");
-        graphics->material->load_uniform_location("u_Dir_Light");
+        
 
         for(int i=0; i<graphics->elements.size(); i++)
         {
             graphics->elements[i].vao.Bind();
             graphics->elements[i].vbo.Bind();
-            for(std::vector<VertexAttribute>::iterator attr = graphics->layout.vertex_attributes.begin(); attr !=  graphics->layout.vertex_attributes.end(); attr++)
+            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
             {
                 GL_CALL(
                     glEnableVertexAttribArray( attr->index))
