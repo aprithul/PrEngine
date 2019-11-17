@@ -177,15 +177,11 @@ namespace Pringine {
         //Material* material;
         //VertexLayout layout;  
 
-        const Matrix4x4<float>* model;
-        const Matrix4x4<float>* normal;
+        std::vector<const Matrix4x4<float>*> models;
+        std::vector<const Matrix4x4<float>*> normals;
 
         Graphics3D();// const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics3D();
-        private:
-            Matrix4x4<float> _model;
-            Matrix4x4<float> _normal;
-        
     };
     
 

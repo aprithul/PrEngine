@@ -137,10 +137,6 @@ namespace Pringine {
         vbo.Unbind();
         vao.Unbind();
         */
-        _model = Matrix4x4<float>::identity();
-        model = &_model;
-        _normal = Matrix4x4<float>::identity();
-        normal = &_normal;
     }
 
     Graphics3D::~Graphics3D()
@@ -525,43 +521,47 @@ namespace Pringine {
 
     void Renderer3D::update()
     {
-        Clear(0,0,0,1);
+        Clear(1,1,1,1);
         for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
         {
             Graphics3D* grp = (*it);
-            Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
+            //Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
             
             for(int i=0; i < grp->elements.size(); i++)
             {
                 grp->elements[i].material.diffuse_texture->Bind(0);
-
+                grp->elements[i].vao.Bind();
+                grp->elements[i].ibo.Bind();
+                
                 if(grp->elements[i].material.uniform_locations["u_sampler2d"] != -1)
                 GL_CALL(
                     glUniform1i(grp->elements[i].material.uniform_locations["u_sampler2d"], 0))
-            
-                if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
-                GL_CALL(
-                    glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
-            
-                if(grp->elements[i].material.uniform_locations["u_Normal_M"] != -1)
-                GL_CALL(
-                    glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normal->data ))
-            
                 if(grp->elements[i].material.uniform_locations["u_Dir_Light"] != -1)
                 GL_CALL(
                     glUniform3f(grp->elements[i].material.uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
+                
+                // models and normals should be same size
+                for(int j=0; j<grp->models.size() ; j++) 
+                {
+                    Matrix4x4<float> mvp = (projection) * (*(grp->models[j])) ;
+                    if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
+                    GL_CALL(
+                        glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
 
+                    if(grp->elements[i].material.uniform_locations["u_Normal_M"] != -1)
+                    GL_CALL(
+                        glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normals[j]->data ))
+                    GL_CALL(
+                    //glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
+                    glDrawElements(GL_TRIANGLES, grp->elements[i].ibo.count, GL_UNSIGNED_INT, nullptr));
 
-                grp->elements[i].vao.Bind();
-                grp->elements[i].ibo.Bind();
+                }
+
                 //grp->ibo[i].Bind();
 
                 //GL_CALL(
                 //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
                
-                GL_CALL(
-                    //glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
-                    glDrawElements(GL_TRIANGLES, grp->elements[i].ibo.count, GL_UNSIGNED_INT, nullptr));
                 
                 grp->elements[i].ibo.Unbind();
                 grp->elements[i].vao.Unbind();
