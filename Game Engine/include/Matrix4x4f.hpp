@@ -30,7 +30,7 @@ namespace Pringine {
 
         }
         
-        Matrix4x4<T> operator+(Matrix4x4<T> m)
+        Matrix4x4<T> operator+(Matrix4x4<T> m) const 
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)
@@ -43,7 +43,7 @@ namespace Pringine {
             return r;
         }
 
-        Matrix4x4<T> operator-(Matrix4x4<T> m)
+        Matrix4x4<T> operator-(Matrix4x4<T> m) const
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)
@@ -72,7 +72,7 @@ namespace Pringine {
             return r;
         }
 
-        Matrix4x4<T> operator^(Matrix4x4<T> m)
+        Matrix4x4<T> operator^(Matrix4x4<T> m) const
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)
@@ -85,7 +85,7 @@ namespace Pringine {
             return r;
         }
         
-        Matrix4x4<T> operator/(T v)
+        Matrix4x4<T> operator/(T v) const
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)
@@ -98,7 +98,7 @@ namespace Pringine {
             return r;
         } 
 
-        Matrix4x4<T> operator*(T v)
+        Matrix4x4<T> operator*(T v) const
         {
             Matrix4x4<T> r;
             for(int i=0; i<4; i++)
@@ -106,6 +106,21 @@ namespace Pringine {
                 for(int j=0; j<4; j++)
                 {
                     r.data[(i*4)+j] = data[(i*4)+j] * v;
+                }
+            }
+            return r;
+        }
+
+        Matrix4x4<T> transpose() const
+        {
+            T _temp;
+            Matrix4x4<T> r;
+            for(int i=0; i<4; i++)
+            {
+                for(int j=i;j<4;j++)
+                {
+                    r.data[(j*4)+i] = data[(i*4)+j];
+                    r.data[(i*4)+j] = data[(j*4)+i];
                 }
             }
             return r;

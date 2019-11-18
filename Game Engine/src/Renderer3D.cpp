@@ -510,13 +510,11 @@ namespace Pringine {
         SDL_GL_SetSwapInterval(value);
     }
 
-    Matrix4x4<float> projection;
     void Renderer3D::start()
     {
         //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
         projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
-
-        
+        view_matrix = Matrix4x4<float>::identity();
     }
 
     void Renderer3D::update()
@@ -543,7 +541,7 @@ namespace Pringine {
                 // models and normals should be same size
                 for(int j=0; j<grp->models.size() ; j++) 
                 {
-                    Matrix4x4<float> mvp = (projection) * (*(grp->models[j])) ;
+                    Matrix4x4<float> mvp = (projection) * view_matrix * (*(grp->models[j])) ;
                     if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
                     GL_CALL(
                         glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))

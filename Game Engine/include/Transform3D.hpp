@@ -25,6 +25,7 @@ namespace Pringine{
             
             const Matrix4x4<float>& get_transformation();
             const Matrix4x4<float>& get_rotation_transformation();
+            const Matrix4x4<float>& get_translation_transformation();
             const Vector3<float>& get_position();
             const Vector3<float>& get_scale();
             const Vector3<float>& get_rotation();

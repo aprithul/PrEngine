@@ -117,6 +117,11 @@ namespace  Pringine
         return transformation;
     }
 
+    const Matrix4x4<float>& Transform3D::get_translation_transformation()
+    {
+        return translation;
+    }
+
     const Matrix4x4<float>& Transform3D::get_rotation_transformation()
     {
         return rotation_transformation;

@@ -24,11 +24,10 @@
 #include "FrameRateCounterModule.hpp"
 #include "Sprite.hpp"
 #include "Player.hpp"
-#include "Camera.hpp"
 #include "GUI.hpp"
 #include "EditorModule.hpp"
 #include "Cube.hpp"
-
+#include "Camera3D.hpp"
 
 using namespace Pringine;
 
@@ -140,15 +139,21 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         if(graphics != nullptr)
         {
                 Cube* cube = new Cube(graphics);
-                cube->transform.set_position(Vector3<float>(-1.f,0.0f,-1.8f));
+                cube->transform.set_position(Vector3<float>(0.f,0.0f,-1.8f));
                 cube->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
                 entity_management_system->assign_id_and_store_entity(*cube);
 
-                Cube* cube_2 = new Cube(graphics);
+/*                Cube* cube_2 = new Cube(graphics);
                 cube_2->transform.set_position(Vector3<float>(1.0f,0.0f,-1.8f));
                 cube_2->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-                entity_management_system->assign_id_and_store_entity(*cube_2);
+                entity_management_system->assign_id_and_store_entity(*cube_2);*/
         }
+        
+        Camera3D* camera_3d = new Camera3D(*renderer3d);
+        camera_3d->transform.set_position(0.f, 0.f, 1.f);
+        entity_management_system->assign_id_and_store_entity(*camera_3d);
+
+
         //std::cout<<graphics->normal->data[0]<<std::endl;
 
 
