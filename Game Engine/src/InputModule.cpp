@@ -457,6 +457,9 @@ namespace Pringine {
         key_binding[SDLK_y] = SDLK_y;
         key_binding[SDLK_v] = SDLK_v;
         key_binding[SDLK_b] = SDLK_b;
+
+        key_binding[SDLK_1] = SDLK_1;
+        key_binding[SDLK_2] = SDLK_2;
         
     }
 

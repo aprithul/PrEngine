@@ -29,7 +29,10 @@ namespace Pringine{
             const Vector3<float>& get_position();
             const Vector3<float>& get_scale();
             const Vector3<float>& get_rotation();
-        
+
+            const Vector3<float> get_forward();
+            const Vector3<float> get_right();
+            const Vector3<float> get_up();
 
             Transform3D();
             Transform3D(Vector3<float> position, Vector3<float> angle, Vector3<float> scale);
@@ -44,6 +47,10 @@ namespace Pringine{
             Vector3<float> position;
             Vector3<float> rotation;
             Vector3<float> scale;
+
+            Vector3<float> forward;
+            Vector3<float> right;
+            Vector3<float> up;
 
             Matrix4x4<float> translation;
             Matrix4x4<float> scale_m;

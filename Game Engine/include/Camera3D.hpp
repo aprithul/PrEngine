@@ -22,7 +22,12 @@ namespace Pringine
             void zoom_out(float zoom_speed);
             void start() override;
             void update() override;
-            void end() override;            
+            void end() override;     
+
+
+            float fov;
+            float near;
+            float far;       
 
         private:
             Renderer3D& renderer_3d;

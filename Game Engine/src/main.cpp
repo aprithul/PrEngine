@@ -133,7 +133,7 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         
 
         Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("TreasureChest").c_str(), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")).c_str(), 
-                                get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")).c_str());
+                get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")).c_str());
         //Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("").c_str(), get_resource_path(std::string("cube.obj")).c_str(), 
         //                        get_resource_path(std::string("default.png")).c_str());
         if(graphics != nullptr)
@@ -148,6 +148,13 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
                 cube_2->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
                 entity_management_system->assign_id_and_store_entity(*cube_2);*/
         }
+        Graphics3D* graphics_plane = renderer3d->generate_graphics3d(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
+                get_resource_path(std::string("stonetile.png")).c_str());
+        std::cout<<"grpahics made"<<std::endl;
+        Entity3D* floor = new Entity3D(ENTITY_TYPE_CUBE,graphics_plane);
+        floor->transform.set_scale(Vector3<float>(8.f,1.f,8.f));
+        floor->transform.set_position(Vector3<float>(-0.5f,-.1f,-0.5f));
+        entity_management_system->assign_id_and_store_entity(*floor);
         
         Camera3D* camera_3d = new Camera3D(*renderer3d);
         camera_3d->transform.set_position(0.f, 0.f, 1.f);

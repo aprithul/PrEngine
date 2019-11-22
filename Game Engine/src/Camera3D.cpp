@@ -4,7 +4,9 @@ namespace Pringine
 {
     Camera3D::Camera3D(Renderer3D& renderer_3d): renderer_3d(renderer_3d),Entity(ENTITY_TYPE_CAMERA)
     {
-    
+        fov = 45.f;
+        near = 1.f;
+        far = -1.f;    
     }
 
     Camera3D::~Camera3D()
@@ -21,25 +23,25 @@ namespace Pringine
     {
 
         Vector3<float> pos = transform.get_position();
-        if(input_manager->keyboard.get_key(SDLK_UP))
+        if(input_manager->keyboard.get_key(SDLK_z))
             pos.y = pos.y+(Time::Frame_time*1.f);
-        if(input_manager->keyboard.get_key(SDLK_DOWN))
+        if(input_manager->keyboard.get_key(SDLK_c))
             pos.y = pos.y-(Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_RIGHT))
-            pos.x = pos.x+(Time::Frame_time*1.f);
+            pos = pos + (transform.get_right()*(float)(Time::Frame_time*5.f));
         if(input_manager->keyboard.get_key(SDLK_LEFT))
-            pos.x = pos.x-(Time::Frame_time*1.f);
-        if(input_manager->keyboard.get_key(SDLK_z))
-            pos.z = pos.z-(Time::Frame_time*1.f);
-        if(input_manager->keyboard.get_key(SDLK_c))
-            pos.z = pos.z+(Time::Frame_time*1.f);
+            pos = pos - (transform.get_right()*(float)(Time::Frame_time*5.f));
+        if(input_manager->keyboard.get_key(SDLK_DOWN))
+            pos = pos - (transform.get_forward()*(float)(Time::Frame_time*5.f));
+        if(input_manager->keyboard.get_key(SDLK_UP))
+            pos = pos + (transform.get_forward()*(float)(Time::Frame_time*5.f));
         transform.set_position(pos);
 
         Vector3<float> rot = transform.get_rotation();
         if(input_manager->keyboard.get_key(SDLK_a))
-            rot.y = rot.y-(Time::Frame_time*20.f);
+            rot.y = rot.y+(Time::Frame_time*100.f);
         if(input_manager->keyboard.get_key(SDLK_d))
-            rot.y = rot.y+(Time::Frame_time*20.f);
+            rot.y = rot.y-(Time::Frame_time*100.f);
         transform.set_rotation(rot);
 
         // set view matrix based on camera
@@ -50,6 +52,7 @@ namespace Pringine
         renderer_3d.view_matrix.set(2,3, -transform.get_position().z);
         Matrix4x4<float> reverse_rot = transform.get_rotation_transformation().transpose();
         renderer_3d.view_matrix = reverse_rot * renderer_3d.view_matrix;
+        renderer_3d.projection = Matrix4x4<float>::perspective(near, far,4.f,3.f, fov);
 
 /*
         Vector3<float> rot = transform.get_rotation();

@@ -13,6 +13,9 @@ namespace  Pringine
         position = Vector3<float>(0,0,0);
         scale = Vector3<float>(1,1,1);
         rotation = Vector3<float>(0,0,0);
+        forward = Vector3<float>(0,0,1.f);
+        right   = Vector3<float>(1.f,0,0.f);
+        up      = Vector3<float>(0,1.f,0.f);
         dirty = true;
     }
 
@@ -140,6 +143,21 @@ namespace  Pringine
     const Vector3<float>& Transform3D::get_rotation()
     {
         return rotation;
+    }
+
+    const Vector3<float> Transform3D::get_forward()
+    {
+        return rotation_transformation * forward;
+    }
+
+    const Vector3<float> Transform3D::get_right()
+    {
+        return rotation_transformation * right;
+    }
+
+    const Vector3<float> Transform3D::get_up()
+    {
+        return rotation_transformation * up;
     }
 
 }

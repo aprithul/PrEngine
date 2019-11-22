@@ -9,7 +9,10 @@
 #ifndef Matrix4x4_hpp
 #define Matrix4x4_hpp
 
+#include <cmath>
 #include <stdio.h>
+#include "Vector3.hpp"
+#define DEG_TO_RAD 0.0174533f
 
 namespace Pringine {
     
@@ -69,6 +72,24 @@ namespace Pringine {
                                         (data[(i*4)+3]*m.data[12+j]);
                 }
             }
+            return r;
+        }
+
+        Vector3<T> operator*(const Vector3<T>& v) const
+        {
+            Vector3<T> r;
+            r.x =   (data[(0*4)+0]*v.x)+
+                    (data[(0*4)+1]*v.y)+
+                    (data[(0*4)+2]*v.z);
+
+            r.y =   (data[(1*4)+0]*v.x)+
+                    (data[(1*4)+1]*v.y)+
+                    (data[(1*4)+2]*v.z);
+
+            r.z =   (data[(2*4)+0]*v.x)+
+                    (data[(2*4)+1]*v.y)+
+                    (data[(2*4)+2]*v.z);
+           
             return r;
         }
 
@@ -162,7 +183,18 @@ namespace Pringine {
             return ortho;
         }
 
-
+        static Matrix4x4 perspective(float n, float f, float width, float height, float fov)
+        {
+            float aspect_ratio = width / height;
+            Matrix4x4<float> perspective;
+            perspective.set(0,0, 1/(aspect_ratio*std::tanf(fov*DEG_TO_RAD/2.f)));
+            perspective.set(1,1, 1/(std::tanf(fov*DEG_TO_RAD/2.f)));
+            perspective.set(2,2, (-f-n)/(n-f));
+            perspective.set(2,3, ((2*f*n)/(n-f)));
+            perspective.set(3, 2, 1);
+            perspective.set(3, 3, 0);
+            return perspective;
+        }
 
         static Matrix4x4 perspective(float n, float f, float width, float height)
         {

@@ -513,7 +513,8 @@ namespace Pringine {
     void Renderer3D::start()
     {
         //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
-        projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
+        //projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
+        projection = Matrix4x4<float>::perspective(0.f,1.f,4.f,3.f, 45.f);
         view_matrix = Matrix4x4<float>::identity();
     }
 
@@ -629,7 +630,7 @@ namespace Pringine {
         layout.add_attribute(attribute_1);
         layout.add_attribute(attribute_2);
         layout.add_attribute(attribute_3);
-
+        std::cout<<"1"<<std::endl;
         /*
         std::cout<<"ind size: "<<shapes[0].mesh.indices.size()<<std::endl;
         std::cout<<"vertices size: "<<attrib.vertices.size()<<std::endl;
@@ -801,6 +802,8 @@ namespace Pringine {
 
             std::unordered_map<std::string, GLuint> indices_map;
             GLuint index = 0;
+        std::cout<<"2: "<<shapes.size()<<std::endl;
+            
             for(int i=0; i< shapes[s].mesh.indices.size(); i++)
             {
                 std::string key =   
@@ -811,12 +814,14 @@ namespace Pringine {
                 std::unordered_map<std::string, GLuint>::iterator item;
                 if( (item = indices_map.find(key)) != indices_map.end() )
                 {
+
                     tinyobj::index_t ind = shapes[s].mesh.indices[i];
                     //std::cout<<attrib.vertices[ind.vertex_index+0]<<","<<attrib.vertices[ind.vertex_index+1]<<","<<attrib.vertices[ind.vertex_index+2]<<std::endl;
                     indices.push_back(item->second);
                 }
                 else
                 {
+
                     tinyobj::index_t ind = shapes[s].mesh.indices[i];
                     
                     Vertex vert;
@@ -891,6 +896,8 @@ namespace Pringine {
         }
         
         graphics3d_list.push_back(graphics);
+
+        std::cout<<"returning"<<std::endl;
         return graphics;
 
     }

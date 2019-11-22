@@ -212,6 +212,7 @@ namespace Pringine {
         GLuint make_shader( GLenum type, const std::string& source);
         Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name, const char* texture_file_path);
         Matrix4x4<float> view_matrix;
+        Matrix4x4<float> projection;
 
         void start() override;
         void update() override;
@@ -223,7 +224,6 @@ namespace Pringine {
         // the opengl context used with the window
         SDL_GLContext glContext;
         GLuint shader_programs[SHADER_COUNT];
-        Matrix4x4<float> projection;
 
         
     };
