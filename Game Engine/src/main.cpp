@@ -138,12 +138,11 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         //                        get_resource_path(std::string("default.png")).c_str());
         if(graphics != nullptr)
         {
-                Cube* cube = new Cube(graphics);
-                cube->transform.set_position(Vector3<float>(0.f,0.0f,-1.8f));
-                cube->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-                entity_management_system->assign_id_and_store_entity(*cube);
-
-/*                Cube* cube_2 = new Cube(graphics);
+                Cube* chest = new Cube(graphics);
+                chest->transform.set_position(Vector3<float>(0.f,0.5f,-1.8f));
+                chest->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
+                entity_management_system->assign_id_and_store_entity(*chest);
+/*              Cube* cube_2 = new Cube(graphics);
                 cube_2->transform.set_position(Vector3<float>(1.0f,0.0f,-1.8f));
                 cube_2->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
                 entity_management_system->assign_id_and_store_entity(*cube_2);*/
@@ -153,11 +152,11 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         std::cout<<"grpahics made"<<std::endl;
         Entity3D* floor = new Entity3D(ENTITY_TYPE_CUBE,graphics_plane);
         floor->transform.set_scale(Vector3<float>(8.f,1.f,8.f));
-        floor->transform.set_position(Vector3<float>(-0.5f,-.1f,-0.5f));
+        floor->transform.set_position(Vector3<float>(0.f, 0.f,0.f));
         entity_management_system->assign_id_and_store_entity(*floor);
         
         Camera3D* camera_3d = new Camera3D(*renderer3d);
-        camera_3d->transform.set_position(0.f, 0.f, 1.f);
+        camera_3d->transform.set_position(0.f, 1.f, 0.f);
         entity_management_system->assign_id_and_store_entity(*camera_3d);
 
 
