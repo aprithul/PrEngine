@@ -87,8 +87,10 @@ namespace Pringine {
             keyboard.key_released_flags[it->first] = false;
 
 //        LOG(LOGTYPE_GENERAL, std::to_string(Time::get_time()));
+        SDL_GetRelativeMouseState(&mouse.delta.x, &mouse.delta.y);
 
         while (SDL_PollEvent(&event)) {
+
             switch (event.type)
             {
 
@@ -449,6 +451,9 @@ namespace Pringine {
         key_binding[SDLK_e] = SDLK_e;
         key_binding[SDLK_a] = SDLK_a;
         key_binding[SDLK_d] = SDLK_d;
+        key_binding[SDLK_w] = SDLK_w;
+        key_binding[SDLK_s] = SDLK_s;
+        
         key_binding[SDLK_r] = SDLK_r;
         key_binding[SDLK_t] = SDLK_t;
         key_binding[SDLK_z] = SDLK_z;

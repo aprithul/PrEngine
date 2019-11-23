@@ -5,7 +5,7 @@ namespace Pringine
     Camera3D::Camera3D(Renderer3D& renderer_3d): renderer_3d(renderer_3d),Entity(ENTITY_TYPE_CAMERA)
     {
         fov = 45.f;
-        near = 1.f;
+        near = 0.1f;
         far = -1.f;    
     }
 
@@ -27,22 +27,17 @@ namespace Pringine
             pos.y = pos.y+(Time::Frame_time*1.f);
         if(input_manager->keyboard.get_key(SDLK_c))
             pos.y = pos.y-(Time::Frame_time*1.f);
-        if(input_manager->keyboard.get_key(SDLK_RIGHT))
+        if(input_manager->keyboard.get_key(SDLK_d))
             pos = pos + (transform.get_right()*(float)(Time::Frame_time*5.f));
-        if(input_manager->keyboard.get_key(SDLK_LEFT))
+        if(input_manager->keyboard.get_key(SDLK_a))
             pos = pos - (transform.get_right()*(float)(Time::Frame_time*5.f));
-        if(input_manager->keyboard.get_key(SDLK_DOWN))
+        if(input_manager->keyboard.get_key(SDLK_s))
             pos = pos - (transform.get_forward()*(float)(Time::Frame_time*5.f));
-        if(input_manager->keyboard.get_key(SDLK_UP))
+        if(input_manager->keyboard.get_key(SDLK_w))
             pos = pos + (transform.get_forward()*(float)(Time::Frame_time*5.f));
         transform.set_position(pos);
 
-        Vector3<float> rot = transform.get_rotation();
-        if(input_manager->keyboard.get_key(SDLK_a))
-            rot.y = rot.y+(Time::Frame_time*100.f);
-        if(input_manager->keyboard.get_key(SDLK_d))
-            rot.y = rot.y-(Time::Frame_time*100.f);
-        transform.set_rotation(rot);
+
 
         // set view matrix based on camera
 
@@ -71,6 +66,18 @@ namespace Pringine
         if(input_manager->keyboard.get_key(SDLK_e))
             rot.x = rot.x+(Time::Frame_time*20.f);
         transform.set_rotation(rot);*/
+
+        //std::cout<<"Mouse delta: "<<input_manager->mouse.delta.length()<<std::endl;
+
+        float rotation_factor = 15.f;
+        Vector3<float> rot = transform.get_rotation();
+        //if(input_manager->keyboard.get_key(SDLK_a))
+        rot.y = rot.y+(Time::Frame_time*rotation_factor*input_manager->mouse.delta.x);
+        rot.x = rot.x+(Time::Frame_time*rotation_factor*input_manager->mouse.delta.y);
+        //if(input_manager->keyboard.get_key(SDLK_d))
+        //    rot.y = rot.y-(Time::Frame_time*100.f);
+        transform.set_rotation(rot);
+
     }
 
     void Camera3D::end()

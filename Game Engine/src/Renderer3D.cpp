@@ -516,6 +516,9 @@ namespace Pringine {
         //projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
         projection = Matrix4x4<float>::perspective(0.f,1.f,4.f,3.f, 45.f);
         view_matrix = Matrix4x4<float>::identity();
+        //SDL_ShowCursor(0);
+        if(SDL_SetRelativeMouseMode(SDL_TRUE) == -1)
+            LOG(LOGTYPE_ERROR, "Failed to set relative mouse mode");
     }
 
     void Renderer3D::update()

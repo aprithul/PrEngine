@@ -103,7 +103,7 @@ namespace Pringine {
             std::unordered_map<SDL_Keycode, bool> kb;
             void map_mb_to_mb(int from, int to);
             void map_mb_to_kb(int from, SDL_Keycode to);
-
+            Vector2<int> delta;
     };
 
     class Keyboard
