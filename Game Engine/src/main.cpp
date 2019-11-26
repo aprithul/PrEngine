@@ -28,6 +28,7 @@
 #include "EditorModule.hpp"
 #include "Cube.hpp"
 #include "Camera3D.hpp"
+#include "ImGuiModule.hpp"
 
 using namespace Pringine;
 
@@ -66,7 +67,7 @@ int main(int argc, const char * argv[])
         #endif
         
         Pringine::Renderer3D* renderer3d = (Pringine::Renderer3D*) game_engine->
-                                                add_module(new Pringine::Renderer3D(800,600,"Hello Opengl"));
+                                                add_module(new Pringine::Renderer3D(1280,720,"Hello Opengl"));
         //Pringine::Renderer2D* renderer2d =
         //                (Pringine::Renderer2D*)game_engine->
         //                        add_module(new Pringine::Renderer2D(1280,720,"Pringine",false, 25, "Renderer", 99999));
@@ -79,6 +80,7 @@ int main(int argc, const char * argv[])
         Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
         Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
         Pringine::Mouse* mouse =  &((Pringine::InputManager*)game_engine->get_module("Input"))->mouse;
+        Pringine::ImGuiModule* imgui = (Pringine::ImGuiModule*) game_engine->add_module(new Pringine::ImGuiModule("ImGUI",10,*renderer3d));
         //mouse->map_mb_to_mb(1,0);
         //mouse->map_mb_to_mb(3,1);
 

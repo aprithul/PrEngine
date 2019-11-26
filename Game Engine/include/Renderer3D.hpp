@@ -217,8 +217,6 @@ namespace Pringine {
         void start() override;
         void update() override;
         void end() override;
-        
-    private:
         // reference to the sdl window
         SDL_Window* window;
         // the opengl context used with the window

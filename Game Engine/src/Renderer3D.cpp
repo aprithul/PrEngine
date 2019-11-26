@@ -420,7 +420,7 @@ namespace Pringine {
 
     }
 
-    Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 4)
+    Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 20)
     {
         this->width = width;
         this->height = height;
@@ -430,7 +430,7 @@ namespace Pringine {
         init();
         
         // create window
-        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_OPENGL);
+        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
         // create the openGL context from the window  that was created
         glContext = SDL_GL_CreateContext(window);
 
@@ -510,6 +510,7 @@ namespace Pringine {
         SDL_GL_SetSwapInterval(value);
     }
 
+
     void Renderer3D::start()
     {
         //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
@@ -517,9 +518,12 @@ namespace Pringine {
         projection = Matrix4x4<float>::perspective(0.f,1.f,4.f,3.f, 45.f);
         view_matrix = Matrix4x4<float>::identity();
         //SDL_ShowCursor(0);
-        if(SDL_SetRelativeMouseMode(SDL_TRUE) == -1)
-            LOG(LOGTYPE_ERROR, "Failed to set relative mouse mode");
+        //if(SDL_SetRelativeMouseMode(SDL_TRUE) == -1)
+        //    LOG(LOGTYPE_ERROR, "Failed to set relative mouse mode");
+
     }
+
+    bool my_tool_active = true;
 
     void Renderer3D::update()
     {

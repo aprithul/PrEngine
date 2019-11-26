@@ -17,6 +17,8 @@
 #include "Vector2.hpp"
 #include "Utils.hpp"
 #include "TimeModule.hpp"
+#include "../Vendor/imgui-master/imgui.h"
+#include "../Vendor/imgui-master/imgui_impl_sdl.h"
 
 #define MAX_GAMECONTROLLER_COUNT 16
 #define MAX_MOUSE_BUTTON_COUNT 10

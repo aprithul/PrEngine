@@ -47,7 +47,7 @@ namespace Pringine
         renderer_3d.view_matrix.set(2,3, -transform.get_position().z);
         Matrix4x4<float> reverse_rot = transform.get_rotation_transformation().transpose();
         renderer_3d.view_matrix = reverse_rot * renderer_3d.view_matrix;
-        renderer_3d.projection = Matrix4x4<float>::perspective(near, far,4.f,3.f, fov);
+        renderer_3d.projection = Matrix4x4<float>::perspective(near, far,renderer_3d.width, renderer_3d.height, fov);
 
 /*
         Vector3<float> rot = transform.get_rotation();

@@ -90,7 +90,10 @@ namespace Pringine {
         SDL_GetRelativeMouseState(&mouse.delta.x, &mouse.delta.y);
 
         while (SDL_PollEvent(&event)) {
-
+            
+            //ImGuiIO& io = ImGui::GetIO();
+            ImGui_ImplSDL2_ProcessEvent(&event);            
+            
             switch (event.type)
             {
 
