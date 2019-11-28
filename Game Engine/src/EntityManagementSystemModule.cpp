@@ -56,7 +56,7 @@ namespace Pringine
         }
         else
         {
-            LOG(LOGTYPE_ERROR, "requested entity couldn't be found ");
+            LOG(LOGTYPE_ERROR, "requested entity couldn't be found : ", std::to_string(id));
         }
 
         return nullptr;

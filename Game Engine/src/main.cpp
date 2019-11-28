@@ -28,7 +28,8 @@
 #include "EditorModule.hpp"
 #include "Cube.hpp"
 #include "Camera3D.hpp"
-#include "ImGuiModule.hpp"
+#include "DirectionalLight.hpp"
+//#include "ImGuiModule.hpp"
 
 using namespace Pringine;
 
@@ -66,8 +67,14 @@ int main(int argc, const char * argv[])
                                 add_module(new Pringine::NetworkManager("Network manager", 5));
         #endif
         
+
+
+        Camera3D* camera_3d = new Camera3D(1280, 720, 0.1f, -1.f, 45.f);
+        camera_3d->transform.set_position(0.f, 1.f, 0.f);
+        entity_management_system->assign_id_and_store_entity(*camera_3d);
+
         Pringine::Renderer3D* renderer3d = (Pringine::Renderer3D*) game_engine->
-                                                add_module(new Pringine::Renderer3D(1280,720,"Hello Opengl"));
+                                                add_module(new Pringine::Renderer3D(camera_3d->width,camera_3d->height,"Hello Opengl"));
         //Pringine::Renderer2D* renderer2d =
         //                (Pringine::Renderer2D*)game_engine->
         //                        add_module(new Pringine::Renderer2D(1280,720,"Pringine",false, 25, "Renderer", 99999));
@@ -80,7 +87,7 @@ int main(int argc, const char * argv[])
         Pringine::GameController* gc = ((Pringine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
         Pringine::Keyboard* kb =  &((Pringine::InputManager*)game_engine->get_module("Input"))->keyboard;
         Pringine::Mouse* mouse =  &((Pringine::InputManager*)game_engine->get_module("Input"))->mouse;
-        Pringine::ImGuiModule* imgui = (Pringine::ImGuiModule*) game_engine->add_module(new Pringine::ImGuiModule("ImGUI",10,*renderer3d));
+        //Pringine::ImGuiModule* imgui = (Pringine::ImGuiModule*) game_engine->add_module(new Pringine::ImGuiModule("ImGUI",10,*renderer3d));
         //mouse->map_mb_to_mb(1,0);
         //mouse->map_mb_to_mb(3,1);
 
@@ -157,9 +164,8 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         floor->transform.set_position(Vector3<float>(0.f, 0.f,0.f));
         entity_management_system->assign_id_and_store_entity(*floor);
         
-        Camera3D* camera_3d = new Camera3D(*renderer3d);
-        camera_3d->transform.set_position(0.f, 1.f, 0.f);
-        entity_management_system->assign_id_and_store_entity(*camera_3d);
+        DirectionalLight* light = new DirectionalLight();
+        entity_management_system->assign_id_and_store_entity(*light);
 
 
         //std::cout<<graphics->normal->data[0]<<std::endl;

@@ -12,6 +12,7 @@ namespace Pringine
     {
         ENTITY_TYPE_SPRITE = 0,
         ENTITY_TYPE_CAMERA,
+        ENTITY_TYPE_LIGHT,
         ENTITY_TYPE_PLAYER,
         ENTITY_TYPE_CUBE,
         ENTITY_TYPE_COUNT

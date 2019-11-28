@@ -9,423 +9,12 @@
 
 namespace Pringine {
     
-    std::unordered_map<std::string, Texture*> texture_library;
-    std::unordered_map<std::string, stbi_uc*> texture_data_library;
-
-    VertexArray::VertexArray()
-    {
-    }
-
-    VertexArray::~VertexArray()
-    {
-    }
-    
-    void VertexArray::Generate()
-    {
-        GL_CALL(
-            glGenVertexArrays(1, &id))
-    }
-
-    void VertexArray::Delete()
-    {
-        GL_CALL(
-            glDeleteVertexArrays(1, &id))
-    }
-
-    void VertexArray::Bind()
-    {
-        GL_CALL(
-            glBindVertexArray(id))
-    }
-
-    void VertexArray::Unbind()
-    {
-        GL_CALL(
-            glBindVertexArray(0))
-    }
-
-    VertexBuffer::VertexBuffer()
-    {
-    }
-
-    void VertexBuffer::Generate(const Vertex* vertices, GLuint size)
-    {
-        GL_CALL( 
-            glGenBuffers(1, &id))
-        Bind(); 
-        GL_CALL( 
-            glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW))
-        Unbind();
-    }
-
-    VertexBuffer::~VertexBuffer()
-    {
-    }
-
-    void VertexBuffer::Delete()
-    {
-        GL_CALL( 
-            glDeleteBuffers(1, &id));
-    }
-
-    void VertexBuffer::Bind()
-    {
-        GL_CALL(
-            glBindBuffer(GL_ARRAY_BUFFER, id));
-    }
-
-    void VertexBuffer::Unbind()
-    {
-        GL_CALL(
-            glBindBuffer(GL_ARRAY_BUFFER, 0));
-    }
-
-
-    IndexBuffer::IndexBuffer()
-    {
-    }
-
-    void IndexBuffer::Generate(const GLuint* indices, GLuint indices_size, GLsizei count)
-    {
-        this->count = count;
-        GL_CALL( 
-            glGenBuffers(1, &id));
-        Bind();
-        GL_CALL(
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW))
-        Unbind();
-    }
-
-    IndexBuffer::~IndexBuffer()
-    {
-
-    }
-
-    void IndexBuffer::Delete()
-    {
-        GL_CALL( 
-            glDeleteBuffers(1, &id));
-    }
-
-    void IndexBuffer::Bind()
-    {
-        GL_CALL(
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id));
-    }
-
-    void IndexBuffer::Unbind()
-    {
-        GL_CALL(
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
-    }
-
-    Graphics3D::Graphics3D():Component(COMP_GRAPHICS_3D)// (const Vertex* vertices, GLuint vertices_size, const GLuint* indices, 
-                                    //GLuint indices_size, GLsizei indices_count, Material material, 
-                                    //Texture texture, VertexLayout layout)
-                                //:vbo(vertices,vertices_size),ibo(indices,indices_size,indices_count),
-                                //    material(material),texture(texture),layout(layout),
-    {
-        //vao.Bind();
-        //vbo.Bind();
-        //for(std::vector<VertexAttribute>::iterator attr = layout.vertex_attributes.begin(); attr !=  layout.vertex_attributes.end(); attr++)
-        /*{
-            GL_CALL(
-                glEnableVertexAttribArray( attr->index))
-            GL_CALL(
-                glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
-        //}
-        vbo.Unbind();
-        vao.Unbind();
-        */
-    }
-
-    Graphics3D::~Graphics3D()
-    {
-        //delete material;
-        std::cout<<"DESTROYED"<<std::endl;   
-    }
-
-    void GraphicsElement::Delete()
-    {
-        vao.Delete();
-        vbo.Delete();
-        ibo.Delete();
-    }
-
-    int Texture::texture_create_status;
-    Texture::Texture(const char* path)
-    {
-        texture_create_status = 0;
-        stbi_set_flip_vertically_on_load(true);
-        if(texture_data_library.count(path) > 0)
-            data = texture_data_library[path];
-        else
-        {
-            data = stbi_load(path,&width, &height, &no_of_channels, 0);
-            if(data!=nullptr)
-                texture_data_library[path] = data;
-        }
-
-
-        if(data == NULL){
-            LOG(LOGTYPE_ERROR, "Couldn't create texture");
-        }
-        else
-        {
-            LOG(LOGTYPE_GENERAL, "Image ",std::string(path)," loaded");
-
-            GL_CALL(glGenTextures(1, &id))
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, id))
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER))
-            GL_CALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER))
-            
-            GLenum type = GL_RGBA;
-            switch(no_of_channels)
-            {
-                case 1:type = GL_R;break;
-                case 2:type = GL_RG;break;
-                case 3:type = GL_RGB;break;
-                case 4:type = GL_RGBA;break;
-            }
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, type, GL_UNSIGNED_BYTE, data))
-            GL_CALL(glBindTexture(GL_TEXTURE_2D, 0))
-            texture_create_status = 1;
-        }
-    }
-
-    Texture::~Texture()
-    {
-        Unbind();
-        GL_CALL(
-            glDeleteTextures(1, &id))
-        //if(data != NULL)
-        //    stbi_image_free(data);
-    }
-
-    void Texture::Bind(int slot)
-    {
-        GL_CALL(
-            glActiveTexture(GL_TEXTURE0 + slot))
-        GL_CALL(
-            glBindTexture(GL_TEXTURE_2D, id))
-    }
-
-    void Texture::Unbind()
-    {
-        GL_CALL(
-            glBindTexture(GL_TEXTURE_2D, 0))
-    }
-
-    Material::Material()
-    {
-
-    }
-
-    void Material::Generate(const std::string& shader_path, const std::string& diffuse_tex_path)
-    {
-        // only create new texture on gpu if texture doesn't exist already
-        std::unordered_map<std::string, Texture*>::iterator _tex_it = texture_library.find(diffuse_tex_path);
-        if(_tex_it == texture_library.end()) // texture not in library, so create
-        {
-            Texture* _tex =  new Texture(diffuse_tex_path.c_str());
-            if(Texture::texture_create_status == 0){    // creating texture failed, so assign default
-                delete _tex;
-                diffuse_texture = texture_library[get_resource_path("default.jpg")];
-            }
-            else // successfully created texture, store in library and assign that
-            {
-                texture_library[diffuse_tex_path] = _tex;
-                diffuse_texture = _tex;
-
-            }
-        }
-        else    // texture found in library, so assign that
-            diffuse_texture = texture_library[diffuse_tex_path];
-    
-        // create shader, probably can be shared, will check later
-        this->source_file_path = std::string(shader_path);
-        make_shader_program(this->source_file_path);
-        GL_CALL(
-            glUseProgram(shader_program))
-    }
-
-    void Material::Delete()
-    {
-        GL_CALL(
-            glDeleteProgram(shader_program))
-        delete diffuse_texture;
-    }
-
-    Material::~Material()
-    {
-
-    }
-
-    void Material::load_uniform_location(const char* uniform)
-    {
-        GLint loc = -1;
-        GL_CALL(
-            loc = glGetUniformLocation(shader_program, uniform))
-        
-        std::cout<<"Location: "<<loc<<std::endl;
-        //if(loc != -1)
-        uniform_locations[uniform] = loc;
-    }
-
-    bool Material::make_shader_program(const std::string& path)
-    {
-        std::string _source = read_file(get_resource_path(path).c_str());
-        std::stringstream shader_source;
-        shader_source << _source;
-        
-        std::string vert = "";
-        std::string frag = "";
-        std::string line = "";
-        GLenum type = GL_VERTEX_SHADER;
-        while(std::getline(shader_source, line))
-        {
-            //std::cout<<line<<std::endl;
-            if(line.find("#vertex") != std::string::npos){
-                type = GL_VERTEX_SHADER;
-
-            }
-            else if(line.find("#fragment")!= std::string::npos){
-                type = GL_FRAGMENT_SHADER;
-            }
-            else
-            {
-                if(type == GL_VERTEX_SHADER)
-                    vert += line+"\n";
-                else if(type == GL_FRAGMENT_SHADER)
-                    frag += line+"\n";
-            }
-        }
-
-        shader_program = glCreateProgram();
-        if(shader_program == 0)
-        {
-            std::cout<<"Couldn't create shader program"<<std::endl;
-            return false;
-        }
-
-        GLuint v = make_shader( GL_VERTEX_SHADER, vert);
-        GLuint f = make_shader( GL_FRAGMENT_SHADER, frag);
-        if(v != -1 && f != -1)
-        {
-            glAttachShader(shader_program, v);
-            glAttachShader(shader_program, f);
-            glLinkProgram(shader_program);
-            GLint program_linked;
-
-            glGetProgramiv(shader_program, GL_LINK_STATUS, &program_linked);
-            if (program_linked != GL_TRUE)
-            {
-                int length;
-                glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &length);
-                GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
-                glGetProgramInfoLog(shader_program, length, &length, log);
-                LOG(LOGTYPE_ERROR, "Shader linking error\n",std::string(log));
-                
-                glDetachShader(shader_program, v);
-                glDeleteShader(v);
-                glDetachShader(shader_program, f);
-                glDeleteShader(f);       
-            }
-            else
-            {   
-                glDetachShader(shader_program, v);
-                glDeleteShader(v);
-                glDetachShader(shader_program, f);
-                glDeleteShader(f);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    GLuint Material::make_shader( GLenum type,  const std::string& source)
-    {
-        GLuint shader =  glCreateShader(type);
-        if(shader == 0)
-            std::cout<<"Couldn't create shader"<<std::endl;
-            
-        const char* _source = source.c_str();
-        glShaderSource(shader,1, &(_source) , NULL);
-        glCompileShader(shader);
-        
-        // check
-        GLint compilation_status;
-        glGetShaderiv(shader, GL_COMPILE_STATUS, &compilation_status);
-        if(compilation_status != GL_TRUE)
-        {
-            int length;
-            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-
-            GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
-            glGetShaderInfoLog(shader, length, &length, log);
-            LOG(LOGTYPE_ERROR, "Shader compilation error in ",(type==GL_VERTEX_SHADER?"Vertex":"Fragment"),"shader: \n"+std::string(log)+"\n");
-            glDeleteShader(shader);
-            shader = -1;
-        }
-        return shader;
-    }
-
-
-
-    VertexLayout::VertexLayout()
-    {
-        stride = sizeof(Vertex);
-    }
-
-    VertexAttribute::VertexAttribute(GLuint index, GLuint count, int type, GLboolean normalized)
-    {
-        this->index = index;
-        this->count = count;
-        this->type  = type;
-        this->normalized = normalized;
-        this->offset = 0;
-        this->size = 0;
-    }
-
-    void VertexLayout::add_attribute(VertexAttribute& attribute)
-    {
-        if(vertex_attributes.size() >= 1)
-        {
-            attribute.offset = (vertex_attributes.back().size + vertex_attributes.back().offset);
-        }
-
-        switch (attribute.type)
-        {
-        case GL_FLOAT:
-            attribute.size = (sizeof(GLfloat) * attribute.count);
-            break;
-        case GL_UNSIGNED_INT:
-            attribute.size = (sizeof(GLuint) * attribute.count);
-            break;
-        case GL_INT:
-            attribute.size = (sizeof(GLint) * attribute.count);
-            break;
-            //....
-            //....
-            //....
-        default:
-            LOG(LOGTYPE_ERROR, "Attribute type not found");
-            break;
-        }
-
-        //stride += attribute.size;
-        vertex_attributes.push_back(attribute);
-
-    }
-
     Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 20)
     {
         this->width = width;
         this->height = height;
         this->title = title;
-        light_direction = Vector3<float>(.2,.2,-0.1).normalize();
+        //light_direction = 
         // initialize sdl and opengl related settings for graphics
         init();
         
@@ -459,6 +48,23 @@ namespace Pringine {
         Texture* _tex = new Texture(get_resource_path("default.jpg").c_str());
         texture_library[get_resource_path("default.jpg")] = _tex;
         //data = stbi_load( get_resource_path("default.jpg").c_str() ,&width, &height, &no_of_channels, 0);
+
+
+        /// create render layers
+        Camera3D* camera = (Camera3D*)entity_management_system->get_entity(ENTITY_TYPE_CAMERA);
+        long camera_handle = -1;
+        if(camera == nullptr){
+            LOG(LOGTYPE_ERROR, "No camera found");
+            return;
+        }
+        else
+            camera_handle = camera->id;
+        std::cout<<"cam handle "<<camera_handle<<std::endl;
+
+        GeometryLayer* gl = new GeometryLayer(camera_handle);
+        render_layers.push_back(gl);
+
+
 
     }
     
@@ -510,16 +116,18 @@ namespace Pringine {
         SDL_GL_SetSwapInterval(value);
     }
 
-
     void Renderer3D::start()
     {
         //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
         //projection = Matrix4x4<float>::perspective(1.f,-1.f,2.f,1.5f);
-        projection = Matrix4x4<float>::perspective(0.f,1.f,4.f,3.f, 45.f);
-        view_matrix = Matrix4x4<float>::identity();
+        //projection = Matrix4x4<float>::perspective(0.f,1.f,4.f,3.f, 45.f);
+        //view_matrix = Matrix4x4<float>::identity();
+
         //SDL_ShowCursor(0);
         //if(SDL_SetRelativeMouseMode(SDL_TRUE) == -1)
         //    LOG(LOGTYPE_ERROR, "Failed to set relative mouse mode");
+        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+            (*it)->start();
 
     }
 
@@ -528,58 +136,15 @@ namespace Pringine {
     void Renderer3D::update()
     {
         Clear(1,1,1,1);
-        for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
-        {
-            Graphics3D* grp = (*it);
-            //Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
-            
-            for(int i=0; i < grp->elements.size(); i++)
-            {
-                grp->elements[i].material.diffuse_texture->Bind(0);
-                grp->elements[i].vao.Bind();
-                grp->elements[i].ibo.Bind();
-                
-                if(grp->elements[i].material.uniform_locations["u_sampler2d"] != -1)
-                GL_CALL(
-                    glUniform1i(grp->elements[i].material.uniform_locations["u_sampler2d"], 0))
-                if(grp->elements[i].material.uniform_locations["u_Dir_Light"] != -1)
-                GL_CALL(
-                    glUniform3f(grp->elements[i].material.uniform_locations["u_Dir_Light"],light_direction.x, light_direction.y, light_direction.z))
-                
-                // models and normals should be same size
-                for(int j=0; j<grp->models.size() ; j++) 
-                {
-                    Matrix4x4<float> mvp = (projection) * view_matrix * (*(grp->models[j])) ;
-                    if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
-                    GL_CALL(
-                        glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
-
-                    if(grp->elements[i].material.uniform_locations["u_Normal_M"] != -1)
-                    GL_CALL(
-                        glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normals[j]->data ))
-                    GL_CALL(
-                    //glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
-                    glDrawElements(GL_TRIANGLES, grp->elements[i].ibo.count, GL_UNSIGNED_INT, nullptr));
-
-                }
-
-                //grp->ibo[i].Bind();
-
-                //GL_CALL(
-                //    glUniform1f((*it)->material.uniform_locations["u_red"], 1.f))
-               
-                
-                grp->elements[i].ibo.Unbind();
-                grp->elements[i].vao.Unbind();
-                //grp->ibo[i].Unbind();
-            }
-        }
+        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+            (*it)->update();
         SwapBuffers();
     }
 
     void Renderer3D::end()
     {
-
+        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+            (*it)->end();
     }
 
     static void CalcNormal(float N[3], float v0[3], float v1[3], float v2[3]) {
@@ -880,12 +445,8 @@ namespace Pringine {
             graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();
             graphics->elements.back().layout = layout;
-
             graphics->elements.back().num_of_triangles = (buffer.size()/3);
         }
-
-
-        
 
         for(int i=0; i<graphics->elements.size(); i++)
         {
@@ -901,8 +462,14 @@ namespace Pringine {
             graphics->elements[i].vbo.Unbind();
             graphics->elements[i].vao.Unbind();
         }
-        
-        graphics3d_list.push_back(graphics);
+        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+        {
+                if((*it)->name == "Geometry"){
+                    ((GeometryLayer*)(*it))->graphics3d_list.push_back(graphics);
+                    std::cout<<"added graphics"<<std::endl;
+                }
+                std::cout<<"name : "<<(*it)->name<<std::endl;
+        }
 
         std::cout<<"returning"<<std::endl;
         return graphics;

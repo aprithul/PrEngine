@@ -14,7 +14,7 @@ namespace Pringine
     class Camera3D: public Entity
     {
         public:
-            Camera3D(Renderer3D& renderer_3D);
+            Camera3D(float width, float height, float near, float far, float fov);
             ~Camera3D();
             Transform3D transform;
 
@@ -27,10 +27,12 @@ namespace Pringine
 
             float fov;
             float near;
-            float far;       
+            float far; 
+            float width;
+            float height;
 
-        private:
-            Renderer3D& renderer_3d;
+            Matrix4x4<float> view_matrix;
+            Matrix4x4<float> projection_matrix;
     };
 }
 #endif
