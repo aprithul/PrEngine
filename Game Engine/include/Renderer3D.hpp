@@ -17,6 +17,7 @@
 #include "Module.hpp"
 #include "RenderLayer.hpp"
 #include "GeometryLayer.hpp"
+#include "GuiLayer.hpp"
 #include <vector>
 
 namespace Pringine {

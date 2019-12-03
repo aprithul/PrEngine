@@ -61,11 +61,11 @@ namespace Pringine {
             camera_handle = camera->id;
         std::cout<<"cam handle "<<camera_handle<<std::endl;
 
-        GeometryLayer* gl = new GeometryLayer(camera_handle);
-        render_layers.push_back(gl);
+        GeometryLayer* geometry_layer = new GeometryLayer(camera_handle);
+        render_layers.push_back(geometry_layer);
 
-
-
+        GuiLayer* gui_layer = new GuiLayer(window, &glContext);
+        render_layers.push_back(gui_layer);
     }
     
     
