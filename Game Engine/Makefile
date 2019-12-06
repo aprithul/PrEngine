@@ -1,37 +1,26 @@
-INC_DIR := ./Sources
-SRC_DIR := ./Sources
+INC_DIR := ./include
+SRC_DIR := ./src
 OBJ_DIR := ./Build
+VENDOR := ./Vendor/Build
 
 CC       := g++
-CPPFLAGS := -I$(INC_DIR) -MMD -MP -std=c++11 -g
-CXXFLAGS := -Wall
-LDLIBS   := -lSDL2 -lSDL2_image -lSDL2_ttf
+CPPFLAGS := -I$(INC_DIR) -I./Vendor/include -std=c++11 -g
+LDLIBS   := -lSDL2 -lSDL2_image -lSDL2_ttf -lGLEW -framework OpenGL
 
 SOURCES := $(wildcard $(SRC_DIR)/*.cpp)
-OBJECTS := $(SOURCES:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
-DEPS    := $(wildcard $(OBJ_DIR)/*.d)
+OBJECTS := $(patsubst $(SRC_DIR)%.cpp,$(OBJ_DIR)%.o,$(SOURCES)) $(wildcard $(VENDOR)/*.o)
 
 .PHONY: clean
 
 Pringine: $(OBJECTS)
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+	$(CC) $(CPPFLAGS) $^ $(LDLIBS) -o $@
 
-$(OBJECTS): $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c $(OUTPUT_OPTION) $<
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
+	$(CC) $(CPPFLAGS) -c $^ -o $@
 
-clean: ; $(RM) $(DEPS) $(OBJECTS)
+clean: ; rm -f Pringine $(OBJ_DIR)/*.o
 
 run: Pringine
 	./Pringine
-
-include $(DEPS)
-
-$(MAKEFILE_LIST): ;
-%:: %,v
-%:: RCS/%,v
-%:: RCS/%
-%:: s.%
-%:: SCCS/s.%
-
 
 #em++ -std=c++11 Sources/*.cpp -O2 -s ALLOW_MEMORY_GROWTH=1 -s USE_SDL=2 -s USE_SDL_IMAGE=2 -s SDL2_IMAGE_FORMATS='["png"]' -s USE_SDL_TTF=2 -s USE_SDL_MIXER=2 --preload-file res -o index.html

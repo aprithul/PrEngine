@@ -4,7 +4,9 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/Users/prithul/emsdk/upstream/emscripten/system/include/"
+                "/Users/prithul/emsdk/upstream/emscripten/system/include/",
+                "/Users/prithul/Downloads/glm/glm",
+                "${workspaceFolder}/include"
             ],
             "defines": [],
             "macFrameworkPath": [

@@ -84,7 +84,8 @@
 			"filesystem": "cpp",
 			"codecvt": "cpp",
 			"iomanip": "cpp",
-			"stack": "cpp"
+			"stack": "cpp",
+			"cfenv": "cpp"
 		}
 	}
 }
