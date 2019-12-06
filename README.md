@@ -1,1 +1,1 @@
-A opengl renderer based engine in development.
+An opengl renderer based engine in development.
