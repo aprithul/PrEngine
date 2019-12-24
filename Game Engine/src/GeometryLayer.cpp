@@ -19,7 +19,6 @@ namespace Pringine
         DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity(ENTITY_TYPE_LIGHT);
         for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
         {
-            std::cout<<"drawing "<<std::endl;
             Graphics3D* grp = (*it);
             //Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
             
@@ -48,9 +47,16 @@ namespace Pringine
                     GL_CALL(
                         glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp->normals[j]->data ))
                     GL_CALL(
+                        glUniform2f(grp->elements[i].material.uniform_locations["u_Panning"],grp->elements[i].material.panning.x, grp->elements[i].material.panning.y);
+                    )
+                    GL_CALL(
+                        glUniform2f(grp->elements[i].material.uniform_locations["u_Tiling"],grp->elements[i].material.tiling.x, grp->elements[i].material.tiling.y);
+                    )
+                
+                    GL_CALL(
                     //glDrawArrays(GL_TRIANGLES,0, grp->elements[i].num_of_triangles*3))
                     glDrawElements(GL_TRIANGLES, grp->elements[i].ibo.count, GL_UNSIGNED_INT, nullptr));
-
+                
                 }
 
                 //grp->ibo[i].Bind();

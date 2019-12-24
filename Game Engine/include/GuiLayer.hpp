@@ -6,6 +6,7 @@
 #include "../Vendor/imgui-master/imgui.h"
 #include "../Vendor/imgui-master/imgui_impl_opengl3.h"
 #include "../Vendor/imgui-master/imgui_impl_sdl.h"
+#include "Vector2.hpp"
 namespace Pringine
 {
     class GuiLayer : public RenderLayer
@@ -17,10 +18,15 @@ namespace Pringine
             void start() override;
             void update() override;
             void end() override;
-
+            Vector2<float> *panning;
+            Vector2<float> *tiling;
         private:
             SDL_Window* window;
             SDL_GLContext* gl_context;
+            
+            // inspector
+            bool inspector_active;
+
 
     };
 }

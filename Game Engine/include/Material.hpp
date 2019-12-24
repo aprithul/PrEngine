@@ -24,6 +24,8 @@ namespace Pringine
         bool make_shader_program(const std::string& path);
         GLuint make_shader(GLenum type,  const std::string& source);
         void load_uniform_location(const char* uniform);
+        Vector2<float> tiling;
+        Vector2<float> panning;
     };
 
 } // namespace Pringine

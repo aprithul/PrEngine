@@ -5,7 +5,8 @@ namespace Pringine
 
     Material::Material()
     {
-
+        tiling = Vector2<float>(1,1);
+        panning = Vector2<float>(0,0);
     }
 
     void Material::Generate(const std::string& shader_path, const std::string& diffuse_tex_path)

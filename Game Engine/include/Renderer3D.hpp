@@ -46,6 +46,7 @@ namespace Pringine {
         bool make_shader_program(const std::string& path, GLuint& shader_program);
         GLuint make_shader( GLenum type, const std::string& source);
         Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name, const char* texture_file_path);
+        RenderLayer* get_layer(const std::string& layer_name);
         //Matrix4x4<float> view_matrix;
         //Matrix4x4<float> projection;
 

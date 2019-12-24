@@ -1,10 +1,13 @@
 #include "GuiLayer.hpp"
-
+#include "Logger.hpp"
 namespace Pringine
 {
 
     GuiLayer::GuiLayer(SDL_Window* sdl_window, SDL_GLContext* gl_context):window(sdl_window),gl_context(gl_context)
     {
+        this->name = "GUI";
+        panning = nullptr;
+        tiling = nullptr;
 
     }
 
@@ -25,8 +28,12 @@ namespace Pringine
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         ImGui_ImplOpenGL3_Init("#version 410");
+        
+        //inspector initialization
+        inspector_active = true;
         //ImGui::StyleColorsClassic();
     }
+
 
     void GuiLayer::update()
     {
@@ -41,7 +48,29 @@ namespace Pringine
         ImGui_ImplSDL2_NewFrame(window);
         ImGui::NewFrame();
         static bool show = true;
-        ImGui::ShowDemoWindow(&show);
+        //ImGui::ShowDemoWindow(&show);
+
+        if(inspector_active)
+        {
+            ImGui::Begin("Inspector", &inspector_active, ImGuiWindowFlags_MenuBar);
+            
+            ImGui::Text("Panning:");
+            if(panning!=nullptr)
+            {
+                ImGui::DragFloat("Pan X", &(panning->x), 0.01f);
+                ImGui::DragFloat("Pan Y", &(panning->y),0.01f);
+            }
+            ImGui::Text("Tiling:");
+            if(tiling!=nullptr)
+            {
+                ImGui::DragFloat("Tile X", &(tiling->x),0.01f);
+                ImGui::DragFloat("Tile Y", &(tiling->y),0.01f);
+            }
+            ImGui::End();
+        }
+
+        //ImGui::ShowDemoWindow();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData( ImGui::GetDrawData());
     }

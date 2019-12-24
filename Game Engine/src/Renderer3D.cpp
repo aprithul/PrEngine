@@ -441,6 +441,8 @@ namespace Pringine {
             graphics->elements.back().material.load_uniform_location("u_MVP");
             graphics->elements.back().material.load_uniform_location("u_Normal_M");
             graphics->elements.back().material.load_uniform_location("u_Dir_Light");
+            graphics->elements.back().material.load_uniform_location("u_Tiling");
+            graphics->elements.back().material.load_uniform_location("u_Panning");
             graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
             graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();
@@ -462,18 +464,33 @@ namespace Pringine {
             graphics->elements[i].vbo.Unbind();
             graphics->elements[i].vao.Unbind();
         }
-        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+        /*for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
         {
                 if((*it)->name == "Geometry"){
                     ((GeometryLayer*)(*it))->graphics3d_list.push_back(graphics);
                     std::cout<<"added graphics"<<std::endl;
                 }
                 std::cout<<"name : "<<(*it)->name<<std::endl;
-        }
+        }*/
+
+        GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
+        if(geom_layer != nullptr)
+            geom_layer->graphics3d_list.push_back(graphics);
 
         std::cout<<"returning"<<std::endl;
         return graphics;
 
+    }
+
+    RenderLayer* Renderer3D::get_layer(const std::string& layer_name)
+    {
+        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
+        {
+                if((*it)->name == layer_name){
+                    return (*it);
+                }
+        }
+        return nullptr;
     }
 
 /*

@@ -163,7 +163,13 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         floor->transform.set_scale(Vector3<float>(8.f,1.f,8.f));
         floor->transform.set_position(Vector3<float>(0.f, 0.f,0.f));
         entity_management_system->assign_id_and_store_entity(*floor);
-        
+        ((GuiLayer*)renderer3d->get_layer("GUI"))->panning =
+                &(graphics_plane->elements.begin()->material.panning);
+        ((GuiLayer*)renderer3d->get_layer("GUI"))->tiling =
+                &(graphics_plane->elements.begin()->material.tiling);
+
+        LOG(LOGTYPE_WARNING, "Pan: ",std::to_string(graphics_plane->elements.begin()->material.panning.x));
+
         DirectionalLight* light = new DirectionalLight();
         entity_management_system->assign_id_and_store_entity(*light);
 
