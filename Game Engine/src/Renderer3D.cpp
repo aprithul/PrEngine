@@ -115,7 +115,7 @@ namespace Pringine {
     {
         SDL_GL_SetSwapInterval(value);
     }
-
+    GLuint fbo;
     void Renderer3D::start()
     {
         //projection = Matrix4x4<float>::ortho(-1.f, 1.f, -0.75f, 0.75f,-1.f,1.f);
@@ -129,6 +129,23 @@ namespace Pringine {
         for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
             (*it)->start();
 
+        GLuint col_buf;
+        glGenRenderbuffers(1, &col_buf);
+        glBindRenderbuffer(GL_RENDERBUFFER, col_buf);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, width, height);
+        
+        GLuint dep_buf;
+        glGenRenderbuffers(1, &dep_buf);
+        glBindRenderbuffer(GL_RENDERBUFFER, dep_buf);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        
+        GL_CALL(glGenFramebuffers(1, &fbo))
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, col_buf);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dep_buf);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+
     }
 
     bool my_tool_active = true;
@@ -136,8 +153,9 @@ namespace Pringine {
     void Renderer3D::update()
     {
         Clear(1,1,1,1);
-        for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
-            (*it)->update();
+
+        for(std::vector<RenderLayer*>::iterator layer=render_layers.begin(); layer!=render_layers.end(); layer++)
+            (*layer)->update();
         SwapBuffers();
     }
 
