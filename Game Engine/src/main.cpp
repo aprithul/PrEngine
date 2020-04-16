@@ -145,19 +145,31 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
 
         Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("TreasureChest").c_str(), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")).c_str(), 
                 get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")).c_str());
-        //Graphics3D* graphics = renderer3d->generate_graphics3d(get_resource_path("").c_str(), get_resource_path(std::string("cube.obj")).c_str(), 
-        //                        get_resource_path(std::string("default.png")).c_str());
+        //std::cout<<"num of tri: "<<graphics->elements[0].material.uniform_locations.count("u_sampler2d")<<std::endl;
+
+/*for (auto const& pair: graphics->elements[0].material.uniform_locations) {
+        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
+    }*/
+
+
+       /* std::cout<<"print loaded"<<std::endl;   
+            std::cout<< graphics->elements.back().material.uniform_locations["u_sampler2d"]<<std::endl;
+            std::cout<< graphics->elements.back().material.uniform_locations["u_MVP"]<<std::endl;
+            std::cout<< graphics->elements.back().material.uniform_locations["u_Normal_M"]<<std::endl;
+            std::cout<< graphics->elements.back().material.uniform_locations["u_Dir_Light"]<<std::endl;
+            std::cout<< graphics->elements.back().material.uniform_locations["u_Tiling"]<<std::endl;
+            std::cout<< graphics->elements.back().material.uniform_locations["u_Panning"]<<std::endl;
+*/
+
         if(graphics != nullptr)
         {
                 Cube* chest = new Cube(graphics);
                 chest->transform.set_position(Vector3<float>(0.f,0.5f,-1.8f));
                 chest->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
                 entity_management_system->assign_id_and_store_entity(*chest);
-/*              Cube* cube_2 = new Cube(graphics);
-                cube_2->transform.set_position(Vector3<float>(1.0f,0.0f,-1.8f));
-                cube_2->transform.set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-                entity_management_system->assign_id_and_store_entity(*cube_2);*/
+
         }
+        
         Graphics3D* graphics_plane = renderer3d->generate_graphics3d(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
                 get_resource_path(std::string("stonetile.png")).c_str());
         std::cout<<"grpahics made"<<std::endl;

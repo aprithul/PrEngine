@@ -17,6 +17,7 @@ namespace Pringine
     {
         Camera3D* camera = (Camera3D*)entity_management_system->get_entity(camera_handle);
         DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity(ENTITY_TYPE_LIGHT);
+
         for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
         {
             Graphics3D* grp = (*it);
@@ -28,9 +29,11 @@ namespace Pringine
                 grp->elements[i].vao.Bind();
                 grp->elements[i].ibo.Bind();
                 
-                if(grp->elements[i].material.uniform_locations["u_sampler2d"] != -1)
-                GL_CALL(
-                    glUniform1i(grp->elements[i].material.uniform_locations["u_sampler2d"], 0))
+
+                //std::cout<<"before: "<<grp->elements[i].material.uniform_locations["u_MVP"]  <<std::endl;
+                //if(grp->elements[i].material.uniform_locations["u_sampler2d"] != -1)
+                //GL_CALL(
+                //    glUniform1i(grp->elements[i].material.uniform_locations["u_sampler2d"], 0))
                 if(grp->elements[i].material.uniform_locations["u_Dir_Light"] != -1)
                 GL_CALL(
                     glUniform3f(grp->elements[i].material.uniform_locations["u_Dir_Light"], light->direction.x, light->direction.y, light->direction.z))

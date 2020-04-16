@@ -49,13 +49,13 @@ namespace Pringine
 
     }
 
-    void Material::load_uniform_location(const char* uniform)
+    void Material::load_uniform_location(std::string uniform)
     {
         GLint loc = -1;
         GL_CALL(
-            loc = glGetUniformLocation(shader_program, uniform))
+            loc = glGetUniformLocation(shader_program, uniform.c_str()))
         
-        std::cout<<"Location: "<<loc<<std::endl;
+        std::cout<<"Location: "<<uniform<<" , "<<loc<<std::endl;
         //if(loc != -1)
         uniform_locations[uniform] = loc;
     }

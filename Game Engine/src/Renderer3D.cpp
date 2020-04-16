@@ -129,6 +129,7 @@ namespace Pringine {
         for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
             (*it)->start();
 
+/*
         GLuint col_buf;
         glGenRenderbuffers(1, &col_buf);
         glBindRenderbuffer(GL_RENDERBUFFER, col_buf);
@@ -144,7 +145,7 @@ namespace Pringine {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, col_buf);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, dep_buf);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
+*/
 
     }
 
@@ -461,6 +462,11 @@ namespace Pringine {
             graphics->elements.back().material.load_uniform_location("u_Dir_Light");
             graphics->elements.back().material.load_uniform_location("u_Tiling");
             graphics->elements.back().material.load_uniform_location("u_Panning");
+
+
+
+
+
             graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
             graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();
@@ -492,6 +498,7 @@ namespace Pringine {
         }*/
 
         GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
+
         if(geom_layer != nullptr)
             geom_layer->graphics3d_list.push_back(graphics);
 
