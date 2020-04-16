@@ -15,10 +15,11 @@ namespace Pringine
     SDL_Event event;
     int text_box_width_in_chars = 0;
 
+	
     void show_file_structure(std::string root, std::string prefix)
     {
         
-        #ifdef _WIN32
+        #ifdef _WIN64
             const std::string PATH_SEP = "\\";
         #else
             const std::string PATH_SEP = "/";
@@ -32,8 +33,8 @@ namespace Pringine
             while ((ent = readdir (dir)) != NULL) 
             {
                 std::cout<<prefix<<"|"<<ent->d_name<<std::endl;
-                if(ent->d_type == DT_DIR && ent->d_name[0] != '.' )
-                    show_file_structure( root.append(ent->d_name).append(PATH_SEP), prefix.append(" "));
+                //if(ent->d_type == DT_DIR && ent->d_name[0] != '.' )
+                //    show_file_structure( root.append(ent->d_name).append(PATH_SEP), prefix.append(" "));
             }
             closedir (dir);
         } 
@@ -44,6 +45,7 @@ namespace Pringine
             return;
         }
     }
+	
 
     bool initialize_gui(Mouse* _mouse, Renderer2D* _renderer)
     {

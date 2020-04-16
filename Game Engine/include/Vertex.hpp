@@ -12,7 +12,12 @@
 #include <stdio.h>  
 #include <memory>
 #include "Vector3.hpp"
-#include <OpenGL/gl3.h>
+
+#ifdef __APPLE__
+	#include <OpenGL/gl3.h>
+#elif _WIN64
+	#include <GL/glew.h>
+#endif
 
 namespace Pringine {
 

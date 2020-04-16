@@ -9,7 +9,11 @@
 #ifndef Shader_h
 #define Shader_h
 #include <string>
+#ifdef __APPLE__
 #include <OpenGL/gl3.h>
+#elif _WIN64
+#include <GL/glew.h>
+#endif
 #include <fstream>
 namespace Pringine {
 

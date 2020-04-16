@@ -26,8 +26,8 @@ namespace Pringine
 
 
             float fov;
-            float near;
-            float far; 
+            float near_;
+            float far_; 
             float width;
             float height;
 

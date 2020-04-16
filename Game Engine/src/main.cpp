@@ -4,11 +4,12 @@
 //  Created by Aniruddha Prithul on 7/22/17.
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 
+
 #include "Module.hpp"
 #include <stdlib.h>
 #include <iostream>
 //#include <emscripten.h>
-#ifndef EMSCRIPTEN
+#if defined(EMSCRIPTEN) && defined(_WIN64)
 #include "NetworkManager.hpp"
 #endif
 #include "Utils.hpp"
@@ -36,7 +37,8 @@ using namespace Pringine;
 void main_loop(void* game_engine);
 
 bool is_running = true;
-int main(int argc, const char * argv[]) 
+
+int main(int argc, char * argv[]) 
 {        
 
         // create a new game engine instance
@@ -62,7 +64,7 @@ int main(int argc, const char * argv[])
         //frame_rate_regulator->set_uncapped();
         //frame_rate_regulator->set_frame_rate(15);
 
-        #ifndef EMSCRIPTEN
+        #if defined(EMSCRIPTEN) && defined(_WIN64)
         Pringine::NetworkManager* network_manager = (Pringine::NetworkManager*) game_engine->
                                 add_module(new Pringine::NetworkManager("Network manager", 5));
         #endif

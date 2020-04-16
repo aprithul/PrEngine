@@ -2,15 +2,15 @@
 
 namespace Pringine
 {
-    Camera3D::Camera3D(float width, float height, float near, float far, float fov):Entity(ENTITY_TYPE_CAMERA)
+    Camera3D::Camera3D(float width, float height, float near_, float far_, float fov):Entity(ENTITY_TYPE_CAMERA)
     {
         //fov = 45.f;
-        //near = 0.1f;
-        //far = -1.f;    
+        //near_ = 0.1f;
+        //far_ = -1.f;    
         this->width = width;
         this->height = height;
-        this->near = near;
-        this->far = far;
+        this->near_ = near_;
+        this->far_ = far_;
         this->fov = fov;
     }
 
@@ -52,7 +52,7 @@ namespace Pringine
         view_matrix.set(2,3, -transform.get_position().z);
         Matrix4x4<float> reverse_rot = transform.get_rotation_transformation().transpose();
         view_matrix = reverse_rot * view_matrix;
-        projection_matrix = Matrix4x4<float>::perspective(near, far,width, height, fov);
+        projection_matrix = Matrix4x4<float>::perspective(near_, far_,width, height, fov);
 
 /*
         Vector3<float> rot = transform.get_rotation();

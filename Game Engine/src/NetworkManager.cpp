@@ -1,3 +1,4 @@
+#if PLATFORM != PLATFORM_WINDOWS
 #include "NetworkManager.hpp"
 
 namespace Pringine
@@ -91,6 +92,7 @@ namespace Pringine
         return true;
     }
 
+
     bool Socket::Send(const Address& destination, const Packet* packet, int size)
     {
         int sent_bytes = sendto( handle, packet, size, 0, 
@@ -106,6 +108,13 @@ namespace Pringine
             LOG( LOGTYPE_GENERAL, "packet sent");
         }
         
+    }
+
+
+
+    int Socket::Receive(Address &sender, Packet* packet, int size)
+    {
+        return -1;
     }
 
     int Socket::Receive(Address & sender, Packet * packet, int size)
@@ -135,6 +144,7 @@ namespace Pringine
         
         return bytes;
     }
+
 
 
     //////////////??ADDRESS/////////
@@ -216,3 +226,4 @@ namespace Pringine
 
 
 }
+#endif

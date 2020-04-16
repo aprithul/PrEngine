@@ -166,7 +166,7 @@ namespace Pringine {
             return identity;
         }
 
-        static Matrix4x4 ortho(float left, float right, float bottom, float top, float near, float far)
+        static Matrix4x4 ortho(float left, float right, float bottom, float top, float near_, float far_)
         {
             Matrix4x4<float> ortho;
             ortho.set(0,0, 2.f/(right-left));
@@ -175,8 +175,9 @@ namespace Pringine {
             ortho.set(1,1, 2.f/(top-bottom));
             ortho.set(1,3,-(top+bottom)/(top-bottom));
 
-            ortho.set(2,2, -2.f/(far-near));
-            ortho.set(2,3, -(far+near)/(far-near));
+            ortho.set(2,2, -2.f/(far_-near_));
+            ortho.set(2,3, -(far_+near_)/(far_-near_));
+            ortho.set(2,3, -(far_+near_)/(far_-near_));
 
             ortho.set(3,3,1);
             
@@ -187,8 +188,8 @@ namespace Pringine {
         {
             float aspect_ratio = width / height;
             Matrix4x4<float> perspective;
-            perspective.set(0,0, 1/(aspect_ratio*std::tanf(fov*DEG_TO_RAD/2.f)));
-            perspective.set(1,1, 1/(std::tanf(fov*DEG_TO_RAD/2.f)));
+            perspective.set(0,0, 1/(aspect_ratio*std::tan(fov*DEG_TO_RAD/2.f)));
+            perspective.set(1,1, 1/(std::tan(fov*DEG_TO_RAD/2.f)));
             perspective.set(2,2, (-f-n)/(n-f));
             perspective.set(2,3, ((2*f*n)/(n-f)));
             perspective.set(3, 2, 1);
