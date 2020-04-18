@@ -1,5 +1,5 @@
 #include "Transform3D.hpp"
-namespace  Pringine
+namespace  PrEngine
 {
     Transform3D::Transform3D():Component(COMP_TRANSFORM_3D)
     {
@@ -17,6 +17,8 @@ namespace  Pringine
         right   = Vector3<float>(1.f,0,0.f);
         up      = Vector3<float>(0,1.f,0.f);
         dirty = true;
+
+        LOG(LOGTYPE_WARNING, "CALLED");
     }
 
     Transform3D::~Transform3D()

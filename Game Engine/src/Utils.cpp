@@ -1,6 +1,6 @@
 #include "Utils.hpp"
 
-namespace Pringine{
+namespace PrEngine{
     // writes text to file in append mode
     // doesn't automaticlaly close file
     // file pointer needs to be provided so file can be closed when writing is finished

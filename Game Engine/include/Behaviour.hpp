@@ -3,7 +3,7 @@
 
 #include "Module.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     class Behaviour
     {

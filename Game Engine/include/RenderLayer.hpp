@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Pringine
+namespace PrEngine
 {
     class RenderLayer
     {

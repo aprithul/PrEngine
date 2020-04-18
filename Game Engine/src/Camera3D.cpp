@@ -1,8 +1,8 @@
 #include "Camera3D.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
-    Camera3D::Camera3D(float width, float height, float near_, float far_, float fov):Entity(ENTITY_TYPE_CAMERA)
+    Camera::Camera(float width, float height, float near_, float far_, float fov, Transform3D& _transform):transform(_transform),Component(COMP_CAMERA)
     {
         //fov = 45.f;
         //near_ = 0.1f;
@@ -14,17 +14,22 @@ namespace Pringine
         this->fov = fov;
     }
 
-    Camera3D::~Camera3D()
+    Camera::~Camera()
+    {
+
+    }
+    void Camera::awake()
     {
 
     }
 
-    void Camera3D::start()
+    void Camera::start()
     {
+        LOG(LOGTYPE_GENERAL, "Camera started");
 
     }
 
-    void Camera3D::update()
+    void Camera::update()
     {
 
         Vector3<float> pos = transform.get_position();
@@ -52,7 +57,13 @@ namespace Pringine
         view_matrix.set(2,3, -transform.get_position().z);
         Matrix4x4<float> reverse_rot = transform.get_rotation_transformation().transpose();
         view_matrix = reverse_rot * view_matrix;
-        projection_matrix = Matrix4x4<float>::perspective(near_, far_,width, height, fov);
+        
+        if(projection_type==PERSPECTIVE)
+            projection_matrix = Matrix4x4<float>::perspective(near_, far_,width, height, fov);
+        else
+            projection_matrix = Matrix4x4<float>::ortho(-8, 8, -4.5f, 4.5f, -10, 10);
+            //projection_matrix = Matrix4x4<float>::ortho(0, width,0, height, near_, far_);
+        
 
 /*
         Vector3<float> rot = transform.get_rotation();
@@ -85,7 +96,7 @@ namespace Pringine
 
     }
 
-    void Camera3D::end()
+    void Camera::end()
     {
 
     }

@@ -9,7 +9,7 @@
 #include "Mesh.hpp"
 #include <iostream>
 
-namespace Pringine {
+namespace PrEngine {
     
     Mesh::Mesh()
     {

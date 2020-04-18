@@ -6,7 +6,7 @@
 #include "../Vendor/include/stb_image.h"
 #include "Logger.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     struct Texture
     {

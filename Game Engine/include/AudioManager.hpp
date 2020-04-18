@@ -6,7 +6,7 @@
 #include <string>
 #include "Module.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     class AudioManager: public Module
     {

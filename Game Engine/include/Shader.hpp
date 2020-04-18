@@ -15,7 +15,7 @@
 #include <GL/glew.h>
 #endif
 #include <fstream>
-namespace Pringine {
+namespace PrEngine {
 
     class Shader
     {

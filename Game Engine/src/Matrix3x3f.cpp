@@ -8,7 +8,7 @@
 
 #include "Matrix3x3f.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     Matrix3x3f::Matrix3x3f()
     {   
         

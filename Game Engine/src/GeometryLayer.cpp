@@ -1,6 +1,6 @@
 #include "GeometryLayer.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
 
     GeometryLayer::GeometryLayer(long camera_handle)
@@ -15,12 +15,15 @@ namespace Pringine
 
     void GeometryLayer::update()
     {
-        Camera3D* camera = (Camera3D*)entity_management_system->get_entity(camera_handle);
-        DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity(ENTITY_TYPE_LIGHT);
+                    //LOG(LOGTYPE_ERROR, "Update layer");
 
-        for(std::vector<Graphics3D*>::iterator it = graphics3d_list.begin(); it != graphics3d_list.end(); it++ )
+        Entity* camera = entity_management_system->get_entity(camera_handle);
+
+        DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity_with_component(COMP_LIGHT);
+
+        for(std::vector<Graphics*>::iterator it = graphics_list.begin(); it != graphics_list.end(); it++ )
         {
-            Graphics3D* grp = (*it);
+            Graphics* grp = (*it);
             //Matrix4x4<float> mvp = (projection) * (*(grp->model)) ;
             
             for(int i=0; i < grp->elements.size(); i++)
@@ -41,7 +44,10 @@ namespace Pringine
                 // models and normals should be same size
                 for(int j=0; j<grp->models.size() ; j++) 
                 {
-                    Matrix4x4<float> mvp = (camera->projection_matrix) * camera->view_matrix * (*(grp->models[j])) ;
+
+                    Camera* cam_component = (Camera*)(camera->components[COMP_CAMERA]);
+                    Matrix4x4<float> mvp = (cam_component->projection_matrix) * cam_component->view_matrix * (*(grp->models[j])) ;
+
                     if(grp->elements[i].material.uniform_locations["u_MVP"] != -1)
                     GL_CALL(
                         glUniformMatrix4fv(grp->elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))

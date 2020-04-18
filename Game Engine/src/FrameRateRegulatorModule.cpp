@@ -8,7 +8,7 @@
 
 #include "FrameRateRegulatorModule.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     FrameRateRegulator::FrameRateRegulator(std::string name, int priority):Module(name,priority)
     {
     }

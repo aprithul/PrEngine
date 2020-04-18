@@ -8,6 +8,6 @@
 
 #include "Vertex.hpp"
 
-namespace Pringine {
+namespace PrEngine {
 
 }

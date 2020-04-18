@@ -11,7 +11,7 @@
 
 #define MAX_ENTITY_COUNT 99999
 
-namespace Pringine
+namespace PrEngine
 {
     class EntityManagementSystem : public Module
     {
@@ -20,10 +20,9 @@ namespace Pringine
             ~EntityManagementSystem();
 
             Entity* get_entity(long id);
-            Entity* get_entity(EntityType type);
+            Entity* get_entity_with_component(ComponentType type);
             bool delete_entity(long id);
             Entity* assign_id_and_store_entity(Entity& entity);
-            Entity* create_entity(EntityType type);
 
             Entity* entities[MAX_ENTITY_COUNT];
             static int current_max_entity_pos;

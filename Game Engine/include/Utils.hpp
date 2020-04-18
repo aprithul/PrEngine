@@ -15,7 +15,7 @@
     const std::string PATH_SEP = "/";
 #endif
 
-namespace Pringine
+namespace PrEngine
 {
     extern char* read_file(const char* file_name);
     extern FILE* write_to_file(const char* text, const char* file_name, FILE *fp);

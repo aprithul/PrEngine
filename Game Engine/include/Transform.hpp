@@ -5,7 +5,7 @@
 #include "Component.hpp"
 #include <string>
 
-namespace Pringine{
+namespace PrEngine{
     
     class Transform : public Component
     {

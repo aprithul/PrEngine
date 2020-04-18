@@ -1,6 +1,6 @@
 #include "Material.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
 
     Material::Material()

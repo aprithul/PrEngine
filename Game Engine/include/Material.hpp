@@ -8,7 +8,7 @@
 #include <string>
 #include <GL/glew.h>
 
-namespace Pringine
+namespace PrEngine
 {
 
     struct Material
@@ -28,6 +28,6 @@ namespace Pringine
         Vector2<float> panning;
     };
 
-} // namespace Pringine
+} // namespace PrEngine
 
 #endif

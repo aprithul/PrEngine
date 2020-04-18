@@ -10,7 +10,7 @@
 #define Matrix3x3_hpp
 
 
-namespace Pringine {
+namespace PrEngine {
     class Matrix3x3f
     {
     public:

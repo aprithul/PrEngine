@@ -14,7 +14,7 @@
 #include "SDL2/SDL.h"
 
 
-namespace Pringine {
+namespace PrEngine {
     class FrameRateRegulator:public Module
     {
     public:

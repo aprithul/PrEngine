@@ -1,6 +1,6 @@
 #include "AudioManager.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     AudioManager::AudioManager(const std::string& name, int priority):Module(name, priority)
     {

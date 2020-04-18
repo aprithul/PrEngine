@@ -12,7 +12,7 @@
 #include "Module.hpp"
 #include "SDL2/SDL.h"
 
-namespace Pringine {
+namespace PrEngine {
     class Time: public Module
     {
     public:

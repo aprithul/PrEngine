@@ -16,7 +16,7 @@
 #include <string>
 #include "Utils.hpp"
 
-namespace Pringine{
+namespace PrEngine{
 
 
     typedef enum

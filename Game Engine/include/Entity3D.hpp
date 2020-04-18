@@ -5,15 +5,15 @@
 #include "Renderer3D.hpp"
 #include "Transform3D.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     class Entity3D : public Entity
     {
         public:
             Transform3D transform;
-            Graphics3D* graphics;
+            Graphics* graphics;
 
-            Entity3D(EntityType type, Graphics3D* graphics);
+            Entity3D(Graphics* graphics);
             ~Entity3D();
 
 

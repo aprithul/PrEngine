@@ -1,6 +1,6 @@
 #include "Texture.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
         
     std::unordered_map<std::string, Texture*> texture_library;

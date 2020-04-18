@@ -10,7 +10,7 @@
 
 #define PI 3.14159265
 
-namespace Pringine{
+namespace PrEngine{
     
     class Transform3D : public Component
     {

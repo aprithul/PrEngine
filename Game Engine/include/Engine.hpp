@@ -19,7 +19,7 @@
 #include <algorithm>
 
 
-namespace Pringine {
+namespace PrEngine {
     // pair typedef, used as component map key
     // string is the name of the component
     // int is the order of execution

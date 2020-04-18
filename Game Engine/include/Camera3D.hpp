@@ -8,22 +8,27 @@
 #include "Renderer3D.hpp"
 #include "Transform3D.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
+    enum ProjectionType
+    {
+        PERSPECTIVE = 0,
+        ORTHOGRAPHIC = 1
+    };
 
-    class Camera3D: public Entity
+    class Camera: public Component
     {
         public:
-            Camera3D(float width, float height, float near, float far, float fov);
-            ~Camera3D();
-            Transform3D transform;
+            Camera(float width, float height, float near, float far, float fov, Transform3D& _transform);
+            ~Camera();
+            Transform3D& transform;
 
             void zoom_in(float zoom_speed);
             void zoom_out(float zoom_speed);
+            void awake() override;
             void start() override;
             void update() override;
             void end() override;     
-
 
             float fov;
             float near_;
@@ -33,6 +38,7 @@ namespace Pringine
 
             Matrix4x4<float> view_matrix;
             Matrix4x4<float> projection_matrix;
+            ProjectionType projection_type;
     };
 }
 #endif

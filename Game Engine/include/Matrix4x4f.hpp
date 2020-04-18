@@ -14,7 +14,7 @@
 #include "Vector3.hpp"
 #define DEG_TO_RAD 0.0174533f
 
-namespace Pringine {
+namespace PrEngine {
     
     template<typename T>
     class Matrix4x4
@@ -177,7 +177,7 @@ namespace Pringine {
 
             ortho.set(2,2, -2.f/(far_-near_));
             ortho.set(2,3, -(far_+near_)/(far_-near_));
-            ortho.set(2,3, -(far_+near_)/(far_-near_));
+            //ortho.set(2,3, -(far_+near_)/(far_-near_));
 
             ortho.set(3,3,1);
             

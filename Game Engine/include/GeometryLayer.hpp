@@ -3,14 +3,14 @@
 
 #include "GlAssert.hpp"
 #include "RenderLayer.hpp"
-#include "Graphics3D.hpp"
+#include "Graphics.hpp"
 #include "EntityManagementSystemModule.hpp"
 #include "DirectionalLight.hpp"
 #include "Camera3D.hpp"
 #include "Matrix4x4f.hpp"
 #include <vector>
 
-namespace Pringine
+namespace PrEngine
 {
     class GeometryLayer : public RenderLayer
     {
@@ -22,7 +22,7 @@ namespace Pringine
             void update() override;
             void end() override;
 
-            std::vector<Graphics3D*> graphics3d_list;
+            std::vector<Graphics*> graphics_list;
             long camera_handle;
     };
 } // namespace Pringin

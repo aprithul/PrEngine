@@ -1,6 +1,6 @@
 #include "Logger.hpp"
 
-namespace Pringine{
+namespace PrEngine{
 
 
     const char* LogTypeStrings[] = {"ERROR", "WARNING", "LOG"};
@@ -18,7 +18,7 @@ namespace Pringine{
 
     void set_log_file_path(const char* log_file_path)
     {
-        Pringine::log_file_path = log_file_path;
+        PrEngine::log_file_path = log_file_path;
     }
 
   

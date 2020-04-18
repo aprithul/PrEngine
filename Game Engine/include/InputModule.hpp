@@ -23,7 +23,7 @@
 #define MAX_GAMECONTROLLER_COUNT 16
 #define MAX_MOUSE_BUTTON_COUNT 10
 
-namespace Pringine {
+namespace PrEngine {
 
     extern std::string textinput;
     extern bool textinput_modified;

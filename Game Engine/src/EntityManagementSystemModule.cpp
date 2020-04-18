@@ -1,6 +1,6 @@
 #include "EntityManagementSystemModule.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     EntityManagementSystem* entity_management_system;    
     long EntityManagementSystem::next_entity_id = 0;
@@ -14,7 +14,7 @@ namespace Pringine
         for(int i=0;i<MAX_ENTITY_COUNT;i++)
             entities[i] = nullptr;
         started = false;
-        Pringine::entity_management_system = this;
+        PrEngine::entity_management_system = this;
     }
 
     EntityManagementSystem::~EntityManagementSystem()
@@ -29,11 +29,11 @@ namespace Pringine
         }
     }
 
-    Entity* EntityManagementSystem::get_entity(EntityType type)
+    Entity* EntityManagementSystem::get_entity_with_component(ComponentType type)
     {
         for(int i=0;i < next_entity_id; i++)
         {
-            if(entities[i]->type == type)
+            if(entities[i]->has_component[type])
                 return entities[i];
         }
         return nullptr;
@@ -93,11 +93,6 @@ namespace Pringine
             LOG(LOGTYPE_WARNING, std::string("No entity with id: ").append(std::to_string(id)).append(" exists"));
         }
         return false;
-    }
-
-    Entity* EntityManagementSystem:: create_entity(EntityType type)
-    {
-        
     }
 
 

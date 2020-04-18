@@ -8,7 +8,7 @@
 
 #include "FrameRateCounterModule.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     
     FrameRateCounter::FrameRateCounter(std::string name, int priority):Module(name,priority)
     {
@@ -18,9 +18,9 @@ namespace Pringine {
     FrameRateCounter::~FrameRateCounter()
     {
         #if !IS_SERVER
-            renderer2D->close_font(font);
-            if(text_texture != nullptr)
-                SDL_DestroyTexture(text_texture);
+            //renderer2D->close_font(font);
+            //if(text_texture != nullptr)
+            //    SDL_DestroyTexture(text_texture);
         #endif
     }
     
@@ -29,8 +29,8 @@ namespace Pringine {
         this->frame_count = 0;
         this->last_frame_count = 0;
         #if !IS_SERVER
-            font = renderer2D->open_font(get_resource_path("sample.ttf"), 16);
-            text_texture = nullptr;
+            //font = renderer2D->open_font(get_resource_path("sample.ttf"), 16);
+            //text_texture = nullptr;
         #endif
 
     }

@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "math.h"
 
-namespace Pringine {
+namespace PrEngine {
 
     template<typename T>
     class Vector3

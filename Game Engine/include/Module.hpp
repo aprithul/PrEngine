@@ -14,7 +14,7 @@
 
 #define IS_SERVER false
 
-namespace Pringine {
+namespace PrEngine {
     
     // every component class extends this
     class Module

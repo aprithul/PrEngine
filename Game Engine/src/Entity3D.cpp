@@ -1,8 +1,8 @@
 #include "Entity3D.hpp"
 
-namespace Pringine{
+namespace PrEngine{
 
-    Entity3D::Entity3D(EntityType type, Graphics3D* graphics):graphics(graphics),Entity(type)
+    Entity3D::Entity3D(Graphics* graphics):graphics(graphics)
     {
         graphics->models.push_back( &(transform.get_transformation()));
         graphics->normals.push_back(&transform.get_rotation_transformation());

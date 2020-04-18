@@ -8,7 +8,7 @@
 #include<iostream>
 #include "Shader.hpp"
 
-namespace Pringine {
+namespace PrEngine {
 
     Shader::Shader(GLenum type, const std::string& dir)
     {

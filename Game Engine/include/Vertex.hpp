@@ -19,7 +19,7 @@
 	#include <GL/glew.h>
 #endif
 
-namespace Pringine {
+namespace PrEngine {
 
     
     struct Vertex

@@ -14,16 +14,16 @@
 #include "Module.hpp"
 #include "TimeModule.hpp"
 #include "Logger.hpp"
-#include "RendererModule.hpp"
-#include "GUI.hpp"
+//#include "RendererModule.hpp"
+//#include "GUI.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     class FrameRateCounter:public Module
     {
     public:
         FrameRateCounter(std::string name, int priority);
         ~FrameRateCounter();
-        Renderer2D* renderer2D;
+        //Renderer2D* renderer2D;
 
     private:
         void start() override;
@@ -32,8 +32,8 @@ namespace Pringine {
         double one_second;
         int frame_count;
         int last_frame_count;
-        TTF_Font* font;
-        SDL_Texture* text_texture;
+        //TTF_Font* font;
+        //SDL_Texture* text_texture;
     };
 }
 

@@ -7,7 +7,7 @@
 #include "../Vendor/imgui-master/imgui_impl_opengl3.h"
 #include "../Vendor/imgui-master/imgui_impl_sdl.h"
 #include "Vector2.hpp"
-namespace Pringine
+namespace PrEngine
 {
     class GuiLayer : public RenderLayer
     {

@@ -1,15 +1,21 @@
 #include "DirectionalLight.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
-    DirectionalLight::DirectionalLight():Entity(ENTITY_TYPE_LIGHT)
+    DirectionalLight::DirectionalLight():Component(COMP_LIGHT)
     {
         direction = Vector3<float>(.2,.2,-0.1).normalize();
+        
     }
 
     DirectionalLight::~DirectionalLight()
     {
 
+    }
+
+    void DirectionalLight::awake()
+    {
+        
     }
 
     void DirectionalLight::start()

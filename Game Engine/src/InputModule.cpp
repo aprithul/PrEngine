@@ -7,7 +7,7 @@
 
 #include "InputModule.hpp"
 
-namespace Pringine {
+namespace PrEngine {
 
     InputManager* input_manager;
     std::string textinput = "";
@@ -27,7 +27,7 @@ namespace Pringine {
         else
             LOG(LOGTYPE_GENERAL, "Text input is not active");
 
-        Pringine::input_manager = this;
+        PrEngine::input_manager = this;
     }
     
     InputManager::~InputManager()

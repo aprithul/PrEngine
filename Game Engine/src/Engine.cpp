@@ -9,7 +9,7 @@
 #include "Engine.hpp"
 
 
-namespace Pringine {
+namespace PrEngine {
     
     Engine* engine;
 

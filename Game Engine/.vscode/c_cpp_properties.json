@@ -4,18 +4,35 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/Users/prithul/emsdk/upstream/emscripten/system/include/",
-                "/Users/prithul/Downloads/glm/glm",
-                "${workspaceFolder}/include"
+                "${workspaceFolder}/include",
+                "C:\\msys64\\mingw64\\include"
             ],
             "defines": [],
             "macFrameworkPath": [
                 "/Library/Developer/CommandLineTools/SDKs/MacOSX10.14.sdk/System/Library/Frameworks"
             ],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
             "cStandard": "c11",
-            "cppStandard": "c++17",
-            "intelliSenseMode": "clang-x64"
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64"
+        },
+        {
+            "name": "Windows",
+            "includePath": [
+                "${workspaceFolder}\\include",
+                "C:\\msys64\\mingw64\\include",
+                "C:\\msys64\\mingw64\\include\\SDL2"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "C:/msys64/mingw64/bin/g++.exe",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "intelliSenseMode": "gcc-x64"
         }
     ],
     "version": 4

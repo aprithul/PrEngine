@@ -8,7 +8,7 @@
 
 #include "Module.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     
     Module::Module(std::string name, int priority)

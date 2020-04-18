@@ -18,7 +18,7 @@
 #endif
 
 
-namespace Pringine {
+namespace PrEngine {
     class Mesh
     {
     public:

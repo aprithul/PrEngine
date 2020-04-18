@@ -36,7 +36,7 @@
     #define HEADER_SIZE 12
     #define PAYLOAD_SIZE 512
 
-    namespace Pringine
+    namespace PrEngine
     {
 
         struct Packet   //524 bytes

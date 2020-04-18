@@ -1,6 +1,6 @@
 #include "GuiLayer.hpp"
 #include "Logger.hpp"
-namespace Pringine
+namespace PrEngine
 {
 
     GuiLayer::GuiLayer(SDL_Window* sdl_window, SDL_GLContext* gl_context):window(sdl_window),gl_context(gl_context)

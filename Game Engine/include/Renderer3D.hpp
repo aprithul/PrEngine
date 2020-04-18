@@ -13,14 +13,14 @@
 #include "GlAssert.hpp"
 
 #include "Material.hpp"
-#include "Graphics3D.hpp"
+#include "Graphics.hpp"
 #include "Module.hpp"
 #include "RenderLayer.hpp"
 #include "GeometryLayer.hpp"
 #include "GuiLayer.hpp"
 #include <vector>
 
-namespace Pringine {
+namespace PrEngine {
     
     class Renderer3D : public Module
     {
@@ -45,7 +45,8 @@ namespace Pringine {
         void set_vsync(GLboolean value);
         bool make_shader_program(const std::string& path, GLuint& shader_program);
         GLuint make_shader( GLenum type, const std::string& source);
-        Graphics3D* generate_graphics3d(const char* base_dir, const char* file_name, const char* texture_file_path);
+        Graphics* generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path);
+        Graphics* generate_graphics_quad(const std::string& texture_file_path);
         RenderLayer* get_layer(const std::string& layer_name);
         //Matrix4x4<float> view_matrix;
         //Matrix4x4<float> projection;

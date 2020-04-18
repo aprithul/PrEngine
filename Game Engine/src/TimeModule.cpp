@@ -9,7 +9,7 @@
 
 #include "TimeModule.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     
     double Time::Frame_time;
     double Time::current_frame_start_time;

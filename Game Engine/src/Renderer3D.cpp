@@ -7,7 +7,7 @@
 //
 #include "Renderer3D.hpp"
 
-namespace Pringine {
+namespace PrEngine {
     
     Renderer3D::Renderer3D(int width, int height, std::string title):Module("Opengl Renderer", 20)
     {
@@ -19,11 +19,11 @@ namespace Pringine {
         init();
         
         // create window
-        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+        window = SDL_CreateWindow(this->title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, this->width, this->height, SDL_WINDOW_OPENGL);
         // create the openGL context from the window  that was created
         glContext = SDL_GL_CreateContext(window);
 
-        GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order
+        GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order 
         GL_CALL(glDisable(GL_CULL_FACE))
         GL_CALL(glEnable(GL_BLEND))
         GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
@@ -51,7 +51,7 @@ namespace Pringine {
 
 
         /// create render layers
-        Camera3D* camera = (Camera3D*)entity_management_system->get_entity(ENTITY_TYPE_CAMERA);
+        Entity* camera = entity_management_system->get_entity_with_component(COMP_CAMERA);
         long camera_handle = -1;
         if(camera == nullptr){
             LOG(LOGTYPE_ERROR, "No camera found");
@@ -191,7 +191,138 @@ namespace Pringine {
         }
     }
 
-    Graphics3D* Renderer3D::generate_graphics3d(const char* base_dir, const char* file_name, const char* texture_file_path)
+
+    Graphics* Renderer3D::generate_graphics_quad(const std::string& texture_file_path)
+    {
+        std::vector<GLuint> indices;
+        std::vector<Vertex> buffer;
+
+        #pragma region vertex declaration
+        Vertex v1;
+        v1.p_x = 0.5f;
+        v1.p_y = 0.5f;
+        v1.p_z = 0.0f;
+        v1.c_r = 1.0f;
+        v1.c_g = 1.0f;
+        v1.c_b = 1.0f;
+        v1.c_a = 1.0f;
+        v1.n_x = 0.0f;
+        v1.n_y = 0.0f;
+        v1.n_z = -1.0f;
+        v1.u = 1.0f;
+        v1.v = 1.0f;
+
+        Vertex v2;
+        v2.p_x = -0.5f;
+        v2.p_y = 0.5f;
+        v2.p_z = 0.f;
+        v2.c_r = 1.0f;
+        v2.c_g = 1.0f;
+        v2.c_b = 1.0f;
+        v2.c_a = 1.0f;
+        v2.n_x = 0.0f;
+        v2.n_y = 0.0f;
+        v2.n_z = -1.0f;
+        v2.u = 0.f;
+        v2.v = 1.0f;
+
+        Vertex v3;
+        v3.p_x = -0.5f;
+        v3.p_y = -0.5f;
+        v3.p_z = 0.f;
+        v3.c_r = 1.0f;
+        v3.c_g = 1.0f;
+        v3.c_b = 1.0f;
+        v3.c_a = 1.0f;
+        v3.n_x = 0.0f;
+        v3.n_y = 0.0f;
+        v3.n_z = -1.0f;
+        v3.u = 0.0f;
+        v3.v = 0.0f;
+
+        Vertex v4;
+        v4.p_x = 0.5f;
+        v4.p_y = -0.5f;
+        v4.p_z = 0.f;
+        v4.c_r = 1.0f;
+        v4.c_g = 1.0f;
+        v4.c_b = 1.0f;
+        v4.c_a = 1.0f;
+        v4.n_x = 0.0f;
+        v4.n_y = 0.0f;
+        v4.n_z = -1.0f;
+        v4.u = 1.0f;
+        v4.v = 0.0f;
+        #pragma endregion
+
+        buffer.push_back(v1);
+        buffer.push_back(v2);
+        buffer.push_back(v3);
+        buffer.push_back(v4);
+
+        indices.push_back(0);
+        indices.push_back(1);
+        indices.push_back(2);
+        indices.push_back(2);
+        indices.push_back(3);
+        indices.push_back(0);
+
+
+
+        Graphics* graphics = new Graphics();
+        VertexLayout layout;
+        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_2(2,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_3(3,2,GL_FLOAT,GL_FALSE);
+        layout.add_attribute(attribute_0);
+        layout.add_attribute(attribute_1);
+        layout.add_attribute(attribute_2);
+        layout.add_attribute(attribute_3);
+
+        GraphicsElement g_element;
+        graphics->elements.push_back(g_element);
+        graphics->elements.back().material.Generate("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
+        graphics->elements.back().material.load_uniform_location("u_sampler2d");
+        graphics->elements.back().material.load_uniform_location("u_MVP");
+        graphics->elements.back().material.load_uniform_location("u_Normal_M");
+        graphics->elements.back().material.load_uniform_location("u_Dir_Light");
+        graphics->elements.back().material.load_uniform_location("u_Tiling");
+        graphics->elements.back().material.load_uniform_location("u_Panning");
+
+        graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
+        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
+        graphics->elements.back().vao.Generate();
+        graphics->elements.back().layout = layout;
+        graphics->elements.back().num_of_triangles = (buffer.size()/3);
+
+        for(int i=0; i<graphics->elements.size(); i++)
+        {
+            graphics->elements[i].vao.Bind();
+            graphics->elements[i].vbo.Bind();
+            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
+            {
+                GL_CALL(
+                    glEnableVertexAttribArray( attr->index))
+                GL_CALL(
+                    glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+            }
+            graphics->elements[i].vbo.Unbind();
+            graphics->elements[i].vao.Unbind();
+        }
+
+        GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
+
+        if(geom_layer != nullptr)
+            geom_layer->graphics_list.push_back(graphics);
+        else
+            LOG(LOGTYPE_ERROR, "Geometry layer not found");
+
+        return graphics;
+    
+    }
+
+    Graphics* Renderer3D::generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -199,7 +330,7 @@ namespace Pringine {
 
         std::string warn;
         std::string err;
-        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name, base_dir);
+        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.c_str(), base_dir.c_str());
         if (!warn.empty())
             LOG(LOGTYPE_WARNING, warn);
         if (!err.empty())
@@ -211,7 +342,7 @@ namespace Pringine {
         else
             LOG(LOGTYPE_GENERAL, "Successfully loaded mesh ", std::string(file_name));
 
-        Graphics3D* graphics = new Graphics3D();                
+        Graphics* graphics = new Graphics();                
         VertexLayout layout;
         VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
         VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
@@ -393,8 +524,8 @@ namespace Pringine {
 
             std::unordered_map<std::string, GLuint> indices_map;
             GLuint index = 0;
-        std::cout<<"2: "<<shapes.size()<<std::endl;
-            
+            std::cout<<"2: "<<shapes.size()<<std::endl;
+                
             for(int i=0; i< shapes[s].mesh.indices.size(); i++)
             {
                 std::string key =   
@@ -442,15 +573,15 @@ namespace Pringine {
             std::cout<<"Indices: "<<indices.size()<<std::endl;
 
 
-            /*for(int i=0; i<indices.size(); i++)
-                std::cout<<indices[i]<<std::endl;
-            for(int i=0; i<buffer.size(); i++)
-                std::cout<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;*/
-            //std::cout<<indices[i]<<" : "<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;
+                /*for(int i=0; i<indices.size(); i++)
+                    std::cout<<indices[i]<<std::endl;
+                for(int i=0; i<buffer.size(); i++)
+                    std::cout<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;*/
+                //std::cout<<indices[i]<<" : "<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;
 
-            //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
-            //for(int i=0; i<buffer.size(); i++)
-            //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
+                //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
+                //for(int i=0; i<buffer.size(); i++)
+                //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
 
             GraphicsElement g_element;
 
@@ -500,7 +631,7 @@ namespace Pringine {
         GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
 
         if(geom_layer != nullptr)
-            geom_layer->graphics3d_list.push_back(graphics);
+            geom_layer->graphics_list.push_back(graphics);
 
         std::cout<<"returning"<<std::endl;
         return graphics;

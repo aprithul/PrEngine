@@ -1,7 +1,7 @@
 #if PLATFORM != PLATFORM_WINDOWS
 #include "NetworkManager.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     bool InitializeSockets()
     {

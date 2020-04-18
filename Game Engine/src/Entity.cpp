@@ -1,52 +1,84 @@
 #include "Entity.hpp"
 
-namespace Pringine
+namespace PrEngine
 {
     
-    void initialize(bool* has_comp)
+    void initialize(bool* has_comp, Component** components)
     {
         for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
             has_comp[i] = false;
+            components[i] = nullptr;
+        }
     }
     ///////////////////////////////
 
 
-    Entity::Entity(EntityType type):type(type)
+    Entity::Entity()
     {
         id = -1;
-        initialize(has_component);
+        initialize(has_component, components);
     }
 
-    Entity::Entity(std::string name, EntityType type):type(type)
+    Entity::Entity(std::string name)
     {
         id = -1;        
         this->name = name;
-        initialize(has_component);
+        initialize(has_component, components);
     }
     
     Entity::~Entity()
     {
-
+        LOG(LOGTYPE_GENERAL, "Deleting entity (",std::to_string(id),") Components");
+        for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
+            if(components[i] != nullptr){
+                LOG(LOGTYPE_GENERAL, "DELETING : ", CompName[components[i]->type]);
+                delete components[i];
+            }
+        }
     }
 
     void Entity::awake()
     {
 
+        for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
+            if(has_component[i]){
+                components[i]->awake();
+            }
+        }
     }
 
     void Entity::start()
     {
-        
+        for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
+            if(has_component[i])
+            {
+                LOG(LOGTYPE_ERROR, std::to_string(components[i]->type));
+                    components[i]->start();
+            }
+
+        }
     }
 
     void Entity::update()
     {
-        
+        for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
+            if(has_component[i])
+                components[i]->update();
+        }        
     }
 
     void Entity::end()
     {
-        
+        for(int i=0; i<COMP_COUNT_MAX; i++)
+        {
+            if(has_component[i])
+                components[i]->end();
+        }        
     }
 
     void Entity::add_componenet(Component* component)
