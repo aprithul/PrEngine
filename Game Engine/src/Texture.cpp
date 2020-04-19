@@ -18,6 +18,7 @@ namespace PrEngine
             data = stbi_load(path,&width, &height, &no_of_channels, 0);
             if(data!=nullptr)
                 texture_data_library[path] = data;
+
         }
 
 
@@ -73,4 +74,8 @@ namespace PrEngine
             glBindTexture(GL_TEXTURE_2D, 0))
     }
 
+    void delete_texture_from_library()
+    {
+        
+    }
 }

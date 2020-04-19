@@ -56,8 +56,7 @@ namespace PrEngine
         {
             if(has_component[i])
             {
-                LOG(LOGTYPE_ERROR, std::to_string(components[i]->type));
-                    components[i]->start();
+                components[i]->start();
             }
 
         }

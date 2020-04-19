@@ -198,7 +198,7 @@ namespace PrEngine {
         }
     }
 
-    Graphics* RendererOpenGL::generate_graphics_sprite(const std::string& texture_file_path)
+    Sprite* RendererOpenGL::generate_graphics_sprite(const std::string& texture_file_path)
     {
         std::vector<GLuint> indices;
         std::vector<Vertex> buffer;
@@ -318,11 +318,10 @@ namespace PrEngine {
         }
         
        // if(!has_transparency)
-        {
             SpriteLayer* geom_layer = (SpriteLayer*)get_layer("Sprite");
             Sprite* sprite = new Sprite(0,*graphics);
             geom_layer->sprite_list.push_back(sprite);
-        }
+        
         //else
         //{
        //     SpriteLayer* tr_layer = (SpriteLayer*)get_layer("Transparency");
@@ -332,7 +331,7 @@ namespace PrEngine {
 
        // }
         
-        return graphics;
+        return sprite;
     
     }
 

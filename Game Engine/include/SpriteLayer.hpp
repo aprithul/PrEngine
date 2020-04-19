@@ -14,7 +14,7 @@
 namespace PrEngine
 {
 
-    void insertion_sort(Sprite** arr, int n);
+    void insertion_sort(std::vector<Sprite*>& arr, int n);
 
     class SpriteLayer : public RenderLayer
     {

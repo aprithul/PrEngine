@@ -132,15 +132,32 @@ int main(int argc, char * argv[])
         Transform3D* tim_tran = new Transform3D();
         tim_tran->set_position(0,0.5f,0);
         //tim_tran->set_scale(2,2,2);
-        Graphics* tim_1 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
-        tim_1->models.push_back( &(tim_tran->get_transformation()));
-        tim_1->normals.push_back(&tim_tran->get_rotation_transformation());
+        
+        Sprite* tim_sp_1 = renderer->generate_graphics_sprite( get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")));
+        tim_sp_1->order = 2;
+        tim_sp_1->graphics.models.push_back( &(tim_tran->get_transformation()));
+        tim_sp_1->graphics.normals.push_back(&tim_tran->get_rotation_transformation());
+        
         Entity* tim_ent = new Entity();
-        tim_ent->add_componenet(tim_1);
+        tim_ent->add_componenet(tim_sp_1);
         tim_ent->add_componenet(tim_tran);
         entity_management_system->assign_id_and_store_entity(*tim_ent);
 
-        Transform3D* tim_tran_2 = new Transform3D();
+        Transform3D* tim_tran1 = new Transform3D();
+        tim_tran1->set_position(0.25f,0.5f,0.2f);
+        //tim_tran->set_scale(2,2,2);
+        
+        Sprite* tim_sp_11 = renderer->generate_graphics_sprite( get_resource_path(std::string("braid"+PATH_SEP+"tim6.png")));
+        tim_sp_11->order = 1;
+        tim_sp_11->graphics.models.push_back( &(tim_tran1->get_transformation()));
+        tim_sp_11->graphics.normals.push_back(&tim_tran1->get_rotation_transformation());
+        
+        Entity* tim_ent1 = new Entity();
+        tim_ent1->add_componenet(tim_sp_11);
+        tim_ent1->add_componenet(tim_tran1);
+        entity_management_system->assign_id_and_store_entity(*tim_ent1);
+
+        /*Transform3D* tim_tran_2 = new Transform3D();
         tim_tran_2->set_position(0.5f,0.5f,1.f);
         Graphics* tim_2 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
         tim_2->models.push_back( &(tim_tran_2->get_transformation()));
@@ -149,7 +166,7 @@ int main(int argc, char * argv[])
         tim_ent_1->add_componenet(tim_2);
         tim_ent_1->add_componenet(tim_tran_2);
         entity_management_system->assign_id_and_store_entity(*tim_ent_1);
-
+        */
         /*Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
         get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")));
 

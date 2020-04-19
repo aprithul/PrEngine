@@ -15,8 +15,7 @@ namespace PrEngine
 
     void SpriteLayer::update()
     {
-                    //LOG(LOGTYPE_ERROR, "Update layer");
-        insertion_sort(&sprite_list[0], sprite_list.size());
+        insertion_sort(sprite_list, sprite_list.size());
         Entity* camera = entity_management_system->get_entity(camera_handle);
 
         DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity_with_component(COMP_LIGHT);
@@ -92,12 +91,12 @@ namespace PrEngine
     }
 
 
-    void insertion_sort(Sprite** arr, int n)  
+    void insertion_sort(std::vector<Sprite*>& arr, int n)  
     {  
         int i, j;  
         //LOG(LOGTYPE_GENERAL, std::to_string(n));
         Sprite* key;
-        for (i = 2; i <= n; i++) 
+        for (i = 1; i < n; i++) 
         {  
             key = arr[i];  
             j = i - 1;  
@@ -105,7 +104,7 @@ namespace PrEngine
             /* Move elements of arr[0..i-1], that are  
             greater than key, to one position ahead  
             of their current position */
-            while (j >= 1 && arr[j]->order > key->order) 
+            while (j >= 0 && arr[j]->order > key->order) 
             {  
                 arr[j + 1] = arr[j];  
                 j = j - 1;  

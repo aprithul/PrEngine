@@ -50,7 +50,7 @@ namespace PrEngine
                 {
                     delete it->second;
                     it->second = nullptr;
-                    LOG(LOGTYPE_WARNING, "Deleting texture");
+                    LOG(LOGTYPE_GENERAL, "Deleting texture");
 
                 }
             }
