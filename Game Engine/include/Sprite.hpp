@@ -2,8 +2,10 @@
 #define SPRITE_HPP
 #include "Entity.hpp"
 #include "TimeModule.hpp"
-#include "Transform.hpp"
+#include "Transform3D.hpp"
 #include <string>
+#include "Graphics.hpp"
+
 namespace PrEngine
 {
 
@@ -11,10 +13,11 @@ namespace PrEngine
     {
 
         public:
-            Sprite();
+            Sprite(int order, Graphics& graphics);
             ~Sprite();
 
-
+            int order;
+            Graphics& graphics;
     };
 
 }

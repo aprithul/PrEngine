@@ -24,6 +24,7 @@ namespace PrEngine
         void Unbind();
     };
 
+    void delete_texture_from_library(GLuint id);
     extern std::unordered_map<std::string, stbi_uc*> texture_data_library;
     extern std::unordered_map<std::string, Texture*> texture_library;
 }

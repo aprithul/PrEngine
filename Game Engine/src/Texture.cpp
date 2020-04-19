@@ -43,6 +43,7 @@ namespace PrEngine
                 case 3:type = GL_RGB;break;
                 case 4:type = GL_RGBA;break;
             }
+            LOG(LOGTYPE_GENERAL, "Number of channels ", std::to_string(type));
             GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, type, GL_UNSIGNED_BYTE, data))
             GL_CALL(glBindTexture(GL_TEXTURE_2D, 0))
             texture_create_status = 1;

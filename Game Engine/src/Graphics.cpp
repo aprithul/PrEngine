@@ -131,6 +131,9 @@ namespace PrEngine
 
     Graphics::~Graphics()
     {
+        for(std::vector<GraphicsElement>::iterator it = elements.begin(); it!= elements.end(); it++)
+            it->Delete();
+        
         //delete material;
     }
 
@@ -139,6 +142,7 @@ namespace PrEngine
         vao.Delete();
         vbo.Delete();
         ibo.Delete();
+        material.Delete();
     }
 
     VertexLayout::VertexLayout()

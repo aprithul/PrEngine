@@ -16,7 +16,7 @@ namespace PrEngine
     {
         public:
             GeometryLayer(long camera_handle);
-            ~GeometryLayer();
+            ~GeometryLayer() override;
 
             void start() override;
             void update() override;

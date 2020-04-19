@@ -20,7 +20,7 @@
 #include "EntityManagementSystemModule.hpp"
 #include <SDL2/SDL.h>
 //#include "RendererModule.hpp"
-#include "Renderer3D.hpp"
+#include "RendererOpenGL.hpp"
 #include "FrameRateRegulatorModule.hpp"
 #include "FrameRateCounterModule.hpp"
 #include "Sprite.hpp"
@@ -68,16 +68,16 @@ int main(int argc, char * argv[])
 
         Entity* camera_ent = new Entity();
         Transform3D* camera_transform = new Transform3D();
-        Camera* camera_3d = new Camera(16, 9, 0.1f, 100.f, 45.f, *camera_transform);
-        camera_3d->projection_type = PERSPECTIVE;
-        camera_3d->transform.set_position(0.f, 1.f, -6.f);
+        Camera* camera = new Camera(16, 9, 0.1f, 100.f, 45.f, *camera_transform);
+        camera->projection_type = PERSPECTIVE;
+        camera->transform.set_position(0.f, 1.f, -6.f);
 
         camera_ent->add_componenet(camera_transform);
-        camera_ent->add_componenet(camera_3d);
+        camera_ent->add_componenet(camera);
         entity_management_system->assign_id_and_store_entity(*camera_ent);
-        PrEngine::Renderer3D* renderer3d = (PrEngine::Renderer3D*) game_engine->
-                                                add_module(new PrEngine::Renderer3D(1280,720,"PrEngine"));
-        renderer3d->set_vsync(true);
+        PrEngine::RendererOpenGL* renderer = (PrEngine::RendererOpenGL*) game_engine->
+                                                add_module(new PrEngine::RendererOpenGL(1280,720,"PrEngine"));
+        renderer->set_vsync(true);
         PrEngine::GameController* gc = ((PrEngine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
         PrEngine::Keyboard* kb =  &((PrEngine::InputManager*)game_engine->get_module("Input"))->keyboard;
         PrEngine::Mouse* mouse =  &((PrEngine::InputManager*)game_engine->get_module("Input"))->mouse;
@@ -87,12 +87,7 @@ int main(int argc, char * argv[])
         if(gc == nullptr)
                 PrEngine::LOG( PrEngine::LOGTYPE_ERROR,"Didn't return a valid gamecontroller");
 
-
-        
-
-
-
-LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
+        LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
 /*
         const int number_of_meshes = 1;
@@ -132,7 +127,30 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
             std::cout<< graphics->elements.back().material.uniform_locations["u_Tiling"]<<std::endl;
             std::cout<< graphics->elements.back().material.uniform_locations["u_Panning"]<<std::endl;
 */
-        Graphics* graphics = renderer3d->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
+
+
+        Transform3D* tim_tran = new Transform3D();
+        tim_tran->set_position(0,0.5f,0);
+        //tim_tran->set_scale(2,2,2);
+        Graphics* tim_1 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
+        tim_1->models.push_back( &(tim_tran->get_transformation()));
+        tim_1->normals.push_back(&tim_tran->get_rotation_transformation());
+        Entity* tim_ent = new Entity();
+        tim_ent->add_componenet(tim_1);
+        tim_ent->add_componenet(tim_tran);
+        entity_management_system->assign_id_and_store_entity(*tim_ent);
+
+        Transform3D* tim_tran_2 = new Transform3D();
+        tim_tran_2->set_position(0.5f,0.5f,1.f);
+        Graphics* tim_2 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
+        tim_2->models.push_back( &(tim_tran_2->get_transformation()));
+        tim_2->normals.push_back(&tim_tran_2->get_rotation_transformation());
+        Entity* tim_ent_1 = new Entity();
+        tim_ent_1->add_componenet(tim_2);
+        tim_ent_1->add_componenet(tim_tran_2);
+        entity_management_system->assign_id_and_store_entity(*tim_ent_1);
+
+        /*Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
         get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")));
 
         Entity* chest = new Entity();
@@ -146,9 +164,9 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         chest->add_componenet(graphics);
 
         entity_management_system->assign_id_and_store_entity(*chest);
+        */
         
-        
-        Graphics* graphics_plane = renderer3d->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
+        Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
                 get_resource_path(std::string("stonetile.png")).c_str());
         Entity* floor = new Entity();
         Transform3D* floor_transform = new Transform3D();
@@ -161,9 +179,9 @@ LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",
         floor->add_componenet(graphics_plane);
         entity_management_system->assign_id_and_store_entity(*floor);
 
-        ((GuiLayer*)renderer3d->get_layer("GUI"))->panning =
+        ((GuiLayer*)renderer->get_layer("GUI"))->panning =
                 &(graphics_plane->elements.begin()->material.panning);
-        ((GuiLayer*)renderer3d->get_layer("GUI"))->tiling =
+        ((GuiLayer*)renderer->get_layer("GUI"))->tiling =
                 &(graphics_plane->elements.begin()->material.tiling);
 
         LOG(LOGTYPE_WARNING, "Pan: ",std::to_string(graphics_plane->elements.begin()->material.panning.x));

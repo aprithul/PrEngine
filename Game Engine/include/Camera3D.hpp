@@ -5,7 +5,6 @@
 #include "Engine.hpp"
 #include "TimeModule.hpp"
 #include "Vector3.hpp"
-#include "Renderer3D.hpp"
 #include "Transform3D.hpp"
 
 namespace PrEngine

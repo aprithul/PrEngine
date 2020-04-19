@@ -2,7 +2,7 @@
 #define ENTITY_3D_HPP
 
 #include "Entity.hpp"
-#include "Renderer3D.hpp"
+#include "RendererOpenGL.hpp"
 #include "Transform3D.hpp"
 
 namespace PrEngine

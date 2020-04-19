@@ -41,7 +41,22 @@ namespace PrEngine
     {
         GL_CALL(
             glDeleteProgram(shader_program))
-        delete diffuse_texture;
+
+        for(std::unordered_map<std::string, Texture*>::iterator it=texture_library.begin(); it!=texture_library.end(); it++)
+        {
+            if( it->second!=nullptr)
+            {
+                if(it->second->id == diffuse_texture->id)
+                {
+                    delete it->second;
+                    it->second = nullptr;
+                    LOG(LOGTYPE_WARNING, "Deleting texture");
+
+                }
+            }
+        }
+        
+        //delete diffuse_texture;
     }
 
     Material::~Material()

@@ -45,5 +45,8 @@ void main()
     u_sampler2d;
     //color = vec4(out_light,out_light,out_light,1);// vec4(out_light,out_light,out_light,1.0);// texture(u_sampler2d, out_texco)*2.0;// * out_light;// * out_light;// vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
     vec4 tex_col = texture(u_sampler2d, (out_texco.xy+out_panning.xy)*out_tiling.xy);// * out_light;// vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
-    color = vec4(tex_col.rgb* out_light, tex_col.a);
+    if(tex_col.a <0.7f)
+        discard;
+    else
+        color = vec4(tex_col.rgb* out_light, tex_col.a);
 }

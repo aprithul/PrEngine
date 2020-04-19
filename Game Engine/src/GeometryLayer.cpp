@@ -86,4 +86,10 @@ namespace PrEngine
 
     }
 
+    GeometryLayer::~GeometryLayer()
+    {
+        LOG(LOGTYPE_GENERAL, "Deleting geometry layer");
+
+    }
+
 }
