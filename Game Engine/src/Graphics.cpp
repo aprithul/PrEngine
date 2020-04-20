@@ -142,7 +142,8 @@ namespace PrEngine
         vao.Delete();
         vbo.Delete();
         ibo.Delete();
-        material.Delete();
+        //material->Delete();
+        //delete material;
     }
 
     VertexLayout::VertexLayout()

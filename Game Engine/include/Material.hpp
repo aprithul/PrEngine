@@ -13,8 +13,8 @@ namespace PrEngine
 
     struct Material
     {
-        Material();
-        void Generate(const std::string& shader_path, const std::string& diffuse_tex_path);
+        Material(const std::string& shader_path, const std::string& diffuse_tex_path,const std::string& name);
+        //void Generate(const std::string& shader_path, const std::string& diffuse_tex_path, const std::string& name);
         void Delete();
         ~Material();
         GLuint shader_program;
@@ -27,6 +27,8 @@ namespace PrEngine
         Vector2<float> tiling;
         Vector2<float> panning;
     };
+    extern std::unordered_map<std::string, Material*> material_library;
+    extern std::unordered_map<std::string, GLuint> shader_library;
 
 } // namespace PrEngine
 

@@ -3,20 +3,25 @@
 namespace PrEngine
 {
 
-    Material::Material()
-    {
-        tiling = Vector2<float>(1,1);
-        panning = Vector2<float>(0,0);
-    }
+    std::unordered_map<std::string, Material*> material_library;
+    std::unordered_map<std::string, GLuint> shader_library;
 
-    void Material::Generate(const std::string& shader_path, const std::string& diffuse_tex_path)
+    /*Material::()
+    {
+
+    }*/
+
+    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path,const std::string& name)
     {
         // only create new texture on gpu if texture doesn't exist already
+        tiling = Vector2<float>(1,1);
+        panning = Vector2<float>(0,0);
+
         std::unordered_map<std::string, Texture*>::iterator _tex_it = texture_library.find(diffuse_tex_path);
         if(_tex_it == texture_library.end()) // texture not in library, so create
         {
             Texture* _tex =  new Texture(diffuse_tex_path.c_str());
-            if(Texture::texture_create_status == 0){    // creating texture failed, so assign default
+            if(texture_create_status == 0){    // creating texture failed, so assign default
                 delete _tex;
                 diffuse_texture = texture_library[get_resource_path("default.jpg")];
             }
@@ -29,12 +34,28 @@ namespace PrEngine
         }
         else    // texture found in library, so assign that
             diffuse_texture = texture_library[diffuse_tex_path];
-    
-        // create shader, probably can be shared, will check later
-        this->source_file_path = std::string(shader_path);
-        make_shader_program(this->source_file_path);
-        GL_CALL(
-            glUseProgram(shader_program))
+
+        std::unordered_map<std::string, GLuint>::iterator _shader_it = shader_library.find(shader_path);
+        if(_shader_it == shader_library.end())
+        {
+            // create shader, probably can be shared, will check later
+            this->source_file_path = std::string(shader_path);
+            make_shader_program(this->source_file_path);
+            GL_CALL(
+                glUseProgram(shader_program))
+            
+            shader_library[shader_path] = shader_program;
+        }
+        else
+            shader_program = _shader_it->second;
+
+        load_uniform_location("u_sampler2d");
+        load_uniform_location("u_MVP");
+        load_uniform_location("u_Normal_M");
+        load_uniform_location("u_Dir_Light");
+        load_uniform_location("u_Tiling");
+        load_uniform_location("u_Panning");
+
     }
 
     void Material::Delete()
@@ -61,7 +82,7 @@ namespace PrEngine
 
     Material::~Material()
     {
-
+        
     }
 
     void Material::load_uniform_location(std::string uniform)

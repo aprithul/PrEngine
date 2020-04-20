@@ -2,11 +2,10 @@
 
 namespace PrEngine
 {
-        
+    int texture_create_status;
     std::unordered_map<std::string, Texture*> texture_library;
     std::unordered_map<std::string, stbi_uc*> texture_data_library;
 
-    int Texture::texture_create_status;
     Texture::Texture(const char* path)
     {
         texture_create_status = 0;
@@ -50,14 +49,15 @@ namespace PrEngine
             texture_create_status = 1;
         }
     }
+    
 
     Texture::~Texture()
     {
         Unbind();
         GL_CALL(
             glDeleteTextures(1, &id))
-        //if(data != NULL)
-        //    stbi_image_free(data);
+        if(data != NULL)
+            stbi_image_free(data);
     }
 
     void Texture::Bind(int slot)
@@ -72,6 +72,56 @@ namespace PrEngine
     {
         GL_CALL(
             glBindTexture(GL_TEXTURE_2D, 0))
+    }
+
+
+    TextureCubeMap::TextureCubeMap( const std::vector<std::string> paths)
+    {
+        
+        stbi_set_flip_vertically_on_load(true);
+
+        for(int i=0; i<paths.size(); i++)
+        {
+            std::string path = paths[i];
+            texture_create_status = 0;
+
+            if(texture_data_library.count(path) > 0)
+                data = texture_data_library[path];
+            else
+            {
+                data = stbi_load(path.c_str(),&width, &height, &no_of_channels, 0);
+                if(data!=nullptr)
+                    texture_data_library[path] = data;
+
+            }
+
+
+            if(data == NULL){
+                texture_create_status = 0;
+                LOG(LOGTYPE_ERROR, "Couldn't create texture : ", path);
+                return;
+            }
+            else
+            {
+                LOG(LOGTYPE_GENERAL, "Image ",std::string(path)," loaded");
+
+                GL_CALL(glGenTextures(1, &id))
+                GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, id))
+                GL_CALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR))
+                GL_CALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR))
+                GL_CALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP))
+                GL_CALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP))
+                GL_CALL(glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP))
+                
+
+                GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data))
+                GL_CALL(glBindTexture(GL_TEXTURE_CUBE_MAP, 0))
+                texture_create_status = 1;
+            }
+        }
+        LOG(LOGTYPE_GENERAL, "Cubemap texture created successfully");
+        texture_create_status = 1;
+        
     }
 
     void delete_texture_from_library()

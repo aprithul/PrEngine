@@ -23,8 +23,12 @@ namespace PrEngine {
         // create the openGL context from the window  that was created
         glContext = SDL_GL_CreateContext(window);
 
-        GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order 
-        GL_CALL(glDisable(GL_CULL_FACE))
+       // GL_CALL(glFrontFace(GL_CCW))     // points are gonna get supplid in clockwise order 
+       // GL_CALL(glEnable(GL_CULL_FACE))
+        GL_CALL(glDisable(GL_CULL_FACE));
+        //GL_CALL(glEnable(GL_CULL_FACE)); // enalbe face culling
+        GL_CALL(glCullFace(GL_BACK));    // cull the back face
+        GL_CALL(glFrontFace(GL_CCW));
         GL_CALL(glEnable(GL_BLEND))
         GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
         GL_CALL(glEnable(GL_DEPTH_TEST))
@@ -99,9 +103,8 @@ namespace PrEngine {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1 );
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
         
-        //glCullFace(GL_BACK);    // cull the back face
-        //glEnable(GL_CULL_FACE); // enalbe face culling
-        //glEnable(GL_DEPTH_TEST); //
+
+//        glEnable(GL_DEPTH_TEST); //
         //glEnable(GL_FRAMEBUFFER_SRGB);  // auto gamma correction
         
     }
@@ -198,7 +201,7 @@ namespace PrEngine {
         }
     }
 
-    Sprite* RendererOpenGL::generate_graphics_sprite(const std::string& texture_file_path)
+    Sprite* RendererOpenGL::generate_graphics_sprite(const std::string& texture_file_path, const std::string& mat_name)
     {
         std::vector<GLuint> indices;
         std::vector<Vertex> buffer;
@@ -288,14 +291,20 @@ namespace PrEngine {
 
         GraphicsElement g_element;
         graphics->elements.push_back(g_element);
-        graphics->elements.back().material.Generate("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
-        graphics->elements.back().material.load_uniform_location("u_sampler2d");
-        graphics->elements.back().material.load_uniform_location("u_MVP");
-        graphics->elements.back().material.load_uniform_location("u_Normal_M");
-        graphics->elements.back().material.load_uniform_location("u_Dir_Light");
-        graphics->elements.back().material.load_uniform_location("u_Tiling");
-        graphics->elements.back().material.load_uniform_location("u_Panning");
 
+        std::unordered_map<std::string, Material*>::iterator _mat_it = material_library.find(mat_name);
+        Material* mat;
+        if(_mat_it == material_library.end())
+        {
+            mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+            material_library[mat_name] = mat;
+        }
+        else
+        {
+            mat = _mat_it->second;
+        }
+        
+        graphics->elements.back().material = mat;
         graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
         graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
         graphics->elements.back().vao.Generate();
@@ -336,7 +345,7 @@ namespace PrEngine {
     }
 
 
-    Graphics* RendererOpenGL::generate_graphics_quad(const std::string& texture_file_path, bool has_transparency)
+    Graphics* RendererOpenGL::generate_graphics_quad(const std::string& texture_file_path, bool has_transparency, const std::string& mat_name)
     {
         std::vector<GLuint> indices;
         std::vector<Vertex> buffer;
@@ -426,13 +435,19 @@ namespace PrEngine {
 
         GraphicsElement g_element;
         graphics->elements.push_back(g_element);
-        graphics->elements.back().material.Generate("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
-        graphics->elements.back().material.load_uniform_location("u_sampler2d");
-        graphics->elements.back().material.load_uniform_location("u_MVP");
-        graphics->elements.back().material.load_uniform_location("u_Normal_M");
-        graphics->elements.back().material.load_uniform_location("u_Dir_Light");
-        graphics->elements.back().material.load_uniform_location("u_Tiling");
-        graphics->elements.back().material.load_uniform_location("u_Panning");
+        std::unordered_map<std::string, Material*>::iterator _mat_it = material_library.find(mat_name);
+        Material* mat;
+        if(_mat_it == material_library.end())
+        {
+            mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+            material_library[mat_name] = mat;
+        }
+        else
+        {
+            mat = _mat_it->second;
+        }
+        
+        graphics->elements.back().material = mat;
 
         graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
         graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
@@ -473,7 +488,7 @@ namespace PrEngine {
     
     }
 
-    Graphics* RendererOpenGL::generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path)
+    Graphics* RendererOpenGL::generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path, const std::string& mat_name)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -737,13 +752,19 @@ namespace PrEngine {
             GraphicsElement g_element;
 
             graphics->elements.push_back(g_element);
-            graphics->elements.back().material.Generate("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path));
-            graphics->elements.back().material.load_uniform_location("u_sampler2d");
-            graphics->elements.back().material.load_uniform_location("u_MVP");
-            graphics->elements.back().material.load_uniform_location("u_Normal_M");
-            graphics->elements.back().material.load_uniform_location("u_Dir_Light");
-            graphics->elements.back().material.load_uniform_location("u_Tiling");
-            graphics->elements.back().material.load_uniform_location("u_Panning");
+            std::unordered_map<std::string, Material*>::iterator _mat_it = material_library.find(mat_name);
+            Material* mat;
+            if(_mat_it == material_library.end())
+            {
+                mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+                material_library[mat_name] = mat;
+            }
+            else
+            {
+                mat = _mat_it->second;
+            }
+            
+            graphics->elements.back().material = mat;
 
 
 

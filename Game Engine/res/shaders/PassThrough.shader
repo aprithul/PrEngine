@@ -42,11 +42,13 @@ in vec2 out_panning;
 out vec4 color;
 void main()
 {
+    
     u_sampler2d;
     //color = vec4(out_light,out_light,out_light,1);// vec4(out_light,out_light,out_light,1.0);// texture(u_sampler2d, out_texco)*2.0;// * out_light;// * out_light;// vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
     vec4 tex_col = texture(u_sampler2d, (out_texco.xy+out_panning.xy)*out_tiling.xy);// * out_light;// vec4(u_red, out_color.gba);//vec4(0.0,1.0,1.0,1.0);
     //if(tex_col.a <0.7f)
     //    discard;
     //else
-        color = vec4(tex_col.rgb* out_light, tex_col.a);
+    color = vec4(tex_col.rgb* out_light, tex_col.a);
+        //color = vec4(vec3(gl_FragCoord.z), tex_col.a);
 }

@@ -5,9 +5,9 @@
 //  Copyright © 2017 Aniruddha Prithul. All rights reserved.
 
 
-#include "Module.hpp"
 #include <stdlib.h>
 #include <iostream>
+#include "Module.hpp"
 //#include <emscripten.h>
 #if defined(EMSCRIPTEN) && defined(_WIN64)
 #include "NetworkManager.hpp"
@@ -128,7 +128,7 @@ int main(int argc, char * argv[])
             std::cout<< graphics->elements.back().material.uniform_locations["u_Panning"]<<std::endl;
 */
 
-
+/*
         Transform3D* tim_tran = new Transform3D();
         tim_tran->set_position(0,0.5f,0);
         //tim_tran->set_scale(2,2,2);
@@ -156,8 +156,8 @@ int main(int argc, char * argv[])
         tim_ent1->add_componenet(tim_sp_11);
         tim_ent1->add_componenet(tim_tran1);
         entity_management_system->assign_id_and_store_entity(*tim_ent1);
-
-        /*Transform3D* tim_tran_2 = new Transform3D();
+*/
+  /*      Transform3D* tim_tran_2 = new Transform3D();
         tim_tran_2->set_position(0.5f,0.5f,1.f);
         Graphics* tim_2 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
         tim_2->models.push_back( &(tim_tran_2->get_transformation()));
@@ -167,8 +167,8 @@ int main(int argc, char * argv[])
         tim_ent_1->add_componenet(tim_tran_2);
         entity_management_system->assign_id_and_store_entity(*tim_ent_1);
         */
-        /*Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
-        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")));
+        Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
+        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "chest.mat");
 
         Entity* chest = new Entity();
         Transform3D* chest_tr = new Transform3D();
@@ -181,10 +181,10 @@ int main(int argc, char * argv[])
         chest->add_componenet(graphics);
 
         entity_management_system->assign_id_and_store_entity(*chest);
-        */
+        
         
         Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
-                get_resource_path(std::string("stonetile.png")).c_str());
+                get_resource_path(std::string("stonetile.png")).c_str(),"floor.mat");
         Entity* floor = new Entity();
         Transform3D* floor_transform = new Transform3D();
         floor_transform->set_scale(Vector3<float>(8.f,1.f,8.f));
@@ -197,18 +197,32 @@ int main(int argc, char * argv[])
         entity_management_system->assign_id_and_store_entity(*floor);
 
         ((GuiLayer*)renderer->get_layer("GUI"))->panning =
-                &(graphics_plane->elements.begin()->material.panning);
+                &(graphics_plane->elements.begin()->material->panning);
         ((GuiLayer*)renderer->get_layer("GUI"))->tiling =
-                &(graphics_plane->elements.begin()->material.tiling);
+                &(graphics_plane->elements.begin()->material->tiling);
 
-        LOG(LOGTYPE_WARNING, "Pan: ",std::to_string(graphics_plane->elements.begin()->material.panning.x));
+        LOG(LOGTYPE_WARNING, "Pan: ",std::to_string(graphics_plane->elements.begin()->material->panning.x));
 
         Entity* light_ent = new Entity();
         DirectionalLight* light = new DirectionalLight();
         light_ent->add_componenet(light);
         entity_management_system->assign_id_and_store_entity(*light_ent);
 
+        std::vector<std::string> paths;
+        std::string right = get_resource_path( std::string("skybox"+PATH_SEP+"right.jpg"));
+        std::string left = get_resource_path( std::string("skybox"+PATH_SEP+"left.jpg"));
+        std::string top = get_resource_path( std::string("skybox"+PATH_SEP+"top.jpg"));
+        std::string bottom = get_resource_path( std::string("skybox"+PATH_SEP+"bottom.jpg"));
+        std::string back = get_resource_path( std::string("skybox"+PATH_SEP+"back.jpg"));
+        std::string front = get_resource_path( std::string("skybox"+PATH_SEP+"front.jpg"));
+        paths.push_back(right);
+        paths.push_back(left);
+        paths.push_back(top);
+        paths.push_back(bottom);
+        paths.push_back(back);
+        paths.push_back(front);
 
+        TextureCubeMap* cube_map = new TextureCubeMap(paths);
         //std::cout<<graphics->normal->data[0]<<std::endl;
         /*PrEngine::Player* player = new PrEngine::Player(gc);
         player->keyboard = kb;

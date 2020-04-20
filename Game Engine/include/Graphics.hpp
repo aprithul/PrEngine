@@ -70,7 +70,7 @@ namespace PrEngine
         VertexArray vao;
         VertexBuffer vbo;
         IndexBuffer ibo;
-        Material material;
+        Material* material;
         VertexLayout layout;
         int num_of_triangles;
         void Delete();

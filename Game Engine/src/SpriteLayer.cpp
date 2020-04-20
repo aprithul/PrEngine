@@ -27,7 +27,7 @@ namespace PrEngine
             
             for(int i=0; i < grp.elements.size(); i++)
             {
-                grp.elements[i].material.diffuse_texture->Bind(0);
+                grp.elements[i].material->diffuse_texture->Bind(0);
                 grp.elements[i].vao.Bind();
                 grp.elements[i].ibo.Bind();
                 
@@ -36,9 +36,9 @@ namespace PrEngine
                 //if(grp.elements[i].material.uniform_locations["u_sampler2d"] != -1)
                 //GL_CALL(
                 //    glUniform1i(grp.elements[i].material.uniform_locations["u_sampler2d"], 0))
-                if(grp.elements[i].material.uniform_locations["u_Dir_Light"] != -1)
+                if(grp.elements[i].material->uniform_locations["u_Dir_Light"] != -1)
                 GL_CALL(
-                    glUniform3f(grp.elements[i].material.uniform_locations["u_Dir_Light"], light->direction.x, light->direction.y, light->direction.z))
+                    glUniform3f(grp.elements[i].material->uniform_locations["u_Dir_Light"], light->direction.x, light->direction.y, light->direction.z))
                 
                 // models and normals should be same size
                 for(int j=0; j<grp.models.size() ; j++) 
@@ -47,18 +47,18 @@ namespace PrEngine
                     Camera* cam_component = (Camera*)(camera->components[COMP_CAMERA]);
                     Matrix4x4<float> mvp = (cam_component->projection_matrix) * cam_component->view_matrix * (*(grp.models[j])) ;
 
-                    if(grp.elements[i].material.uniform_locations["u_MVP"] != -1)
+                    if(grp.elements[i].material->uniform_locations["u_MVP"] != -1)
                     GL_CALL(
-                        glUniformMatrix4fv(grp.elements[i].material.uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
+                        glUniformMatrix4fv(grp.elements[i].material->uniform_locations["u_MVP"],1, GL_TRUE, mvp.data))
 
-                    if(grp.elements[i].material.uniform_locations["u_Normal_M"] != -1)
+                    if(grp.elements[i].material->uniform_locations["u_Normal_M"] != -1)
                     GL_CALL(
-                        glUniformMatrix4fv(grp.elements[i].material.uniform_locations["u_Normal_M"],1, GL_TRUE, grp.normals[j]->data ))
+                        glUniformMatrix4fv(grp.elements[i].material->uniform_locations["u_Normal_M"],1, GL_TRUE, grp.normals[j]->data ))
                     GL_CALL(
-                        glUniform2f(grp.elements[i].material.uniform_locations["u_Panning"],grp.elements[i].material.panning.x, grp.elements[i].material.panning.y);
+                        glUniform2f(grp.elements[i].material->uniform_locations["u_Panning"],grp.elements[i].material->panning.x, grp.elements[i].material->panning.y);
                     )
                     GL_CALL(
-                        glUniform2f(grp.elements[i].material.uniform_locations["u_Tiling"],grp.elements[i].material.tiling.x, grp.elements[i].material.tiling.y);
+                        glUniform2f(grp.elements[i].material->uniform_locations["u_Tiling"],grp.elements[i].material->tiling.x, grp.elements[i].material->tiling.y);
                     )
                 
                     GL_CALL(
@@ -106,7 +106,7 @@ namespace PrEngine
             of their current position */
             while (j >= 0 && arr[j]->order > key->order) 
             {  
-                arr[j + 1] = arr[j];  
+                arr[j + 1] = arr[j];
                 j = j - 1;  
             }  
             arr[j + 1] = key;  

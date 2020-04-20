@@ -10,6 +10,7 @@
 
 namespace PrEngine {
 
+
     Shader::Shader(GLenum type, const std::string& dir)
     {
         // create the shader object

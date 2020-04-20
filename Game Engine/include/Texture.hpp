@@ -5,12 +5,15 @@
 #include <unordered_map>
 #include "../Vendor/include/stb_image.h"
 #include "Logger.hpp"
+#include <vector>
+#include <string>
 
 namespace PrEngine
 {
+    extern int texture_create_status;
+
     struct Texture
     {
-        static int texture_create_status;
 
         GLuint id;
         int width;
@@ -20,6 +23,21 @@ namespace PrEngine
 
         Texture(const char* path);
         ~Texture();
+        void Bind(int slot);
+        void Unbind();
+    };
+
+    struct TextureCubeMap
+    {
+
+        GLuint id;
+        int width;
+        int height;
+        int no_of_channels;
+        stbi_uc* data;
+
+        TextureCubeMap( const std::vector<std::string> paths);
+        ~TextureCubeMap();
         void Bind(int slot);
         void Unbind();
     };
