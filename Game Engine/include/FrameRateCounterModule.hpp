@@ -10,7 +10,7 @@
 #define FrameRateCounter_hpp
 
 #include <string>
-#include <SDL2/SDL_ttf.h>
+//#include <SDL2/SDL_ttf.h>
 #include "Module.hpp"
 #include "TimeModule.hpp"
 #include "Logger.hpp"

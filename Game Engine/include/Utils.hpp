@@ -66,7 +66,7 @@ namespace PrEngine
 
     bool inside(Vector2<int> pos, SDL_Rect& rect, bool centered = false);
     bool inside(Vector2<float> pos, SDL_Rect& rect, bool centered = false);
-    bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered = false);
+    //bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered = false);
 
 }
 #endif

@@ -130,7 +130,7 @@ namespace PrEngine{
         return false;
     }
 
-    bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered)
+/*    bool inside(Vector2<float> pos, SDL_FRect& rect, bool centered)
     {
         if(!centered)
         {
@@ -146,7 +146,7 @@ namespace PrEngine{
         }
         
         return false;
-    }
+    }*/
 
 
 }

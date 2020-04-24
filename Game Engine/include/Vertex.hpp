@@ -24,6 +24,11 @@ namespace PrEngine {
     
     struct Vertex
     {
+        Vertex();
+        Vertex(float x,float y, float z);
+        Vertex(float x, float y, float z, float nx, float ny, float nz);
+        Vertex(float x, float y, float z, float nx, float ny, float nz, float r, float g, float b, float a);
+        Vertex(float x, float y, float z, float nx, float ny, float nz, float r, float g, float b, float a, float u, float v);
         float p_x;
         float p_y;
         float p_z;

@@ -54,7 +54,7 @@ int main(int argc, char * argv[])
         PrEngine::FrameRateCounter* frame_rate_counter = 
                         (PrEngine::FrameRateCounter*)game_engine->
                                 add_module(new PrEngine::FrameRateCounter("Frame Counter", 100001));
-        
+         
         // can't exceed 60fps if vsync is on
         //frame_rate_regulator->set_frame_rate(60);
         frame_rate_regulator->set_uncapped();
@@ -182,7 +182,6 @@ int main(int argc, char * argv[])
 
         entity_management_system->assign_id_and_store_entity(*chest);
         
-        
         Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
                 get_resource_path(std::string("stonetile.png")).c_str(),"floor.mat");
         Entity* floor = new Entity();
@@ -219,10 +218,22 @@ int main(int argc, char * argv[])
         paths.push_back(left);
         paths.push_back(top);
         paths.push_back(bottom);
-        paths.push_back(back);
         paths.push_back(front);
+        paths.push_back(back);
 
-        TextureCubeMap* cube_map = new TextureCubeMap(paths);
+        
+        Graphics* cube_map_grpahics = renderer->generate_graphics_skybox(paths, "sky_mat");
+        Transform3D* skybox_transform = new Transform3D();
+        skybox_transform->set_scale(100,100,100);
+        cube_map_grpahics->models.push_back( &(skybox_transform->get_transformation()));
+        cube_map_grpahics->normals.push_back(&skybox_transform->get_rotation_transformation());
+        Entity* skybox = new Entity();
+        skybox->add_componenet(skybox_transform);
+        skybox->add_componenet(cube_map_grpahics);
+        entity_management_system->assign_id_and_store_entity(*skybox);
+        
+
+        //TextureCubeMap* cube_map = new TextureCubeMap(paths);
         //std::cout<<graphics->normal->data[0]<<std::endl;
         /*PrEngine::Player* player = new PrEngine::Player(gc);
         player->keyboard = kb;

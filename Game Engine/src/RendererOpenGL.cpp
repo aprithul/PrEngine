@@ -344,7 +344,6 @@ namespace PrEngine {
     
     }
 
-
     Graphics* RendererOpenGL::generate_graphics_quad(const std::string& texture_file_path, bool has_transparency, const std::string& mat_name)
     {
         std::vector<GLuint> indices;
@@ -440,6 +439,181 @@ namespace PrEngine {
         if(_mat_it == material_library.end())
         {
             mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+            material_library[mat_name] = mat;
+        }
+        else
+        {
+            mat = _mat_it->second;
+        }
+        
+        graphics->elements.back().material = mat;
+
+        graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
+        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
+        graphics->elements.back().vao.Generate();
+        graphics->elements.back().layout = layout;
+        graphics->elements.back().num_of_triangles = (buffer.size()/3);
+
+        for(int i=0; i<graphics->elements.size(); i++)
+        {
+            graphics->elements[i].vao.Bind();
+            graphics->elements[i].vbo.Bind();
+            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
+            {
+                GL_CALL(
+                    glEnableVertexAttribArray( attr->index))
+                GL_CALL(
+                    glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+            }
+            graphics->elements[i].vbo.Unbind();
+            graphics->elements[i].vao.Unbind();
+        }
+        
+       // if(!has_transparency)
+        {
+            GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
+            geom_layer->graphics_list.push_back(graphics);
+        }
+        //else
+        //{
+       //     SpriteLayer* tr_layer = (SpriteLayer*)get_layer("Transparency");
+       //     LOG(LOGTYPE_WARNING,"after");
+       //     tr_layer->graphics_list.push_back(graphics);
+        //    LOG(LOGTYPE_WARNING,"after");
+
+       // }
+        
+        return graphics;
+    
+    }
+
+    Graphics* RendererOpenGL::generate_graphics_skybox(const std::vector<std::string>& texture_file_path, const std::string& mat_name)
+    {
+        std::vector<GLuint> indices;
+        std::vector<Vertex> buffer;
+
+        #pragma region vertex declaration
+        Vertex v1(0.5f,0.5f,0.5f,0.f,0.f,  1.f);
+        Vertex v2( 0.5f,-0.5f,0.5f,0.f,0.f, 1.f);
+        Vertex v3(-0.5f,-0.5f,0.5f,0.f,0.f, 1.f);
+        Vertex v4(-0.5f,0.5f,0.5f,0.f,0.f, 1.f);
+
+        Vertex v5(0.5f,0.5f,-0.5f,0.f,0.f,  -1.f);
+        Vertex v6(-0.5f,0.5f,-0.5f,0.f,0.f, -1.f);
+        Vertex v7(-0.5f,-0.5f,-0.5f,0.f,0.f, -1.f);
+        Vertex v8( 0.5f,-0.5f,-0.5f,0.f,0.f, -1.f);
+        
+        Vertex v9(  0.5f,0.5f,-0.5f,0.f,1.f, 0.f);
+        Vertex v10( 0.5f,0.5f,0.5f,0.f, 1.f,  0.f);
+        Vertex v11(-0.5f,0.5f,0.5f,0.f, 1.f,  0.f);
+        Vertex v12(-0.5f,0.5f,-0.5f,0.f,1.f,  0.f);
+        
+        Vertex v13(0.5f,-0.5f,-0.5f,0.f, -1.f,   0.f);
+        Vertex v14(-0.5f,-0.5f,-0.5f,0.f,-1.f,  0.f);
+        Vertex v15(-0.5f,-0.5f,0.5f,0.f, -1.f,  0.f);
+        Vertex v16( 0.5f,-0.5f,0.5f,0.f, -1.f,  0.f);
+
+        Vertex v17(0.5f,0.5f,0.5f,    1.f,0.f,  0.f);
+        Vertex v18(0.5f,0.5f,-0.5f,   1.f,0.f,  0.f);
+        Vertex v19(0.5f,-0.5f,-0.5f,  1.f,0.f,  0.f);
+        Vertex v20(0.5f,-0.5f,0.5f,   1.f,0.f,  0.f);
+ 
+        Vertex v21(-0.5f,0.5f,-0.5f,   -1.f,0.f,  0.f);
+        Vertex v22(-0.5f,0.5f, 0.5f,   -1.f,0.f,  0.f);
+        Vertex v23(-0.5f,-0.5f,0.5f,   -1.f,0.f,  0.f);
+        Vertex v24(-0.5f,-0.5f,-0.5f,  -1.f,0.f,  0.f);
+ 
+
+        #pragma endregion
+
+        buffer.push_back(v1);
+        buffer.push_back(v2);
+        buffer.push_back(v3);
+        buffer.push_back(v4);
+        buffer.push_back(v5);
+        buffer.push_back(v6);
+        buffer.push_back(v7);
+        buffer.push_back(v8);       
+        buffer.push_back(v9);
+        buffer.push_back(v10);
+        buffer.push_back(v11);      
+        buffer.push_back(v12);
+        buffer.push_back(v13);
+        buffer.push_back(v14);       
+        buffer.push_back(v15);
+        buffer.push_back(v16);
+        buffer.push_back(v17);       
+        buffer.push_back(v18);
+        buffer.push_back(v19);
+        buffer.push_back(v20);       
+        buffer.push_back(v21);
+        buffer.push_back(v22);
+        buffer.push_back(v23);
+        buffer.push_back(v24);
+
+        indices.push_back(0);
+        indices.push_back(1);
+        indices.push_back(2);
+        indices.push_back(2);
+        indices.push_back(3);
+        indices.push_back(0);
+
+        indices.push_back(4);
+        indices.push_back(5);
+        indices.push_back(6);
+        indices.push_back(6);
+        indices.push_back(7);
+        indices.push_back(4);
+
+        indices.push_back(8);
+        indices.push_back(9);
+        indices.push_back(10);
+        indices.push_back(10);
+        indices.push_back(11);
+        indices.push_back(8);
+
+        indices.push_back(12);
+        indices.push_back(13);
+        indices.push_back(14);
+        indices.push_back(14);
+        indices.push_back(15);
+        indices.push_back(12);
+
+        indices.push_back(16);
+        indices.push_back(17);
+        indices.push_back(18);
+        indices.push_back(18);
+        indices.push_back(19);
+        indices.push_back(16);
+
+        indices.push_back(20);
+        indices.push_back(21);
+        indices.push_back(22);
+        indices.push_back(22);
+        indices.push_back(23);
+        indices.push_back(20);
+
+
+
+
+        Graphics* graphics = new Graphics();
+        VertexLayout layout;
+        VertexAttribute attribute_0(0,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_1(1,4,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_2(2,3,GL_FLOAT,GL_FALSE);
+        VertexAttribute attribute_3(3,2,GL_FLOAT,GL_FALSE);
+        layout.add_attribute(attribute_0);
+        layout.add_attribute(attribute_1);
+        layout.add_attribute(attribute_2);
+        layout.add_attribute(attribute_3);
+
+        GraphicsElement g_element;
+        graphics->elements.push_back(g_element);
+        std::unordered_map<std::string, Material*>::iterator _mat_it = material_library.find(mat_name);
+        Material* mat;
+        if(_mat_it == material_library.end())
+        {
+            mat = new Material("shaders"+PATH_SEP+"SkyBox.shader", texture_file_path, mat_name);
             material_library[mat_name] = mat;
         }
         else

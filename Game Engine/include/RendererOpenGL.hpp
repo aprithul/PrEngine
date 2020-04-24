@@ -48,6 +48,7 @@ namespace PrEngine {
         GLuint make_shader( GLenum type, const std::string& source);
         Graphics* generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path, const std::string& mat_name);
         Graphics* generate_graphics_quad(const std::string& texture_file_path, bool has_transparency, const std::string& mat_name);
+        Graphics* generate_graphics_skybox( const std::vector<std::string>& texture_file_path, const std::string& mat_name);
         Sprite* generate_graphics_sprite(const std::string& texture_file_path, const std::string& mat_name);
         RenderLayer* get_layer(const std::string& layer_name);
         //Matrix4x4<float> view_matrix;
