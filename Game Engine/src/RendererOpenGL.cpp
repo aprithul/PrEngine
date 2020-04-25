@@ -662,7 +662,7 @@ namespace PrEngine {
     
     }
 
-    Graphics* RendererOpenGL::generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path, const std::string& mat_name)
+    Graphics* RendererOpenGL::generate_graphics(const std::string& base_dir, const std::string& file_name, const std::string& texture_file_path, const std::string& mat_name, TextureCubeMap* env_map)
     {
         tinyobj::attrib_t attrib;
         std::vector<tinyobj::shape_t> shapes;
@@ -930,7 +930,11 @@ namespace PrEngine {
             Material* mat;
             if(_mat_it == material_library.end())
             {
-                mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+                if(env_map == nullptr)
+                    mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+                else
+                    mat = new Material("shaders"+PATH_SEP+"Reflective.shader", std::string(texture_file_path), *env_map, mat_name);
+
                 material_library[mat_name] = mat;
             }
             else
@@ -939,11 +943,6 @@ namespace PrEngine {
             }
             
             graphics->elements.back().material = mat;
-
-
-
-
-
             graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
             graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();

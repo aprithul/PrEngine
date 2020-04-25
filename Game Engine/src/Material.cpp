@@ -11,11 +11,13 @@ namespace PrEngine
 
     }*/
 
-    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path,const std::string& name)
+    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path, TextureCubeMap& env_map, const std::string& name)
     {
         // only create new texture on gpu if texture doesn't exist already
         tiling = Vector2<float>(1,1);
         panning = Vector2<float>(0,0);
+        
+        environment_map_texture = &env_map;
 
         std::unordered_map<std::string, Texture*>::iterator _tex_it = texture_library.find(diffuse_tex_path);
         if(_tex_it == texture_library.end()) // texture not in library, so create
@@ -48,7 +50,61 @@ namespace PrEngine
             shader_program = _shader_it->second;
 
         load_uniform_location("u_sampler2d");
-        load_uniform_location("u_MVP");
+        load_uniform_location("u_env_map");
+        load_uniform_location("u_Model");
+        load_uniform_location("u_View");
+        load_uniform_location("u_Projection");
+        load_uniform_location("u_Camera_Position");
+        load_uniform_location("u_Normal_M");
+        load_uniform_location("u_Dir_Light");
+        load_uniform_location("u_Tiling");
+        load_uniform_location("u_Panning");
+
+    }
+
+
+    Material::Material(const std::string& shader_path, const std::string& diffuse_tex_path,  const std::string& name)
+    {
+        // only create new texture on gpu if texture doesn't exist already
+        tiling = Vector2<float>(1,1);
+        panning = Vector2<float>(0,0);
+        environment_map_texture = nullptr;
+
+        std::unordered_map<std::string, Texture*>::iterator _tex_it = texture_library.find(diffuse_tex_path);
+        if(_tex_it == texture_library.end()) // texture not in library, so create
+        {
+            Texture* _tex =  new Texture(diffuse_tex_path.c_str());
+            if(texture_create_status == 0){    // creating texture failed, so assign default
+                delete _tex;
+                diffuse_texture = texture_library[get_resource_path("default.jpg")];
+            }
+            else // successfully created texture, store in library and assign that
+            {
+                texture_library[diffuse_tex_path] = _tex;
+                diffuse_texture = _tex;
+
+            }
+        }
+        else    // texture found in library, so assign that
+            diffuse_texture = texture_library[diffuse_tex_path];
+
+        std::unordered_map<std::string, GLuint>::iterator _shader_it = shader_library.find(shader_path);
+        if(_shader_it == shader_library.end())
+        {
+            // create shader, probably can be shared, will check later
+            this->source_file_path = std::string(shader_path);
+            make_shader_program(this->source_file_path);
+            
+            shader_library[shader_path] = shader_program;
+        }
+        else
+            shader_program = _shader_it->second;
+
+        load_uniform_location("u_sampler2d");
+        load_uniform_location("u_Model");
+        load_uniform_location("u_View");
+        load_uniform_location("u_Projection");
+        load_uniform_location("u_Camera_Position");
         load_uniform_location("u_Normal_M");
         load_uniform_location("u_Dir_Light");
         load_uniform_location("u_Tiling");
@@ -62,6 +118,8 @@ namespace PrEngine
         // only create new texture on gpu if texture doesn't exist already
         tiling = Vector2<float>(1,1);
         panning = Vector2<float>(0,0);
+        environment_map_texture = nullptr;
+
         std::string cubemap_file_name = "";
         for(int i=0; i<cubemap_tex_path.size(); i++)
         {
@@ -111,6 +169,8 @@ namespace PrEngine
         GL_CALL(
             glUseProgram(shader_program))
         diffuse_texture->Bind(0);
+        if(environment_map_texture != nullptr)
+            environment_map_texture->Bind(1);
     }
 
     void Material::Unbind()
@@ -118,6 +178,8 @@ namespace PrEngine
         GL_CALL(
             glUseProgram(0))
         diffuse_texture->Unbind();
+        if(environment_map_texture != nullptr)
+            environment_map_texture->Unbind();
     }
 
     void Material::Delete()

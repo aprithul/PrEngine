@@ -41,6 +41,12 @@ namespace PrEngine
                         glUniform1i(m["u_sampler2d"], 0))
                 }
 
+                if(m.find("u_env_map") != m.end())
+                {
+                    GL_CALL(
+                        glUniform1i(m["u_env_map"], 1))
+                }
+
                 if(m.find("u_sampler_cube") != m.end())
                 {
                     GL_CALL(
@@ -71,12 +77,35 @@ namespace PrEngine
                         _view.data[14] = 0;
                         _view.data[15] = 1;
                         mvp = (cam_component->projection_matrix) * _view * (*(grp->models[j])) ;
+
+                        if(m.find("u_MVP") != m.end())
+                        {
+                            GL_CALL(
+                                glUniformMatrix4fv(m["u_MVP"],1, GL_TRUE, mvp.data))
+                        }
                     }
 
-                    if(m.find("u_MVP") != m.end())
+                    if(m.find("u_Model") != m.end())
                     {
                         GL_CALL(
-                            glUniformMatrix4fv(m["u_MVP"],1, GL_TRUE, mvp.data))
+                            glUniformMatrix4fv(m["u_Model"],1, GL_TRUE, (*(grp->models[j])).data))
+                    }
+                    if(m.find("u_View") != m.end())
+                    {
+                        GL_CALL(
+                            glUniformMatrix4fv(m["u_View"],1, GL_TRUE, (cam_component->view_matrix).data) )
+                    }
+                    if(m.find("u_Projection") != m.end())
+                    {
+                        GL_CALL(
+                            glUniformMatrix4fv(m["u_Projection"],1, GL_TRUE, (cam_component->projection_matrix).data))
+                    }
+
+                    if(m.find("u_Camera_Position") != m.end())
+                    {
+                        Vector3<float> cam_pos = cam_component->transform.get_position();
+                        GL_CALL(
+                            glUniform3f(m["u_Camera_Position"], cam_pos.x, cam_pos.y, cam_pos.z) )
                     }
 
                     if(m.find("u_Normal_M") != m.end())

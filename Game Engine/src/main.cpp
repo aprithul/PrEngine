@@ -76,7 +76,7 @@ int main(int argc, char * argv[])
         camera_ent->add_componenet(camera);
         entity_management_system->assign_id_and_store_entity(*camera_ent);
         PrEngine::RendererOpenGL* renderer = (PrEngine::RendererOpenGL*) game_engine->
-                                                add_module(new PrEngine::RendererOpenGL(1280,720,"PrEngine"));
+                                                add_module(new PrEngine::RendererOpenGL(1600,900,"PrEngine"));
         renderer->set_vsync(true);
         PrEngine::GameController* gc = ((PrEngine::InputManager*)game_engine->get_module("Input"))->get_gamecontroller(0);
         PrEngine::Keyboard* kb =  &((PrEngine::InputManager*)game_engine->get_module("Input"))->keyboard;
@@ -89,123 +89,6 @@ int main(int argc, char * argv[])
 
         LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
-/*
-        const int number_of_meshes = 1;
-        Mesh meshes[number_of_meshes];
-
-        Vertex vertices[4];
-                    // pos,   color     texcoord
-                    // x,y,z, r,g,b,a   
-        vertices[0] = {-1.f,-1.f, 0.f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 0.f};
-        vertices[1] = { 1.f,-1.f, 0.f, 0.0f, 1.0f, 0.0f, 1.0f, 1.f, 0.f};
-        vertices[2] = { 1.f, 1.f, 0.f, 0.0f, 0.0f, 1.0f, 1.0f, 1.f, 1.f};
-        vertices[3] = {-1.f, 1.f, 0.f, 1.0f, 0.0f, 0.0f, 1.0f, 0.f, 1.f};
-        
-        GLuint element_array[] = {
-            0, 1, 2,
-            2, 3, 0
-        };
-        meshes[0].set_vertices(vertices, 4);
-        meshes[0].set_indices(element_array, 6);
-        
-*/
-        //std::cout<<"Stride"<<layout.stride<<std::endl;
-        //Graphics* sprite = renderer3d->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")));
-
-              //std::cout<<"num of tri: "<<graphics->elements[0].material.uniform_locations.count("u_sampler2d")<<std::endl;
-
-/*for (auto const& pair: graphics->elements[0].material.uniform_locations) {
-        std::cout << "{" << pair.first << ": " << pair.second << "}\n";
-    }*/
-
-
-       /* std::cout<<"print loaded"<<std::endl;   
-            std::cout<< graphics->elements.back().material.uniform_locations["u_sampler2d"]<<std::endl;
-            std::cout<< graphics->elements.back().material.uniform_locations["u_MVP"]<<std::endl;
-            std::cout<< graphics->elements.back().material.uniform_locations["u_Normal_M"]<<std::endl;
-            std::cout<< graphics->elements.back().material.uniform_locations["u_Dir_Light"]<<std::endl;
-            std::cout<< graphics->elements.back().material.uniform_locations["u_Tiling"]<<std::endl;
-            std::cout<< graphics->elements.back().material.uniform_locations["u_Panning"]<<std::endl;
-*/
-
-/*
-        Transform3D* tim_tran = new Transform3D();
-        tim_tran->set_position(0,0.5f,0);
-        //tim_tran->set_scale(2,2,2);
-        
-        Sprite* tim_sp_1 = renderer->generate_graphics_sprite( get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")));
-        tim_sp_1->order = 2;
-        tim_sp_1->graphics.models.push_back( &(tim_tran->get_transformation()));
-        tim_sp_1->graphics.normals.push_back(&tim_tran->get_rotation_transformation());
-        
-        Entity* tim_ent = new Entity();
-        tim_ent->add_componenet(tim_sp_1);
-        tim_ent->add_componenet(tim_tran);
-        entity_management_system->assign_id_and_store_entity(*tim_ent);
-
-        Transform3D* tim_tran1 = new Transform3D();
-        tim_tran1->set_position(0.25f,0.5f,0.2f);
-        //tim_tran->set_scale(2,2,2);
-        
-        Sprite* tim_sp_11 = renderer->generate_graphics_sprite( get_resource_path(std::string("braid"+PATH_SEP+"tim6.png")));
-        tim_sp_11->order = 1;
-        tim_sp_11->graphics.models.push_back( &(tim_tran1->get_transformation()));
-        tim_sp_11->graphics.normals.push_back(&tim_tran1->get_rotation_transformation());
-        
-        Entity* tim_ent1 = new Entity();
-        tim_ent1->add_componenet(tim_sp_11);
-        tim_ent1->add_componenet(tim_tran1);
-        entity_management_system->assign_id_and_store_entity(*tim_ent1);
-*/
-  /*      Transform3D* tim_tran_2 = new Transform3D();
-        tim_tran_2->set_position(0.5f,0.5f,1.f);
-        Graphics* tim_2 = renderer->generate_graphics_quad(get_resource_path(std::string("braid"+PATH_SEP+"tim1.png")), true);
-        tim_2->models.push_back( &(tim_tran_2->get_transformation()));
-        tim_2->normals.push_back(&tim_tran_2->get_rotation_transformation());
-        Entity* tim_ent_1 = new Entity();
-        tim_ent_1->add_componenet(tim_2);
-        tim_ent_1->add_componenet(tim_tran_2);
-        entity_management_system->assign_id_and_store_entity(*tim_ent_1);
-        */
-        Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
-        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "chest.mat");
-
-        Entity* chest = new Entity();
-        Transform3D* chest_tr = new Transform3D();
-        chest_tr->set_position(Vector3<float>(0.f,0.5f,-1.8f));
-        chest_tr->set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-        graphics->models.push_back( &(chest_tr->get_transformation()));
-        graphics->normals.push_back(&chest_tr->get_rotation_transformation());
-
-        chest->add_componenet(chest_tr);
-        chest->add_componenet(graphics);
-
-        entity_management_system->assign_id_and_store_entity(*chest);
-        
-        Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
-                get_resource_path(std::string("stonetile.png")).c_str(),"floor.mat");
-        Entity* floor = new Entity();
-        Transform3D* floor_transform = new Transform3D();
-        floor_transform->set_scale(Vector3<float>(8.f,1.f,8.f));
-        floor_transform->set_position(Vector3<float>(0.f, 0.f,0.f));
-        graphics_plane->models.push_back( &(floor_transform->get_transformation()));
-        graphics_plane->normals.push_back(&floor_transform->get_rotation_transformation());
-
-        floor->add_componenet(floor_transform);
-        floor->add_componenet(graphics_plane);
-        entity_management_system->assign_id_and_store_entity(*floor);
-
-        ((GuiLayer*)renderer->get_layer("GUI"))->panning =
-                &(graphics_plane->elements.begin()->material->panning);
-        ((GuiLayer*)renderer->get_layer("GUI"))->tiling =
-                &(graphics_plane->elements.begin()->material->tiling);
-
-        LOG(LOGTYPE_WARNING, "Pan: ",std::to_string(graphics_plane->elements.begin()->material->panning.x));
-
-        Entity* light_ent = new Entity();
-        DirectionalLight* light = new DirectionalLight();
-        light_ent->add_componenet(light);
-        entity_management_system->assign_id_and_store_entity(*light_ent);
 
         std::vector<std::string> paths;
         std::string right = get_resource_path( std::string("skybox"+PATH_SEP+"right.jpg"));
@@ -231,7 +114,49 @@ int main(int argc, char * argv[])
         skybox->add_componenet(skybox_transform);
         skybox->add_componenet(cube_map_grpahics);
         entity_management_system->assign_id_and_store_entity(*skybox);
+
+
+
+        Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
+        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "chest.mat");
+
+        Entity* chest = new Entity();
+        Transform3D* chest_tr = new Transform3D();
+        chest_tr->set_position(Vector3<float>(0.f,0.5f,-1.8f));
+        chest_tr->set_scale(Vector3<float>{0.01f,0.01f,0.01f});
+        graphics->models.push_back( &(chest_tr->get_transformation()));
+        graphics->normals.push_back(&chest_tr->get_rotation_transformation());
+
+        chest->add_componenet(chest_tr);
+        chest->add_componenet(graphics);
+
+        entity_management_system->assign_id_and_store_entity(*chest);
         
+
+        Entity* light_ent = new Entity();
+        DirectionalLight* light = new DirectionalLight();
+        light_ent->add_componenet(light);
+        entity_management_system->assign_id_and_store_entity(*light_ent);
+
+
+        Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
+        get_resource_path(std::string("stonetile.png")).c_str(), "floor.mat", (TextureCubeMap*)(cube_map_grpahics->elements[0].material->diffuse_texture));
+        Entity* floor = new Entity();
+        Transform3D* floor_transform = new Transform3D();
+        floor_transform->set_scale(Vector3<float>(8.f,1.f,8.f));
+        floor_transform->set_position(Vector3<float>(0.f, 0.f,0.f));
+        graphics_plane->models.push_back( &(floor_transform->get_transformation()));
+        graphics_plane->normals.push_back(&floor_transform->get_rotation_transformation());
+
+        floor->add_componenet(floor_transform);
+        floor->add_componenet(graphics_plane);
+        entity_management_system->assign_id_and_store_entity(*floor);
+        ((GuiLayer*)renderer->get_layer("GUI"))->panning =
+                &(graphics_plane->elements.begin()->material->panning);
+        ((GuiLayer*)renderer->get_layer("GUI"))->tiling =
+                &(graphics_plane->elements.begin()->material->tiling);
+
+        //graphics_plane->elements[0].material->environment_map_texture = (TextureCubeMap*)cube_map_grpahics->elements[0].material->diffuse_texture;
 
         //TextureCubeMap* cube_map = new TextureCubeMap(paths);
         //std::cout<<graphics->normal->data[0]<<std::endl;

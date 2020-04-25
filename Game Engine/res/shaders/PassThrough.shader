@@ -5,7 +5,10 @@ layout(location=0) in vec4 position;
 layout(location=1) in vec4 _color;
 layout(location=2) in vec4 _normal;
 layout(location=3) in vec2 texco;
-uniform mat4 u_MVP;
+
+uniform mat4 u_Model;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
 uniform mat4 u_Normal_M;
 uniform vec3 u_Dir_Light;
 uniform vec2 u_Tiling;
@@ -19,7 +22,7 @@ out vec2 out_panning;
 
 void main()
 {
-    gl_Position = u_MVP * position;
+    gl_Position = u_Projection * u_View * u_Model * position;
     out_color = _color;
     out_texco = texco;
     vec4 n = normalize(u_Normal_M *_normal);
