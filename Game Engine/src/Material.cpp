@@ -48,8 +48,8 @@ namespace PrEngine
         }
         else
             shader_program = _shader_it->second;
-
-        load_uniform_location("u_sampler2d");
+        
+        /*load_uniform_location("u_sampler2d");
         load_uniform_location("u_env_map");
         load_uniform_location("u_Model");
         load_uniform_location("u_View");
@@ -58,7 +58,7 @@ namespace PrEngine
         load_uniform_location("u_Normal_M");
         load_uniform_location("u_Dir_Light");
         load_uniform_location("u_Tiling");
-        load_uniform_location("u_Panning");
+        load_uniform_location("u_Panning");*/
 
     }
 
@@ -100,7 +100,7 @@ namespace PrEngine
         else
             shader_program = _shader_it->second;
 
-        load_uniform_location("u_sampler2d");
+        /*load_uniform_location("u_sampler2d");
         load_uniform_location("u_Model");
         load_uniform_location("u_View");
         load_uniform_location("u_Projection");
@@ -108,7 +108,7 @@ namespace PrEngine
         load_uniform_location("u_Normal_M");
         load_uniform_location("u_Dir_Light");
         load_uniform_location("u_Tiling");
-        load_uniform_location("u_Panning");
+        load_uniform_location("u_Panning");*/
 
     }
 
@@ -158,8 +158,8 @@ namespace PrEngine
         else
             shader_program = _shader_it->second;
 
-        load_uniform_location("u_sampler_cube");
-        load_uniform_location("u_MVP");
+        //load_uniform_location("u_sampler_cube");
+        //load_uniform_location("u_MVP");
         
 
     }
@@ -209,7 +209,7 @@ namespace PrEngine
         
     }
 
-    void Material::load_uniform_location(std::string uniform)
+    void Material::load_uniform_location(const std::string& uniform, const std::string& type)
     {
         GLint loc = -1;
         GL_CALL(
@@ -217,7 +217,42 @@ namespace PrEngine
         
         std::cout<<"Location: "<<uniform<<" , "<<loc<<std::endl;
         //if(loc != -1)
-        uniform_locations[uniform] = loc;
+        uniform_locations[uniform] = {type, loc};
+    }
+
+    void Material::parse_shader(const std::string& source)
+    {
+        int pos = 0;
+        while((pos = source.find("uniform",pos)) != std::string::npos)
+        {
+            int prev = 1;
+            while(pos-prev>=0 && source[pos-prev]==' ')
+                prev++;
+            if(pos-prev<0 || source[pos-prev] !='/') // ignore comments, ignores spaces
+            {
+                std::string u_type = ""; 
+                std::string u_name = "";
+                
+                int start = pos+8; // "uniform" length is 7
+                int i = 0;
+                for(; source[start+i]!=' '; i++);
+                
+                u_type = source.substr(start,i);
+
+                //skip through spaces
+                start = start+i;
+                while(source[start]==' ')
+                    start++;
+                
+                i = 0;
+                for(; !std::isspace(source[start+i]) && source[start+i]!=';'; i++);
+                u_name = source.substr(start, i);
+                LOG(LOGTYPE_GENERAL, u_type, " ",u_name);
+                load_uniform_location(u_name, u_type);
+            }
+
+            pos++;
+        }
     }
 
     bool Material::make_shader_program(const std::string& path)
@@ -285,6 +320,8 @@ namespace PrEngine
                 glDeleteShader(v);
                 glDetachShader(shader_program, f);
                 glDeleteShader(f);
+                parse_shader(_source);
+
                 return true;
             }
         }

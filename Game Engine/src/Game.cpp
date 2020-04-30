@@ -31,8 +31,6 @@ namespace PrEngine
                 t->set_rotation(t->get_rotation().x+30, 0, 0);
                 LOG(LOGTYPE_WARNING, std::to_string(Time::Frame_time));
             }
-            
-                
         }
         else
         {

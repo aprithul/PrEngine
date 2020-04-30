@@ -19,7 +19,7 @@ namespace PrEngine
         Entity* camera = entity_management_system->get_entity(camera_handle);
 
         DirectionalLight* light = (DirectionalLight*)entity_management_system->get_entity_with_component(COMP_LIGHT);
-
+        /*
         for(std::vector<Sprite*>::iterator it = sprite_list.begin(); it != sprite_list.end(); it++ )
         {
             Graphics& grp = (*it)->graphics;
@@ -78,6 +78,7 @@ namespace PrEngine
                 //grp.ibo[i].Unbind();
             }
         }
+        */
     }
 
     void SpriteLayer::end()

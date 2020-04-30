@@ -21,14 +21,15 @@ namespace PrEngine
         ~Material();
         GLuint shader_program;
         std::string source_file_path;
-        std::unordered_map<std::string, GLint> uniform_locations;
+        std::unordered_map<std::string, std::pair<std::string, GLuint>> uniform_locations;
         Texture* diffuse_texture;
         TextureCubeMap* environment_map_texture;
         void Bind();
         void Unbind();
         bool make_shader_program(const std::string& path);
         GLuint make_shader(GLenum type,  const std::string& source);
-        void load_uniform_location(std::string uniform);
+        void load_uniform_location(const std::string& uniform, const std::string& type);
+        void parse_shader(const std::string& source);
         Vector2<float> tiling;
         Vector2<float> panning;
     };
