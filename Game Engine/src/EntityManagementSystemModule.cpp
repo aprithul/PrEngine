@@ -39,6 +39,7 @@ namespace PrEngine
         return nullptr;
     }    
 
+
     Entity* EntityManagementSystem::get_entity(long id)
     {
         std::unordered_map<long,int>::iterator it = id_map.find(id);
@@ -59,6 +60,17 @@ namespace PrEngine
             LOG(LOGTYPE_ERROR, "requested entity couldn't be found : ", std::to_string(id));
         }
 
+        return nullptr;
+    
+    }
+
+    Entity* EntityManagementSystem::get_entity(std::string name)
+    {
+        for(int i=0;i < entity_count; i++)
+        {
+            if(entities[i]->name == name)
+                return entities[i];
+        }
         return nullptr;
     
     }

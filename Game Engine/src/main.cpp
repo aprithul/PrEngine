@@ -26,6 +26,7 @@
 #include "Sprite.hpp"
 #include "Camera3D.hpp"
 #include "DirectionalLight.hpp"
+#include "Game.hpp"
 //#include "ImGuiModule.hpp"
 
 using namespace PrEngine;
@@ -54,7 +55,7 @@ int main(int argc, char * argv[])
         PrEngine::FrameRateCounter* frame_rate_counter = 
                         (PrEngine::FrameRateCounter*)game_engine->
                                 add_module(new PrEngine::FrameRateCounter("Frame Counter", 100001));
-         
+        Game* game = (Game*)(game_engine->add_module(new Game("game module",3)));
         // can't exceed 60fps if vsync is on
         //frame_rate_regulator->set_frame_rate(60);
         frame_rate_regulator->set_uncapped();
@@ -141,7 +142,7 @@ int main(int argc, char * argv[])
 
         Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
         get_resource_path(std::string("stonetile.png")).c_str(), "floor.mat", (TextureCubeMap*)(cube_map_grpahics->elements[0].material->diffuse_texture));
-        Entity* floor = new Entity();
+        Entity* floor = new Entity("floor");
         Transform3D* floor_transform = new Transform3D();
         floor_transform->set_scale(Vector3<float>(8.f,1.f,8.f));
         floor_transform->set_position(Vector3<float>(0.f, 0.f,0.f));

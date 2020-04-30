@@ -20,7 +20,7 @@ namespace PrEngine {
     class Module
     {
     public:
-        Module(std::string, int name);
+        Module(std::string name, int priority);
         virtual ~Module();
         virtual void start() = 0;
         virtual void update() = 0;

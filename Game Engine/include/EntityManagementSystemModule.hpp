@@ -20,6 +20,7 @@ namespace PrEngine
             ~EntityManagementSystem();
 
             Entity* get_entity(long id);
+            Entity* get_entity(std::string name);
             Entity* get_entity_with_component(ComponentType type);
             bool delete_entity(long id);
             Entity* assign_id_and_store_entity(Entity& entity);
