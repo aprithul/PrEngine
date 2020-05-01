@@ -82,8 +82,8 @@ namespace PrEngine
         //Material* material;
         //VertexLayout layout;  
 
-        std::vector<const Matrix4x4<float>*> models;
-        std::vector<const Matrix4x4<float>*> normals;
+        const Matrix4x4<float>* model;
+        const Matrix4x4<float>* normal;
 
         Graphics();// const Vertex* vertices, GLuint vertices_size, const GLuint* indices, GLuint indices_size, GLsizei indices_count, Material material,Texture texture, VertexLayout layout);
         ~Graphics();

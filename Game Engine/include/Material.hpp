@@ -11,6 +11,12 @@
 namespace PrEngine
 {
 
+    struct Shader
+    {
+        GLuint id;
+        std::unordered_map<std::string, std::pair<std::string, GLuint>> uniform_locations;
+    };
+
     struct Material
     {
         Material(const std::string& shader_path, const std::string& diffuse_tex_path,const std::string& name);
@@ -19,9 +25,8 @@ namespace PrEngine
         //void Generate(const std::string& shader_path, const std::string& diffuse_tex_path, const std::string& name);
         void Delete();
         ~Material();
-        GLuint shader_program;
+        Shader shader_program;
         std::string source_file_path;
-        std::unordered_map<std::string, std::pair<std::string, GLuint>> uniform_locations;
         Texture* diffuse_texture;
         TextureCubeMap* environment_map_texture;
         void Bind();
@@ -34,7 +39,7 @@ namespace PrEngine
         Vector2<float> panning;
     };
     extern std::unordered_map<std::string, Material*> material_library;
-    extern std::unordered_map<std::string, GLuint> shader_library;
+    extern std::unordered_map<std::string, Shader> shader_library;
 
 } // namespace PrEngine
 

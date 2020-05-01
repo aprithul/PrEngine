@@ -90,7 +90,7 @@ int main(int argc, char * argv[])
 
         LOG(LOGTYPE_GENERAL, std::string( (const char*)(glGetString(GL_VERSION))));//,",  ",std::string( (const char*)(glGetString(GL_EXTENSIONS)) ));
 
-
+        
         std::vector<std::string> paths;
         std::string right = get_resource_path( std::string("skybox"+PATH_SEP+"right.jpg"));
         std::string left = get_resource_path( std::string("skybox"+PATH_SEP+"left.jpg"));
@@ -109,43 +109,21 @@ int main(int argc, char * argv[])
         Graphics* cube_map_grpahics = renderer->generate_graphics_skybox(paths, "sky_mat");
         Transform3D* skybox_transform = new Transform3D();
         skybox_transform->set_scale(100,100,100);
-        cube_map_grpahics->models.push_back( &(skybox_transform->get_transformation()));
-        cube_map_grpahics->normals.push_back(&skybox_transform->get_rotation_transformation());
+        cube_map_grpahics->model= &(skybox_transform->get_transformation());
+        cube_map_grpahics->normal= &skybox_transform->get_rotation_transformation();
         Entity* skybox = new Entity();
         skybox->add_componenet(skybox_transform);
         skybox->add_componenet(cube_map_grpahics);
         entity_management_system->assign_id_and_store_entity(*skybox);
+                
 
-
-
-        Graphics* graphics = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
-        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "chest.mat");
-
-        Entity* chest = new Entity();
-        Transform3D* chest_tr = new Transform3D();
-        chest_tr->set_position(Vector3<float>(0.f,0.5f,-1.8f));
-        chest_tr->set_scale(Vector3<float>{0.01f,0.01f,0.01f});
-        graphics->models.push_back( &(chest_tr->get_transformation()));
-        graphics->normals.push_back(&chest_tr->get_rotation_transformation());
-
-        chest->add_componenet(chest_tr);
-        chest->add_componenet(graphics);
-
-        entity_management_system->assign_id_and_store_entity(*chest);
         
-
-        Entity* light_ent = new Entity();
-        DirectionalLight* light = new DirectionalLight();
-        light_ent->add_componenet(light);
-        entity_management_system->assign_id_and_store_entity(*light_ent);
-
-
-        Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("plane.obj")).c_str(), 
-        get_resource_path(std::string("stonetile.png")).c_str(), "floor.mat", (TextureCubeMap*)(cube_map_grpahics->elements[0].material->diffuse_texture));
+        /*Graphics* graphics_plane = renderer->generate_graphics(get_resource_path("").c_str(), get_resource_path(std::string("teapot.obj")).c_str(), 
+                get_resource_path(std::string("stonetile.png")).c_str(), "chest.mat");//, (TextureCubeMap*)(cube_map_grpahics->elements[0].material->diffuse_texture));
         Entity* floor = new Entity("floor");
         Transform3D* floor_transform = new Transform3D();
-        floor_transform->set_scale(Vector3<float>(8.f,1.f,8.f));
-        floor_transform->set_position(Vector3<float>(0.f, 0.f,0.f));
+        floor_transform->set_scale(Vector3<float>(1.f,1.f,1.f));
+        floor_transform->set_position(Vector3<float>(0.f, -5.0f,0.f));
         graphics_plane->models.push_back( &(floor_transform->get_transformation()));
         graphics_plane->normals.push_back(&floor_transform->get_rotation_transformation());
 
@@ -155,7 +133,85 @@ int main(int argc, char * argv[])
         ((GuiLayer*)renderer->get_layer("GUI"))->panning =
                 &(graphics_plane->elements.begin()->material->panning);
         ((GuiLayer*)renderer->get_layer("GUI"))->tiling =
-                &(graphics_plane->elements.begin()->material->tiling);
+                &(graphics_plane->elements.begin()->material->tiling);*/
+        
+
+        Graphics* teapot_graphic_2 = renderer->generate_graphics(get_resource_path(""), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
+        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "stone1.mat");
+
+        Entity* teapot_ent_2 = new Entity();
+        Transform3D* teapot_tr_2 = new Transform3D();
+        teapot_tr_2->set_position(2.f,0.5f,1.f);
+        teapot_tr_2->set_scale(0.01f,0.01f,0.01f);
+        teapot_graphic_2->model = &(teapot_tr_2->get_transformation());
+        teapot_graphic_2->normal = &(teapot_tr_2->get_rotation_transformation());
+
+        teapot_ent_2->add_componenet(teapot_tr_2);
+        teapot_ent_2->add_componenet(teapot_graphic_2);
+
+        entity_management_system->assign_id_and_store_entity(*teapot_ent_2);
+
+
+        Graphics* teapot_graphic = renderer->generate_graphics(get_resource_path(""), get_resource_path(std::string("teapot.obj")), 
+        "", "stone2.mat");
+
+        Entity* teapot_ent = new Entity();
+        Transform3D* teapot_tr = new Transform3D();
+        teapot_tr->set_position(Vector3<float>(-4.f,0.5f,1.f));
+        teapot_tr->set_scale(0.05f,0.05f,0.05f);
+        teapot_graphic->model = &(teapot_tr->get_transformation());
+        teapot_graphic->normal = &(teapot_tr->get_rotation_transformation());
+
+        teapot_ent->add_componenet(teapot_tr);
+        teapot_ent->add_componenet(teapot_graphic);
+
+        entity_management_system->assign_id_and_store_entity(*teapot_ent);
+
+
+
+        Graphics* graphics1 = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("plane.obj")), 
+        get_resource_path(std::string("stonetile.png")), "stone4.mat");
+
+        Entity* chest1 = new Entity();
+        Transform3D* chest_tr1 = new Transform3D();
+        chest_tr1->set_position(0,-1,0);
+        chest_tr1->set_scale(4,4,4);
+        graphics1->model=( &(chest_tr1->get_transformation()));
+        graphics1->normal = (&chest_tr1->get_rotation_transformation());
+
+        chest1->add_componenet(chest_tr1);
+        chest1->add_componenet(graphics1);
+
+        entity_management_system->assign_id_and_store_entity(*chest1);
+
+
+        /*Graphics* graphics2 = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("TreasureChest"+PATH_SEP+"treasure_chest.obj")), 
+        get_resource_path(std::string("TreasureChest"+PATH_SEP+"Treasurechest_DIFF.png")), "chest.mat");
+
+        Entity* chest2 = new Entity();
+        Transform3D* chest_tr2 = new Transform3D();
+        chest_tr2->set_position(Vector3<float>(2.f,0.5f,-3.8f));
+        chest_tr2->set_scale(Vector3<float>{0.01f,0.01f,0.01f});
+        graphics2->models.push_back( &(chest_tr2->get_transformation()));
+        graphics2->normals.push_back(&chest_tr2->get_rotation_transformation());
+
+        chest1->add_componenet(chest_tr2);
+        chest1->add_componenet(graphics2);
+
+        entity_management_system->assign_id_and_store_entity(*chest2);*/
+
+
+
+
+        Entity* light_ent = new Entity();
+        Transform3D* light_tr = new Transform3D();
+        light_tr->set_rotation(Vector3<float>(0,0,90));
+        DirectionalLight* light = new DirectionalLight(0.5f, 0.3f);
+        light_ent->add_componenet(light);
+        light_ent->add_componenet(light_tr);
+        entity_management_system->assign_id_and_store_entity(*light_ent);
+
+
 
         //graphics_plane->elements[0].material->environment_map_texture = (TextureCubeMap*)cube_map_grpahics->elements[0].material->diffuse_texture;
 

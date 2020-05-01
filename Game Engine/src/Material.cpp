@@ -4,7 +4,7 @@ namespace PrEngine
 {
 
     std::unordered_map<std::string, Material*> material_library;
-    std::unordered_map<std::string, GLuint> shader_library;
+    std::unordered_map<std::string, Shader> shader_library;
 
     /*Material::()
     {
@@ -37,7 +37,7 @@ namespace PrEngine
         else    // texture found in library, so assign that
             diffuse_texture = texture_library[diffuse_tex_path];
 
-        std::unordered_map<std::string, GLuint>::iterator _shader_it = shader_library.find(shader_path);
+        std::unordered_map<std::string, Shader>::iterator _shader_it = shader_library.find(shader_path);
         if(_shader_it == shader_library.end())
         {
             // create shader, probably can be shared, will check later
@@ -88,7 +88,7 @@ namespace PrEngine
         else    // texture found in library, so assign that
             diffuse_texture = texture_library[diffuse_tex_path];
 
-        std::unordered_map<std::string, GLuint>::iterator _shader_it = shader_library.find(shader_path);
+        std::unordered_map<std::string, Shader>::iterator _shader_it = shader_library.find(shader_path);
         if(_shader_it == shader_library.end())
         {
             // create shader, probably can be shared, will check later
@@ -97,18 +97,9 @@ namespace PrEngine
             
             shader_library[shader_path] = shader_program;
         }
-        else
+        else{
             shader_program = _shader_it->second;
-
-        /*load_uniform_location("u_sampler2d");
-        load_uniform_location("u_Model");
-        load_uniform_location("u_View");
-        load_uniform_location("u_Projection");
-        load_uniform_location("u_Camera_Position");
-        load_uniform_location("u_Normal_M");
-        load_uniform_location("u_Dir_Light");
-        load_uniform_location("u_Tiling");
-        load_uniform_location("u_Panning");*/
+        }
 
     }
 
@@ -145,7 +136,7 @@ namespace PrEngine
         else    // texture found in library, so assign that
             diffuse_texture = texture_library[cubemap_file_name];
 
-        std::unordered_map<std::string, GLuint>::iterator _shader_it = shader_library.find(shader_path);
+        std::unordered_map<std::string, Shader>::iterator _shader_it = shader_library.find(shader_path);
         if(_shader_it == shader_library.end())
         {
             // create shader, probably can be shared, will check later
@@ -167,7 +158,7 @@ namespace PrEngine
     void Material::Bind()
     {
         GL_CALL(
-            glUseProgram(shader_program))
+            glUseProgram(shader_program.id))
         diffuse_texture->Bind(0);
         if(environment_map_texture != nullptr)
             environment_map_texture->Bind(1);
@@ -185,7 +176,7 @@ namespace PrEngine
     void Material::Delete()
     {
         GL_CALL(
-            glDeleteProgram(shader_program))
+            glDeleteProgram(shader_program.id))
 
         for(std::unordered_map<std::string, Texture*>::iterator it=texture_library.begin(); it!=texture_library.end(); it++)
         {
@@ -213,11 +204,11 @@ namespace PrEngine
     {
         GLint loc = -1;
         GL_CALL(
-            loc = glGetUniformLocation(shader_program, uniform.c_str()))
+            loc = glGetUniformLocation(shader_program.id, uniform.c_str()))
         
         std::cout<<"Location: "<<uniform<<" , "<<loc<<std::endl;
         //if(loc != -1)
-        uniform_locations[uniform] = {type, loc};
+        shader_program.uniform_locations[uniform] = {type, loc};
     }
 
     void Material::parse_shader(const std::string& source)
@@ -284,8 +275,8 @@ namespace PrEngine
             }
         }
 
-        shader_program = glCreateProgram();
-        if(shader_program == 0)
+        shader_program.id = glCreateProgram();
+        if(shader_program.id == 0)
         {
             std::cout<<"Couldn't create shader program"<<std::endl;
             return false;
@@ -295,30 +286,30 @@ namespace PrEngine
         GLuint f = make_shader( GL_FRAGMENT_SHADER, frag);
         if(v != -1 && f != -1)
         {
-            glAttachShader(shader_program, v);
-            glAttachShader(shader_program, f);
-            glLinkProgram(shader_program);
+            glAttachShader(shader_program.id, v);
+            glAttachShader(shader_program.id, f);
+            glLinkProgram(shader_program.id);
             GLint program_linked;
 
-            glGetProgramiv(shader_program, GL_LINK_STATUS, &program_linked);
+            glGetProgramiv(shader_program.id, GL_LINK_STATUS, &program_linked);
             if (program_linked != GL_TRUE)
             {
                 int length;
-                glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &length);
+                glGetProgramiv(shader_program.id, GL_INFO_LOG_LENGTH, &length);
                 GLchar* log = (GLchar*)alloca(length*sizeof(GLchar));
-                glGetProgramInfoLog(shader_program, length, &length, log);
+                glGetProgramInfoLog(shader_program.id, length, &length, log);
                 LOG(LOGTYPE_ERROR, "Shader linking error\n",std::string(log));
                 
-                glDetachShader(shader_program, v);
+                glDetachShader(shader_program.id, v);
                 glDeleteShader(v);
-                glDetachShader(shader_program, f);
+                glDetachShader(shader_program.id, f);
                 glDeleteShader(f);       
             }
             else
             {   
-                glDetachShader(shader_program, v);
+                glDetachShader(shader_program.id, v);
                 glDeleteShader(v);
-                glDetachShader(shader_program, f);
+                glDetachShader(shader_program.id, f);
                 glDeleteShader(f);
                 parse_shader(_source);
 

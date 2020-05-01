@@ -9,9 +9,10 @@ namespace PrEngine
     class DirectionalLight : public Component
     {
         public:
-            DirectionalLight();
+            DirectionalLight(float specular, float ambient);
             ~DirectionalLight() override;
-            Vector3<float> direction;
+            float specular;
+            float ambient;
 
             void awake() override;
             void start() override;

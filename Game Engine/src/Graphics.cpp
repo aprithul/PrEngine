@@ -14,6 +14,7 @@ namespace PrEngine
     {
         GL_CALL(
             glGenVertexArrays(1, &id))
+        Bind();
     }
 
     void VertexArray::Delete()
@@ -45,7 +46,7 @@ namespace PrEngine
         Bind(); 
         GL_CALL( 
             glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW))
-        Unbind();
+        
     }
 
     VertexBuffer::~VertexBuffer()
@@ -83,7 +84,6 @@ namespace PrEngine
         Bind();
         GL_CALL(
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size, indices, GL_STATIC_DRAW))
-        Unbind();
     }
 
     IndexBuffer::~IndexBuffer()

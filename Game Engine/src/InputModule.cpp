@@ -92,7 +92,7 @@ namespace PrEngine {
         while (SDL_PollEvent(&event)) {
             
             //ImGuiIO& io = ImGui::GetIO();
-            ImGui_ImplSDL2_ProcessEvent(&event);            
+            //ImGui_ImplSDL2_ProcessEvent(&event);            
             
             switch (event.type)
             {

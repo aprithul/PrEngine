@@ -2,9 +2,10 @@
 
 namespace PrEngine
 {
-    DirectionalLight::DirectionalLight():Component(COMP_LIGHT)
+    DirectionalLight::DirectionalLight(float _specular, float _ambient):Component(COMP_LIGHT)
     {
-        direction = Vector3<float>(.2,.2,-0.1).normalize();
+        this->specular = _specular;
+        this->ambient = _ambient;
         
     }
 
@@ -15,7 +16,6 @@ namespace PrEngine
 
     void DirectionalLight::awake()
     {
-        
     }
 
     void DirectionalLight::start()

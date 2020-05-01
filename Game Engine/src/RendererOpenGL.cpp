@@ -33,7 +33,7 @@ namespace PrEngine {
         GL_CALL(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA))
         GL_CALL(glEnable(GL_DEPTH_TEST))
         GL_CALL(glDepthFunc(GL_LESS))
-
+        GL_CALL(glEnable(GL_MULTISAMPLE))
 
         if( glewInit() != GLEW_OK)
             printf("Glew not initialized properly");
@@ -68,11 +68,11 @@ namespace PrEngine {
         GeometryLayer* geometry_layer = new GeometryLayer(camera_handle);
         render_layers.push_back(geometry_layer);
 
-        SpriteLayer* sprite_layer = new SpriteLayer(camera_handle);
-        render_layers.push_back(sprite_layer);
+        //SpriteLayer* sprite_layer = new SpriteLayer(camera_handle);
+        //render_layers.push_back(sprite_layer);
 
-        GuiLayer* gui_layer = new GuiLayer(window, &glContext);
-        render_layers.push_back(gui_layer);
+        //GuiLayer* gui_layer = new GuiLayer(window, &glContext);
+        //render_layers.push_back(gui_layer);
     }
     
     
@@ -102,7 +102,8 @@ namespace PrEngine {
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1 );
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+        SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 
 //        glEnable(GL_DEPTH_TEST); //
         //glEnable(GL_FRAMEBUFFER_SRGB);  // auto gamma correction
@@ -304,27 +305,25 @@ namespace PrEngine {
             mat = _mat_it->second;
         }
         
-        graphics->elements.back().material = mat;
-        graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
-        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
-        graphics->elements.back().vao.Generate();
-        graphics->elements.back().layout = layout;
-        graphics->elements.back().num_of_triangles = (buffer.size()/3);
+            graphics->elements.back().material = mat;
+            graphics->elements.back().vao.Generate();
+            graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
 
-        for(int i=0; i<graphics->elements.size(); i++)
-        {
-            graphics->elements[i].vao.Bind();
-            graphics->elements[i].vbo.Bind();
-            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
+            graphics->elements.back().layout = layout;
+            for(std::vector<VertexAttribute>::iterator attr = graphics->elements.back().layout.vertex_attributes.begin(); attr !=  graphics->elements.back().layout.vertex_attributes.end(); attr++)
             {
                 GL_CALL(
                     glEnableVertexAttribArray( attr->index))
                 GL_CALL(
                     glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
             }
-            graphics->elements[i].vbo.Unbind();
-            graphics->elements[i].vao.Unbind();
-        }
+
+            graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
+            graphics->elements.back().num_of_triangles = (buffer.size()/3);
+
+            //graphics->elements.back().material->Unbind();
+            graphics->elements.back().vao.Unbind();
+            graphics->elements.back().ibo.Unbind();
         
        // if(!has_transparency)
             SpriteLayer* geom_layer = (SpriteLayer*)get_layer("Sprite");
@@ -447,27 +446,24 @@ namespace PrEngine {
         }
         
         graphics->elements.back().material = mat;
+        graphics->elements.back().vao.Generate();
+        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
+
+        graphics->elements.back().layout = layout;
+        for(std::vector<VertexAttribute>::iterator attr = graphics->elements.back().layout.vertex_attributes.begin(); attr !=  graphics->elements.back().layout.vertex_attributes.end(); attr++)
+        {
+            GL_CALL(
+                glEnableVertexAttribArray( attr->index))
+            GL_CALL(
+                glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+        }
 
         graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
-        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
-        graphics->elements.back().vao.Generate();
-        graphics->elements.back().layout = layout;
         graphics->elements.back().num_of_triangles = (buffer.size()/3);
 
-        for(int i=0; i<graphics->elements.size(); i++)
-        {
-            graphics->elements[i].vao.Bind();
-            graphics->elements[i].vbo.Bind();
-            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
-            {
-                GL_CALL(
-                    glEnableVertexAttribArray( attr->index))
-                GL_CALL(
-                    glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
-            }
-            graphics->elements[i].vbo.Unbind();
-            graphics->elements[i].vao.Unbind();
-        }
+        //graphics->elements.back().material->Unbind();
+        graphics->elements.back().vao.Unbind();
+        graphics->elements.back().ibo.Unbind();
         
        // if(!has_transparency)
         {
@@ -621,28 +617,29 @@ namespace PrEngine {
             mat = _mat_it->second;
         }
         
+
+
         graphics->elements.back().material = mat;
+        graphics->elements.back().vao.Generate();
+        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
+
+        graphics->elements.back().layout = layout;
+        for(std::vector<VertexAttribute>::iterator attr = graphics->elements.back().layout.vertex_attributes.begin(); attr !=  graphics->elements.back().layout.vertex_attributes.end(); attr++)
+        {
+            GL_CALL(
+                glEnableVertexAttribArray( attr->index))
+            GL_CALL(
+                glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+        }
 
         graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
-        graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
-        graphics->elements.back().vao.Generate();
-        graphics->elements.back().layout = layout;
         graphics->elements.back().num_of_triangles = (buffer.size()/3);
 
-        for(int i=0; i<graphics->elements.size(); i++)
-        {
-            graphics->elements[i].vao.Bind();
-            graphics->elements[i].vbo.Bind();
-            for(std::vector<VertexAttribute>::iterator attr = graphics->elements[i].layout.vertex_attributes.begin(); attr !=  graphics->elements[i].layout.vertex_attributes.end(); attr++)
-            {
-                GL_CALL(
-                    glEnableVertexAttribArray( attr->index))
-                GL_CALL(
-                    glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
-            }
-            graphics->elements[i].vbo.Unbind();
-            graphics->elements[i].vao.Unbind();
-        }
+        //graphics->elements.back().material->Unbind();
+        graphics->elements.back().vao.Unbind();
+        graphics->elements.back().ibo.Unbind();
+
+        
         
        // if(!has_transparency)
         {
@@ -670,7 +667,7 @@ namespace PrEngine {
 
         std::string warn;
         std::string err;
-        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.c_str(), base_dir.c_str());
+        bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_name.c_str());//, base_dir.c_str());
         if (!warn.empty())
             LOG(LOGTYPE_WARNING, warn);
         if (!err.empty())
@@ -692,7 +689,6 @@ namespace PrEngine {
         layout.add_attribute(attribute_1);
         layout.add_attribute(attribute_2);
         layout.add_attribute(attribute_3);
-        std::cout<<"1"<<std::endl;
         /*
         std::cout<<"ind size: "<<shapes[0].mesh.indices.size()<<std::endl;
         std::cout<<"vertices size: "<<attrib.vertices.size()<<std::endl;
@@ -913,15 +909,15 @@ namespace PrEngine {
             std::cout<<"Indices: "<<indices.size()<<std::endl;
 
 
-                /*for(int i=0; i<indices.size(); i++)
-                    std::cout<<indices[i]<<std::endl;
-                for(int i=0; i<buffer.size(); i++)
-                    std::cout<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;*/
-                //std::cout<<indices[i]<<" : "<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;
+            /*for(int i=0; i<indices.size(); i++)
+                std::cout<<indices[i]<<std::endl;
+            for(int i=0; i<buffer.size(); i++)
+                std::cout<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;*/
+            //std::cout<<indices[i]<<" : "<<buffer[i].p_x<<","<<buffer[i].p_y<<","<<buffer[i].p_z<<std::endl;
 
-                //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
-                //for(int i=0; i<buffer.size(); i++)
-                //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
+            //IndexBuffer ib( &(shapes[s].mesh.indices[0]), )
+            //for(int i=0; i<buffer.size(); i++)
+            //    std::cout<< ((&buffer[0])+i)->p_x<<","<<((&buffer[0])+i)->p_y<<","<<((&buffer[0])+i)->p_z <<std::endl;
 
             GraphicsElement g_element;
 
@@ -930,8 +926,9 @@ namespace PrEngine {
             Material* mat;
             if(_mat_it == material_library.end())
             {
+                
                 if(env_map == nullptr)
-                    mat = new Material("shaders"+PATH_SEP+"PassThrough.shader", std::string(texture_file_path), mat_name);
+                    mat = new Material("shaders"+PATH_SEP+"Diffuse.shader", std::string(texture_file_path), mat_name);
                 else
                     mat = new Material("shaders"+PATH_SEP+"Reflective.shader", std::string(texture_file_path), *env_map, mat_name);
 
@@ -939,17 +936,30 @@ namespace PrEngine {
             }
             else
             {
-                mat = _mat_it->second;
+                mat = material_library[mat_name];//_mat_it->second;
             }
             
             graphics->elements.back().material = mat;
-            graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
-            graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
             graphics->elements.back().vao.Generate();
-            graphics->elements.back().layout = layout;
-            graphics->elements.back().num_of_triangles = (buffer.size()/3);
-        }
+            graphics->elements.back().vbo.Generate(&buffer[0], buffer.size()*sizeof(Vertex));
 
+            graphics->elements.back().layout = layout;
+            for(std::vector<VertexAttribute>::iterator attr = graphics->elements.back().layout.vertex_attributes.begin(); attr !=  graphics->elements.back().layout.vertex_attributes.end(); attr++)
+            {
+                GL_CALL(
+                    glEnableVertexAttribArray( attr->index))
+                GL_CALL(
+                    glVertexAttribPointer(attr->index, attr->count, attr->type, attr->normalized, layout.stride, (void*)attr->offset))
+            }
+
+            graphics->elements.back().ibo.Generate( &indices[0], indices.size()*sizeof(GLuint), indices.size());
+            graphics->elements.back().num_of_triangles = (buffer.size()/3);
+
+            //graphics->elements.back().material->Unbind();
+            graphics->elements.back().vao.Unbind();
+            graphics->elements.back().ibo.Unbind();
+        }
+        /*
         for(int i=0; i<graphics->elements.size(); i++)
         {
             graphics->elements[i].vao.Bind();
@@ -963,7 +973,7 @@ namespace PrEngine {
             }
             graphics->elements[i].vbo.Unbind();
             graphics->elements[i].vao.Unbind();
-        }
+        }*/
         /*for(std::vector<RenderLayer*>::iterator it=render_layers.begin(); it!=render_layers.end(); it++)
         {
                 if((*it)->name == "Geometry"){
