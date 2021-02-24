@@ -31,10 +31,10 @@ namespace PrEngine
         TextureCubeMap* environment_map_texture;
         void Bind();
         void Unbind();
-        bool make_shader_program(const std::string& path);
-        GLuint make_shader(GLenum type,  const std::string& source);
-        void load_uniform_location(const std::string& uniform, const std::string& type);
-        void parse_shader(const std::string& source);
+        static bool make_shader_program(const std::string& path, Shader& shader_program);
+        static GLuint make_shader(GLenum type,  const std::string& source);
+        static void load_uniform_location(const std::string& uniform, const std::string& type, Shader& shader_program);
+        static void parse_shader(const std::string& source, Shader& shader_program);
         Vector2<float> tiling;
         Vector2<float> panning;
     };

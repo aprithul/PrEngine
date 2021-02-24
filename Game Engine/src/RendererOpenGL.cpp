@@ -9,6 +9,9 @@
 
 namespace PrEngine {
     
+    std::vector<Graphics*> RendererOpenGL::graphics_list;
+    std::vector<DirectionalLight*> RendererOpenGL::lights_list;
+
     RendererOpenGL::RendererOpenGL(int width, int height, std::string title):Module("Opengl Renderer", 20)
     {
         this->width = width;
@@ -34,6 +37,7 @@ namespace PrEngine {
         GL_CALL(glEnable(GL_DEPTH_TEST))
         GL_CALL(glDepthFunc(GL_LESS))
         GL_CALL(glEnable(GL_MULTISAMPLE))
+        GL_CALL(glEnable(GL_FRAMEBUFFER_SRGB))
 
         if( glewInit() != GLEW_OK)
             printf("Glew not initialized properly");
@@ -65,8 +69,13 @@ namespace PrEngine {
             camera_handle = camera->id;
         std::cout<<"cam handle "<<camera_handle<<std::endl;
 
-        GeometryLayer* geometry_layer = new GeometryLayer(camera_handle);
+        GeometryLayer* geometry_layer = new GeometryLayer(camera_handle, this->width, this->height);
+        ShadowPassLayer* shadowpass_layer = new ShadowPassLayer();
+        
+        render_layers.push_back(shadowpass_layer); // mush be before geometry layer
         render_layers.push_back(geometry_layer);
+
+
 
         //SpriteLayer* sprite_layer = new SpriteLayer(camera_handle);
         //render_layers.push_back(sprite_layer);
@@ -164,8 +173,12 @@ namespace PrEngine {
 
     void RendererOpenGL::update()
     {
-        Clear(0,0,0.3f,1);
 
+        //Clear(0,0,0.3f,1);
+        //glViewport(0,0,width, height);
+        //glClearColor(r, g, b, a);
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
         for(std::vector<RenderLayer*>::iterator layer=render_layers.begin(); layer!=render_layers.end(); layer++)
             (*layer)->update();
         SwapBuffers();
@@ -465,11 +478,8 @@ namespace PrEngine {
         graphics->elements.back().vao.Unbind();
         graphics->elements.back().ibo.Unbind();
         
-       // if(!has_transparency)
-        {
-            GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
-            geom_layer->graphics_list.push_back(graphics);
-        }
+       
+         graphics_list.push_back(graphics);
         //else
         //{
        //     SpriteLayer* tr_layer = (SpriteLayer*)get_layer("Transparency");
@@ -642,10 +652,7 @@ namespace PrEngine {
         
         
        // if(!has_transparency)
-        {
-            GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
-            geom_layer->graphics_list.push_back(graphics);
-        }
+        graphics_list.push_back(graphics);
         //else
         //{
        //     SpriteLayer* tr_layer = (SpriteLayer*)get_layer("Transparency");
@@ -983,10 +990,7 @@ namespace PrEngine {
                 std::cout<<"name : "<<(*it)->name<<std::endl;
         }*/
 
-        GeometryLayer* geom_layer = (GeometryLayer*)get_layer("Geometry");
-
-        if(geom_layer != nullptr)
-            geom_layer->graphics_list.push_back(graphics);
+        graphics_list.push_back(graphics);
 
         std::cout<<"returning"<<std::endl;
         return graphics;
@@ -1009,4 +1013,9 @@ namespace PrEngine {
     {
         
     }*/
+
+    void RendererOpenGL::add_light(DirectionalLight* _light)
+    {
+        lights_list.push_back(_light);
+    }
 }

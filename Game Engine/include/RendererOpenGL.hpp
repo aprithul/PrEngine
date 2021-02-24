@@ -17,6 +17,7 @@
 #include "Module.hpp"
 #include "RenderLayer.hpp"
 #include "GeometryLayer.hpp"
+#include "ShadowPassLayer.hpp"
 #include "SpriteLayer.hpp"
 #include "GuiLayer.hpp"
 #include <vector>
@@ -51,6 +52,7 @@ namespace PrEngine {
         Graphics* generate_graphics_skybox( const std::vector<std::string>& texture_file_path, const std::string& mat_name);
         Sprite* generate_graphics_sprite(const std::string& texture_file_path, const std::string& mat_name);
         RenderLayer* get_layer(const std::string& layer_name);
+        void add_light( DirectionalLight* _light);
         //Matrix4x4<float> view_matrix;
         //Matrix4x4<float> projection;
 
@@ -61,6 +63,9 @@ namespace PrEngine {
         SDL_Window* window;
         // the opengl context used with the window
         SDL_GLContext glContext;
+        static std::vector<Graphics*> graphics_list;
+        static std::vector<DirectionalLight*> lights_list;
+
     };
 }
 

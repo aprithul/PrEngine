@@ -26,11 +26,29 @@ namespace PrEngine
         if(entity != nullptr)        
         {
             Transform3D* t = (Transform3D*)entity->components[COMP_TRANSFORM_3D];
+            auto pos = t->get_position();
+            auto rot = t->get_rotation();
+
             if(input_manager->keyboard.get_key(SDLK_UP))
             {
-                t->set_rotation(t->get_rotation().x+10, 0, 0);
-                LOG(LOGTYPE_WARNING, std::to_string(Time::Frame_time));
+                //pos.y+=2;//(1*Time::Frame_time);
+                rot.x+=0.5;
             }
+            if(input_manager->keyboard.get_key(SDLK_DOWN))
+            {
+                //pos.y-=2;//(1*Time::Frame_time);
+                rot.x-=0.5;
+            }
+            if(input_manager->keyboard.get_key(SDLK_LEFT))
+            {
+                pos.x-=0.1;//(1*Time::Frame_time);
+            }
+            if(input_manager->keyboard.get_key(SDLK_RIGHT))
+            {
+                pos.x+=0.1;//(1*Time::Frame_time);
+            }
+            t->set_position(pos);
+            t->set_rotation(rot);
         }
         else
         {

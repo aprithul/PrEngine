@@ -8,6 +8,7 @@
 #include "DirectionalLight.hpp"
 #include "Camera3D.hpp"
 #include "Matrix4x4f.hpp"
+#include "DirectionalLight.hpp"
 #include <vector>
 
 namespace PrEngine
@@ -15,14 +16,15 @@ namespace PrEngine
     class GeometryLayer : public RenderLayer
     {
         public:
-            GeometryLayer(long camera_handle);
+            GeometryLayer(long camera_handle, const int& screen_width, const int& screen_height);
             ~GeometryLayer() override;
 
             void start() override;
             void update() override;
             void end() override;
 
-            std::vector<Graphics*> graphics_list;
+            const int& screen_width;
+            const int& screen_height;    
             long camera_handle;
     };
 } // namespace Pringin

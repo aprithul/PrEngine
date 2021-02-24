@@ -2,7 +2,7 @@
 
 namespace PrEngine
 {
-    Camera::Camera(float width, float height, float near_, float far_, float fov, Transform3D& _transform):transform(_transform),Component(COMP_CAMERA)
+    Camera::Camera(float near_, float far_, float width, float height, float fov, Transform3D& _transform):transform(_transform),Component(COMP_CAMERA)
     {
         //fov = 45.f;
         //near_ = 0.1f;

@@ -18,7 +18,7 @@ namespace PrEngine
     class Camera: public Component
     {
         public:
-            Camera(float width, float height, float near, float far, float fov, Transform3D& _transform);
+            Camera(float near, float far, float width, float height, float fov, Transform3D& _transform);
             ~Camera();
             Transform3D& transform;
 

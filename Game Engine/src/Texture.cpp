@@ -58,7 +58,7 @@ namespace PrEngine
                 case 4:type = GL_RGBA;break;
             }
             LOG(LOGTYPE_GENERAL, "Number of channels ", std::to_string(type));
-            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, type, GL_UNSIGNED_BYTE, data))
+            GL_CALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, width, height, 0, type, GL_UNSIGNED_BYTE, data))
             GL_CALL(glBindTexture(GL_TEXTURE_2D, 0))
             texture_create_status = 1;
         }
@@ -136,7 +136,7 @@ namespace PrEngine
             else
             {
                 LOG(LOGTYPE_GENERAL, "Image ",std::string(path)," loaded");
-                GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X +i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data))
+                GL_CALL(glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X +i, 0, GL_SRGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data))
                 texture_create_status = 1;
             }
         }

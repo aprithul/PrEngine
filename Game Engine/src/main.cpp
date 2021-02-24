@@ -69,7 +69,7 @@ int main(int argc, char * argv[])
 
         Entity* camera_ent = new Entity();
         Transform3D* camera_transform = new Transform3D();
-        Camera* camera = new Camera(16, 9, 0.1f, 100.f, 45.f, *camera_transform);
+        Camera* camera = new Camera(0.1f, 100.f, 16, 9, 45.f, *camera_transform);
         camera->projection_type = PERSPECTIVE;
         camera->transform.set_position(0.f, 1.f, -6.f);
 
@@ -151,14 +151,14 @@ int main(int argc, char * argv[])
 
         entity_management_system->assign_id_and_store_entity(*teapot_ent_2);
 
-
-        Graphics* teapot_graphic = renderer->generate_graphics(get_resource_path(""), get_resource_path(std::string("teapot.obj")), 
+        
+        Graphics* teapot_graphic = renderer->generate_graphics(get_resource_path(""), get_resource_path(std::string("sphere.obj")), 
         "", "stone2.mat");
 
         Entity* teapot_ent = new Entity();
         Transform3D* teapot_tr = new Transform3D();
-        teapot_tr->set_position(Vector3<float>(-4.f,0.5f,1.f));
-        teapot_tr->set_scale(0.05f,0.05f,0.05f);
+        teapot_tr->set_position(0,2,0);
+        teapot_tr->set_scale(0.1f,0.1f,0.1f);
         teapot_graphic->model = &(teapot_tr->get_transformation());
         teapot_graphic->normal = &(teapot_tr->get_rotation_transformation());
 
@@ -170,7 +170,7 @@ int main(int argc, char * argv[])
 
 
         Graphics* graphics1 = renderer->generate_graphics(get_resource_path("TreasureChest"), get_resource_path(std::string("plane.obj")), 
-        get_resource_path(std::string("stonetile.png")), "stone4.mat");
+        get_resource_path(std::string("wood.png")), "stone4.mat");
 
         Entity* chest1 = new Entity();
         Transform3D* chest_tr1 = new Transform3D();
@@ -205,8 +205,14 @@ int main(int argc, char * argv[])
 
         Entity* light_ent = new Entity();
         Transform3D* light_tr = new Transform3D();
-        light_tr->set_rotation(Vector3<float>(0,0,90));
+        light_tr->set_position(0.f, 3.f, 0);
+        light_tr->set_rotation(90,0,0);
         DirectionalLight* light = new DirectionalLight(0.5f, 0.3f);
+        light->view = &(light_tr->get_transformation());
+//        light->projection = Matrix4x4<float>::ortho(-8, 8, -4.5f, 4.5f, -10, 10);
+        //light->projection = Matrix4x4<float>::perspective(16, 9, 0.1f, 100.f, 45.f);
+        renderer->add_light(light);
+
         light_ent->add_componenet(light);
         light_ent->add_componenet(light_tr);
         entity_management_system->assign_id_and_store_entity(*light_ent);

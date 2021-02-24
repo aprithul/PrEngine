@@ -42,7 +42,7 @@ namespace PrEngine
         {
             // create shader, probably can be shared, will check later
             this->source_file_path = std::string(shader_path);
-            make_shader_program(this->source_file_path);
+            make_shader_program(this->source_file_path, shader_program);
             
             shader_library[shader_path] = shader_program;
         }
@@ -93,7 +93,7 @@ namespace PrEngine
         {
             // create shader, probably can be shared, will check later
             this->source_file_path = std::string(shader_path);
-            make_shader_program(this->source_file_path);
+            make_shader_program(this->source_file_path, shader_program);
             
             shader_library[shader_path] = shader_program;
         }
@@ -141,7 +141,7 @@ namespace PrEngine
         {
             // create shader, probably can be shared, will check later
             this->source_file_path = std::string(shader_path);
-            make_shader_program(this->source_file_path);
+            make_shader_program(this->source_file_path, shader_program);
 
             
             shader_library[shader_path] = shader_program;
@@ -166,11 +166,12 @@ namespace PrEngine
 
     void Material::Unbind()
     {
-        GL_CALL(
-            glUseProgram(0))
         diffuse_texture->Unbind();
         if(environment_map_texture != nullptr)
             environment_map_texture->Unbind();
+        GL_CALL(
+            glUseProgram(0))
+
     }
 
     void Material::Delete()
@@ -200,7 +201,7 @@ namespace PrEngine
         
     }
 
-    void Material::load_uniform_location(const std::string& uniform, const std::string& type)
+    void Material::load_uniform_location(const std::string& uniform, const std::string& type, Shader& shader_program)
     {
         GLint loc = -1;
         GL_CALL(
@@ -211,7 +212,7 @@ namespace PrEngine
         shader_program.uniform_locations[uniform] = {type, loc};
     }
 
-    void Material::parse_shader(const std::string& source)
+    void Material::parse_shader(const std::string& source, Shader& shader_program)
     {
         int pos = 0;
         while((pos = source.find("uniform",pos)) != std::string::npos)
@@ -239,14 +240,14 @@ namespace PrEngine
                 for(; !std::isspace(source[start+i]) && source[start+i]!=';'; i++);
                 u_name = source.substr(start, i);
                 LOG(LOGTYPE_GENERAL, u_type, " ",u_name);
-                load_uniform_location(u_name, u_type);
+                load_uniform_location(u_name, u_type, shader_program);
             }
 
             pos++;
         }
     }
 
-    bool Material::make_shader_program(const std::string& path)
+    bool Material::make_shader_program(const std::string& path, Shader& shader_program)
     {
         std::string _source = read_file(get_resource_path(path).c_str());
         std::stringstream shader_source;
@@ -311,7 +312,7 @@ namespace PrEngine
                 glDeleteShader(v);
                 glDetachShader(shader_program.id, f);
                 glDeleteShader(f);
-                parse_shader(_source);
+                parse_shader(_source, shader_program);
 
                 return true;
             }
